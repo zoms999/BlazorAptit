@@ -94,11 +94,12 @@ namespace BlazorAptit
 
             services.AddSyncfusionBlazor();
             services.AddSignalR(e => {
-                e.MaximumReceiveMessageSize = 102400000;
-                e.ClientTimeoutInterval = TimeSpan.FromSeconds(60);
-                e.KeepAliveInterval = TimeSpan.FromSeconds(15);
-                e.HandshakeTimeout = TimeSpan.FromSeconds(30);
+                e.MaximumReceiveMessageSize = 102400000; // 더 큰 값으로 늘림 (약 100MB)
+                e.ClientTimeoutInterval = TimeSpan.FromSeconds(60); // 클라이언트 타임아웃 60초
+                e.KeepAliveInterval = TimeSpan.FromSeconds(15); // 15초마다 연결 유지 신호 전송
+                e.HandshakeTimeout = TimeSpan.FromSeconds(30); // 핸드셰이크 타임아웃 30초
             });
+
 
             services.AddSession(options => { // Set a short timeout for easy testing.
                 options.IdleTimeout = TimeSpan.FromSeconds(36000000);

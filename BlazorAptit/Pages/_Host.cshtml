@@ -21,107 +21,12 @@
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/lodash.js/4.17.20/lodash.min.js"></script>
     
-    <style>
-        #blazor-reconnect-dialog {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            z-index: 10000;
-            background-color: rgba(0, 0, 0, 0.6);
-            justify-content: center;
-            align-items: center;
-            font-family: sans-serif;
-        }
-
-        #blazor-reconnect-dialog.show {
-            display: flex;
-        }
-
-        .blazor-reconnect-dialog-container {
-            background-color: white;
-            border-radius: 5px;
-            padding: 20px;
-            max-width: 500px;
-            margin: 20px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-        }
-
-        .blazor-reconnect-dialog-title {
-            font-size: 18px;
-            font-weight: bold;
-            margin-bottom: 15px;
-            color: #333;
-        }
-
-        .blazor-reconnect-dialog-message {
-            margin-bottom: 15px;
-            color: #555;
-        }
-
-        .blazor-reconnect-dialog-progress {
-            height: 5px;
-            width: 100%;
-            background-color: #f1f1f1;
-            border-radius: 3px;
-            margin-bottom: 15px;
-        }
-
-        .blazor-reconnect-dialog-progress-bar {
-            height: 100%;
-            background-color: #007bff;
-            border-radius: 3px;
-            width: 0;
-            transition: width 0.3s;
-        }
-
-        .blazor-reconnect-dialog-button {
-            display: inline-block;
-            padding: 8px 16px;
-            background-color: #007bff;
-            color: white;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
-            font-size: 14px;
-        }
-
-        .blazor-reconnect-dialog-button:hover {
-            background-color: #0069d9;
-        }
-
-        .blazor-reconnect-dialog-button:disabled {
-            background-color: #6c757d;
-            cursor: not-allowed;
-        }
-    </style>
 </head>
 <body>
     <app>
         <component type="typeof(App)" render-mode="ServerPrerendered" />
     </app>
 
-    <div id="blazor-reconnect-dialog">
-        <div class="blazor-reconnect-dialog-container">
-            <div class="blazor-reconnect-dialog-title">
-                서버 연결 재시도 중...
-            </div>
-            <div class="blazor-reconnect-dialog-message">
-                서버와의 연결이 끊어졌습니다. 재연결을 시도하고 있습니다. <span id="blazor-reconnect-retry-count"></span>
-            </div>
-            <div class="blazor-reconnect-dialog-progress">
-                <div class="blazor-reconnect-dialog-progress-bar"></div>
-            </div>
-            <button id="blazor-manual-reconnect" class="blazor-reconnect-dialog-button" style="display: none;">
-                재연결 시도
-            </button>
-            <button id="blazor-reload" class="blazor-reconnect-dialog-button">
-                페이지 새로고침
-            </button>
-        </div>
-    </div>
 
     <div id="blazor-error-ui">
         <environment include="Staging,Production">
@@ -138,11 +43,7 @@
     <script src="~/js/saveAsFile.js"></script>
 
     <script>
-        window.blazorReconnectionOptions = {
-            maxRetries: 10,
-            retryIntervalMilliseconds: 5000,
-            dialogId: 'blazor-reconnect-dialog'
-        };
+      
 
         window.selectListViewItem = function (listId, index) {
            
@@ -155,78 +56,7 @@
             }
         };
 
-        // 서버 재연결 관련 스크립트
-        document.addEventListener('DOMContentLoaded', function () {
-            // 필요한 요소 참조
-            var reconnectDialog = document.getElementById('blazor-reconnect-dialog');
-            var progressBar = document.querySelector('.blazor-reconnect-dialog-progress-bar');
-            var retryCountSpan = document.getElementById('blazor-reconnect-retry-count');
-            var manualReconnectButton = document.getElementById('blazor-manual-reconnect');
-            var reloadButton = document.getElementById('blazor-reload');
-            
-            // 현재 재시도 횟수
-            var currentRetry = 0;
-            var maxRetries = window.blazorReconnectionOptions.maxRetries || 8;
-            
-            // Blazor 서버 연결 상태 이벤트 리스너 등록
-            Blazor.start({
-                reconnectionHandler: {
-                    onConnectionDown: function (options, error) {
-                        console.log("Connection down", error);
-                        showReconnectDialog();
-                        return true; // 자동 재연결 시도를 허용
-                    },
-                    onConnectionUp: function () {
-                        console.log("Connection up");
-                        hideReconnectDialog();
-                    }
-                },
-                reconnectionOptions: {
-                    maxRetries: maxRetries,
-                    retryIntervalMilliseconds: window.blazorReconnectionOptions.retryIntervalMilliseconds || 5000
-                }
-            });
-            
-            // 재연결 다이얼로그 표시
-            function showReconnectDialog() {
-                reconnectDialog.classList.add('show');
-                updateProgress();
-            }
-            
-            // 재연결 다이얼로그 숨기기
-            function hideReconnectDialog() {
-                reconnectDialog.classList.remove('show');
-                currentRetry = 0;
-                progressBar.style.width = '0%';
-            }
-            
-            // 진행 표시줄 및 재시도 카운트 업데이트
-            function updateProgress() {
-                retryCountSpan.textContent = '(' + currentRetry + '/' + maxRetries + ')';
-                var progressPercent = (currentRetry / maxRetries) * 100;
-                progressBar.style.width = progressPercent + '%';
-                
-                if (currentRetry >= maxRetries) {
-                    manualReconnectButton.style.display = 'inline-block';
-                }
-                
-                currentRetry++;
-            }
-            
-            // 페이지 새로고침 버튼 이벤트
-            reloadButton.addEventListener('click', function () {
-                window.location.reload();
-            });
-            
-            // 수동 재연결 버튼 이벤트
-            manualReconnectButton.addEventListener('click', function () {
-                currentRetry = 0;
-                progressBar.style.width = '0%';
-                manualReconnectButton.style.display = 'none';
-                // Blazor에 재연결 시도 요청
-                Blazor.reconnect();
-            });
-        });
+        
     </script>
 </body>
 </html>
