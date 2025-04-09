@@ -1,0 +1,263 @@
+﻿@page "/AptitManage/GroupList"
+
+@using Syncfusion.Blazor.Grids
+@using BlazorAptit.Models
+@using Syncfusion.Blazor.DropDowns
+@using Syncfusion.Blazor.Calendars
+@using Syncfusion.Blazor.Inputs
+@using Syncfusion.Blazor.Layouts
+
+@inject Blazored.SessionStorage.ISessionStorageService sessionStorage
+
+<h4>단체리스트</h4>
+
+<div class="col-lg-12 control-section">
+    <div class="content-wrapper">
+        <div class="row">
+            <SfSplitter Height="100%" Width="auto" Orientation="Syncfusion.Blazor.Layouts.Orientation.Horizontal" SeparatorSize="6">
+                <SplitterPanes>
+                    <SplitterPane Size="100%" Collapsible="false">
+
+                        <SfGrid DataSource="@ObservableData" Toolbar="@(new List<string>() { "Add", "Edit", "Delete", "Update", "Cancel" })" Width="2800px" AllowPaging="true" AllowFiltering="true">
+                            <GridEvents OnActionBegin="OnActionBegin" OnCellSave="CellSaveHandler" OnBatchSave="BatchSaveHandler" OnActionComplete="ActionCompletedHandler" TValue="AptitGroup"></GridEvents>
+                            <GridEditSettings AllowAdding="true" AllowDeleting="true" AllowEditing="true" Mode="EditMode.Dialog">
+                                <Template>
+                                    @{
+                                        var Groups = (context as AptitGroup);
+                                    }
+                                    <div>
+                                        <div class="form-row">
+                                            <div class="form-group col-md-6">
+                                                <SfTextBox ID="Group_ID" @bind-value="@(Groups.Group_ID)" FloatLabelType="FloatLabelType.Always" Placeholder="회차코드" Enabled="@txtGroup_ID"></SfTextBox>
+                                            </div>
+                                            <div class="form-group col-md-6">
+                                                <SfTextBox ID="Group_Name" @bind-value="@(Groups.Group_Name)" FloatLabelType="FloatLabelType.Always" Placeholder="단체명"></SfTextBox>
+                                            </div>
+                                        </div>
+                                        <div class="form-row">
+                                            <div class="form-group col-md-6">
+                                                <SfDropDownList ID="ddl지역" TItem="string" @bind-Value="@((context as AptitGroup).Group_City)" TValue="string" DataSource="@listCity" FloatLabelType="FloatLabelType.Always" Placeholder="지역">
+                                                </SfDropDownList>
+                                            </div>
+                                            <div class="form-group col-md-6">
+                                                <SfDropDownList ID="ddl검사종류" TItem="string" @bind-Value="((context as AptitGroup).CheckType)" TValue="string" DataSource="@listState" FloatLabelType="FloatLabelType.Always" Placeholder="검사종류">
+                                                </SfDropDownList>
+                                            </div>
+                                        </div>
+                                        <div class="form-row">
+                                            <div class="form-group col-md-6">
+                                                <SfTextBox ID="Password" @bind-value="@(Groups.Password)" FloatLabelType="FloatLabelType.Always" Placeholder="비밀번호"></SfTextBox>
+                                            </div>
+                                            <div class="form-group col-md-6">
+                                                <SfTextBox ID="Manage_Name" @bind-value="@(Groups.Manage_Name)" FloatLabelType="FloatLabelType.Always" Placeholder="담당자명"></SfTextBox>
+                                            </div>
+                                        </div>
+
+                                        <div class="form-row">
+                                            <div class="form-group col-md-6">
+                                                <SfTextBox ID="Manage_Tel1" @bind-value="@(Groups.Manage_Tel1)" FloatLabelType="FloatLabelType.Always" Placeholder="연락처1"></SfTextBox>
+                                            </div>
+                                            <div class="form-group col-md-6">
+                                                <SfTextBox ID="Manage_Tel2" @bind-value="@(Groups.Manage_Tel2)" FloatLabelType="FloatLabelType.Always" Placeholder="연락처2"></SfTextBox>
+                                            </div>
+                                        </div>
+                                        <div class="form-row">
+                                            <div class="form-group col-md-6">
+                                                <SfDatePicker ID="StartDate" @bind-Value="@(Groups.StartDate)" FloatLabelType="FloatLabelType.Always" Placeholder="시작일" />
+                                            </div>
+                                            <div class="form-group col-md-6">
+                                                <SfDatePicker ID="EndDate" @bind-Value="@(Groups.EndDate)" FloatLabelType="FloatLabelType.Always" Placeholder="마감일">
+                                                </SfDatePicker>
+                                            </div>
+                                        </div>
+
+                                        <div class="form-row">
+                                            <div class="form-group col-md-6">
+                                                <SfNumericTextBox ID="Payment" @bind-Value="@(Groups.Payment)" TValue="int" FloatLabelType="FloatLabelType.Always" Placeholder="입금액"></SfNumericTextBox>
+                                            </div>
+                                            <div class="form-group col-md-6">
+
+                                                <SfDropDownList ID="ddl입금여부" TItem="string" TValue="string" @bind-Value="@(Groups.PaymentComplet)" DataSource="@listPay" FloatLabelType="FloatLabelType.Always" Placeholder="입금여부">
+                                                    <DropDownListFieldSettings Text="입금완료" Value="입금완료"></DropDownListFieldSettings>
+                                                    <DropDownListFieldSettings Text="입금대기" Value="입금대기"></DropDownListFieldSettings>
+                                                </SfDropDownList>
+                                            </div>
+                                        </div>
+                                        <div class="form-row">
+                                            <div class="form-group col-md-6">
+                                                <SfDatePicker ID="PaymentDate" @bind-Value="@(Groups.PaymentDate)" FloatLabelType="FloatLabelType.Always" Placeholder="입금완료일" />
+                                            </div>
+                                            <div class="form-group col-md-6">
+                                                <SfNumericTextBox ID="PaymentCount" @bind-Value="@(Groups.PaymentCount)" TValue="int" FloatLabelType="FloatLabelType.Always" Placeholder="발급회차"></SfNumericTextBox>
+                                            </div>
+                                        </div>
+
+                                        <div class="form-row">
+                                            <div class="form-group col-md-6">
+                                                <SfNumericTextBox ID="RegCount" @bind-Value="@(Groups.RegCount)" TValue="int" FloatLabelType="FloatLabelType.Always" Placeholder="신청인원"></SfNumericTextBox>
+                                            </div>
+                                            <div class="form-group col-md-6">
+                                                <SfNumericTextBox ID="CompletCount" @bind-Value="@(Groups.CompletCount)" TValue="int" FloatLabelType="FloatLabelType.Always" Placeholder="진행인원"></SfNumericTextBox>
+                                            </div>
+                                        </div>
+                                        <div class="form-row">
+                                            <div class="form-group col-md-6">
+                                                <SfDatePicker ID="Created" @bind-Value="@(Groups.Created)" FloatLabelType="FloatLabelType.Always" Placeholder="계약일" />
+                                            </div>
+
+                                        </div>
+                                    </div>
+                                </Template>
+                            </GridEditSettings>
+                            <GridFilterSettings Type="Syncfusion.Blazor.Grids.FilterType.Excel"></GridFilterSettings>
+                            <GridColumns>
+                                @*<GridColumn Field=@nameof(AptitGroup.ID) HeaderText="순번" IsPrimaryKey="true" TextAlign="@TextAlign.Center" HeaderTextAlign="@TextAlign.Center" Width="30" AllowAdding="false"></GridColumn>*@
+                                <GridColumn Field=@nameof(AptitGroup.Group_ID) HeaderText="회차코드" Width="180" TextAlign="@TextAlign.Left" HeaderTextAlign="@TextAlign.Center"></GridColumn>
+                                <GridColumn Field=@nameof(AptitGroup.Group_Name) HeaderText="단체명" Width="100" TextAlign="@TextAlign.Left" HeaderTextAlign="@TextAlign.Center"></GridColumn>
+                                <GridColumn Field=@nameof(AptitGroup.Group_City) HeaderText="지역" Width="100" TextAlign="@TextAlign.Left" HeaderTextAlign="@TextAlign.Center">
+                                    <EditTemplate>
+                                        <SfDropDownList ID="ddl지역" Placeholder="지역" TItem="string" Enabled="@Enabled" TValue="string" @bind-Value="@((context as AptitGroup).Group_City)" DataSource="@listCity">
+                                            <DropDownListFieldSettings Text="서울특별시" Value="서울특별시"></DropDownListFieldSettings>
+                                            <DropDownListFieldSettings Text="부산광역시" Value="부산광역시"></DropDownListFieldSettings>
+                                            <DropDownListFieldSettings Text="대구광역시" Value="대구광역시"></DropDownListFieldSettings>
+                                            <DropDownListFieldSettings Text="인천광역시" Value="인천광역시"></DropDownListFieldSettings>
+                                            <DropDownListFieldSettings Text="광주광역시" Value="광주광역시"></DropDownListFieldSettings>
+                                            <DropDownListFieldSettings Text="대전광역시" Value="대전광역시 "></DropDownListFieldSettings>
+                                            <DropDownListFieldSettings Text="울산광역시" Value="울산광역시"></DropDownListFieldSettings>
+                                            <DropDownListFieldSettings Text="세종특별자치시" Value="세종특별자치시"></DropDownListFieldSettings>
+                                            <DropDownListFieldSettings Text="경기도" Value="경기도"></DropDownListFieldSettings>
+                                            <DropDownListFieldSettings Text="강원도" Value="강원도"></DropDownListFieldSettings>
+                                            <DropDownListFieldSettings Text="충청북도" Value="충청북도"></DropDownListFieldSettings>
+                                            <DropDownListFieldSettings Text="충청남도" Value="충청남도"></DropDownListFieldSettings>
+                                            <DropDownListFieldSettings Text="전라북도" Value="전라북도"></DropDownListFieldSettings>
+                                            <DropDownListFieldSettings Text="전라남도" Value="전라남도"></DropDownListFieldSettings>
+                                            <DropDownListFieldSettings Text="경상북도" Value="경상북도"></DropDownListFieldSettings>
+                                            <DropDownListFieldSettings Text="경상남도" Value="경상남도"></DropDownListFieldSettings>
+                                            <DropDownListFieldSettings Text="제주특별자치도" Value="제주특별자치도"></DropDownListFieldSettings>
+                                        </SfDropDownList>
+                                    </EditTemplate>
+
+                                </GridColumn>
+                                <GridColumn Field=@nameof(AptitGroup.CheckType) HeaderText="검사종류" Width="100" EditType="EditType.DropDownEdit">
+                                    <EditTemplate>
+                                        <SfDropDownList ID="ddl검사종류" Placeholder="검사종류" TItem="string" Enabled="@Enabled" TValue="string" @bind-Value="@((context as AptitGroup).CheckType)" DataSource="@listState">
+                                            <DropDownListFieldSettings Text="사고력" Value="사고력"></DropDownListFieldSettings>
+                                            <DropDownListFieldSettings Text="성향" Value="성향"></DropDownListFieldSettings>
+                                            <DropDownListFieldSettings Text="역량" Value="역량"></DropDownListFieldSettings>
+                                            <DropDownListFieldSettings Text="교과목적성" Value="교과목적성"></DropDownListFieldSettings>
+                                            <DropDownListFieldSettings Text="학과" Value="학과"></DropDownListFieldSettings>
+                                            <DropDownListFieldSettings Text="직업" Value="직업 "></DropDownListFieldSettings>
+                                            <DropDownListFieldSettings Text="직무" Value="직무"></DropDownListFieldSettings>
+                                            <DropDownListFieldSettings Text="선호도" Value="선호도"></DropDownListFieldSettings>
+                                        </SfDropDownList>
+                                    </EditTemplate>
+                                </GridColumn>
+
+                                <GridColumn Field=@nameof(AptitGroup.Password) HeaderText="비밀번호" Width="60" TextAlign="@TextAlign.Left" HeaderTextAlign="@TextAlign.Center"></GridColumn>
+                                <GridColumn Field=@nameof(AptitGroup.Manage_Tel1) HeaderText="연락처1" Width="100" TextAlign="@TextAlign.Left" HeaderTextAlign="@TextAlign.Center"></GridColumn>
+                                <GridColumn Field=@nameof(AptitGroup.Manage_Tel2) HeaderText="연락처2" Width="100" TextAlign="@TextAlign.Left" HeaderTextAlign="@TextAlign.Center"></GridColumn>
+                                <GridColumn Field=@nameof(AptitGroup.Manage_Name) HeaderText="담당자명" Width="60" TextAlign="@TextAlign.Left" HeaderTextAlign="@TextAlign.Center"></GridColumn>
+                                <GridColumn Field=@nameof(AptitGroup.StartDate) HeaderText="시작일" Width="100" EditType="EditType.DatePickerEdit" Format="yyyy/MM/dd" TextAlign="TextAlign.Left" Type="ColumnType.Date" HeaderTextAlign="@TextAlign.Center"></GridColumn>
+                                <GridColumn Field=@nameof(AptitGroup.EndDate) HeaderText="마감일" Width="100" EditType="EditType.DatePickerEdit" Format="yyyy/MM/dd" TextAlign="TextAlign.Left" Type="ColumnType.Date" HeaderTextAlign="@TextAlign.Center"></GridColumn>
+                                <GridColumn Field=@nameof(AptitGroup.Payment) HeaderText="입금액" Width="80" TextAlign="@TextAlign.Center" HeaderTextAlign="@TextAlign.Left"></GridColumn>
+                                <GridColumn Field=@nameof(AptitGroup.PaymentComplet) HeaderText="입금여부" Width="80" EditType="EditType.DropDownEdit" TextAlign="@TextAlign.Center">
+                                    <EditTemplate>
+                                        <SfDropDownList ID="ddl입금여부" Placeholder="입금여부" TItem="string" Enabled="@Enabled" TValue="string" @bind-Value="@((context as AptitGroup).PaymentComplet)" DataSource="@listPay">
+                                            <DropDownListFieldSettings Text="입금완료" Value="입금완료"></DropDownListFieldSettings>
+                                            <DropDownListFieldSettings Text="입금대기" Value="입금대기"></DropDownListFieldSettings>
+                                        </SfDropDownList>
+                                    </EditTemplate>
+                                </GridColumn>
+                                <GridColumn Field=@nameof(AptitGroup.PaymentDate) HeaderText="입금완료일" Width="100" EditType="EditType.DatePickerEdit" Format="yyyy/MM/dd" TextAlign="TextAlign.Center" Type="ColumnType.Date" HeaderTextAlign="@TextAlign.Center"></GridColumn>
+                                <GridColumn Field=@nameof(AptitGroup.PaymentCount) HeaderText="발급회차" Width="80" TextAlign="@TextAlign.Center" HeaderTextAlign="@TextAlign.Center"></GridColumn>
+                                <GridColumn Field=@nameof(AptitGroup.RegCount) HeaderText="신청인원" Width="80" TextAlign="@TextAlign.Center" HeaderTextAlign="@TextAlign.Center"></GridColumn>
+                                <GridColumn Field=@nameof(AptitGroup.CompletCount) HeaderText="진행인원" Width="80" TextAlign="@TextAlign.Center" HeaderTextAlign="@TextAlign.Center" AllowAdding="false"></GridColumn>
+                                <GridColumn Field=@nameof(AptitGroup.Created) HeaderText="계약일" Width="100" EditType="EditType.DatePickerEdit" Format="yyyy/MM/dd" TextAlign="TextAlign.Center" Type="ColumnType.Date" HeaderTextAlign="@TextAlign.Center" AllowAdding="false"></GridColumn>
+
+                            </GridColumns>
+                        </SfGrid>
+                    </SplitterPane>
+                </SplitterPanes>
+            </SfSplitter>
+        </div>
+    </div>
+</div>
+<style>
+    .e-grid .e-headercelldiv {
+        font-size: 12px;
+    }
+
+    .e-grid .e-rowcell {
+        font-size: 12px;
+    }
+</style>
+@code {
+
+
+    public bool Enabled = true;
+
+    public bool txtGroup_ID = true;
+
+    public List<string> listState = new List<string>() { "사고력", "성향", "역량", "교과목적성", "학과", "직업", "직무", "선호도" };
+
+    public List<string> listCity = new List<string>() { "서울특별시", "부산광역시", "대구광역시", "인천광역시", "광주광역시", "대전광역시", "울산광역시", "세종특별자치시", "경기도"
+        , "강원도", "충청북도", "충청남도", "전라북도", "전라남도", "경상북도", "경상남도", "제주특별자치도"  };
+
+    public List<string> listPay = new List<string>() { "입금완료", "입금대기" };
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            var UserRole = await sessionStorage.GetItemAsync<string>("USERROLE");
+
+            if (UserRole == "user")
+            {
+                NavigationManager.NavigateTo(NavigationManager.ToAbsoluteUri("/account").ToString());
+
+                StateHasChanged();
+            }
+
+        }
+    }
+
+    public async Task OnActionBegin(ActionEventArgs<AptitGroup> args)
+    {
+        if (args.RequestType == Syncfusion.Blazor.Grids.Action.Add)
+        {
+            //args.Cancel = true;
+        }
+
+    }
+
+    public async Task ActionCompletedHandler(ActionEventArgs<AptitGroup>
+        args)
+    {
+        if (args.RequestType == Syncfusion.Blazor.Grids.Action.Add)
+        {
+            txtGroup_ID = true;
+            //args.Cancel = true;
+        }
+        else if (args.RequestType == Syncfusion.Blazor.Grids.Action.BeginEdit)
+        {
+            txtGroup_ID = false;
+            //args.Cancel = true;
+        }
+        else if (args.RequestType == Syncfusion.Blazor.Grids.Action.Save)
+        {
+            //args.RowData.CheckType = _signetValue.ToString();
+            await AptitRepository.EditGroupListAsync(args.RowData);
+        }
+    }
+    public void BatchSaveHandler(BeforeBatchSaveArgs<AptitGroup>
+        args)
+    {
+        // Here you can customize your code
+    }
+    public void CellSaveHandler(CellSaveArgs<AptitGroup>
+        args)
+    {
+        // Here you can customize your code
+    }
+
+}

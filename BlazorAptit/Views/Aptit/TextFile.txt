@@ -1,0 +1,45 @@
+﻿@foreach (var choice in item.quiz[0].Choices)
+                        {
+                            @*<input type="radio" class="form-check-input" name="AQ_1" value="@choice" />@choice*@
+
+                            <div class="form-check form-check-inline">
+                                <input class="form-check-input" type="radio" name="AQ_1" id="AQ_1_" value="@choice">
+                                <label class="form-check-label" for="AQ_1">@choice</label>
+                            </div>
+
+                        }
+
+
+       @foreach (var answer in ViewBag.answer)
+                {
+                    @*<input type="radio" class="form-check-input" name="AQ_1" value="@choice" />@choice*@
+
+                    <div class="form-check form-check-inline">
+                        <input class="form-check-input" type="radio" name="AQ_1" id="AQ_1" data-toggle="AQ_1" value="@answer.Choices[0]">
+                        <label class="form-check-label" for="AQ_1">@answer.Choices[0]</label>
+                    </div>
+                }
+
+
+
+                @foreach (var item in ViewData["answer"] as IEnumerable<QuizItem>)
+                    {
+                        for (int i = 0; i < item.Choices.Count(); i++)
+                        {
+
+                            <div class="form-check form-check-inline">
+                                <input class="form-check-input" type="radio" name="AQ_1" data-toggle="AptitAnswerID" data-value="@item.Choices[i]">
+                                <label class="form-check-label" ASfor="AQ_1">@item.Choices[i]</label>
+                            </div>
+                        }
+                        <input asp-for="AptitAnswerID" type="hidden" />
+
+                        <div id="radioBtn1" class="btn-group col-md-9 col-sm-7">
+                            @{ for (int i = 0; i < item.Choices.Count(); i++)
+                                {
+                                    <span class="btn btn-light btn-sm notActive" data-toggle="AptitAnswerID" data-value=@item.Choices[i]"></span>
+                                }
+                            }
+                        </div>
+                        <input asp-for="AptitAnswerID" type="hidden" />
+                    }

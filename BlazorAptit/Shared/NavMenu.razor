@@ -1,0 +1,37 @@
+﻿<div class="top-row pl-4 navbar navbar-dark">
+    <span class="navbar-brand" style="color:aliceblue;" >옥타그노시스 관리자</span>
+    <button class="navbar-toggler" @onclick="ToggleNavMenu">
+        <span class="navbar-toggler-icon"></span>
+    </button>
+</div>
+
+<div class="@NavMenuCssClass" @onclick="ToggleNavMenu">
+    <ul class="nav flex-column">
+        <li class="nav-item px-3">
+            <NavLink class="nav-link" href="/AptitManage/ResultByGroup">
+                <span class="oi oi-list-rich" aria-hidden="true"></span> 결과보기
+            </NavLink>
+        </li>
+      
+    </ul>
+</div>
+<style>
+    .e-statustext,
+    .e-mastertext {
+        font-size: 15px;
+        font-family: Roboto;
+        opacity: 0.87;
+        padding: 1em;
+    }
+</style>
+
+@code {
+    private bool collapseNavMenu = true;
+
+    private string NavMenuCssClass => collapseNavMenu ? "collapse" : null;
+
+    private void ToggleNavMenu()
+    {
+        collapseNavMenu = !collapseNavMenu;
+    }
+}

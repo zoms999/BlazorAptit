@@ -1,0 +1,457 @@
+﻿@page "/AptitManage/ResultDetail4/{AptitUserID:int}/{AptitAnswerID:int}"
+
+@using Syncfusion.Blazor.Buttons
+@using Syncfusion.Blazor.Cards
+@using Syncfusion.Blazor.Data
+@using Syncfusion.Blazor.DropDowns
+@using Syncfusion.Blazor.Inputs
+@using Syncfusion.Blazor.Lists
+@using BlazorAptit.Models
+@using Syncfusion.Blazor.Layouts
+<!-- Bootstrap core CSS -->
+
+<h3>결과보기</h3>
+
+<div class="row">
+    <div class="col-lg-12 text-center">
+        <div>
+            @if (this.AptitReplys.Count == 0)
+            {
+                <div class="e-error">
+                    <div class="e-error-content">No results found. Please try a different search.</div>
+                </div>
+            }
+            else
+            {
+                @foreach (var item in AptitReplys)
+                {
+
+                    <SfDashboardLayout>
+                        <DashboardLayoutPanels>
+                            <DashboardLayoutPanel  SizeY=2>
+                                <HeaderTemplate><div>@item.TITLE</div></HeaderTemplate>
+                                <ContentTemplate>
+                                    <div class="col-lg-10  justify-content-center" style="height: 400px">
+
+                                        <SfCard ID="HugeImage">
+                                            <CardHeader Title="@item.TITLE" /> @(item.Point.ToString()) 점
+                                            <CardContent Content="@item.TITLE_ENG" />
+                                            <CardFooter>
+                                                <CardFooterContent>
+                                                    <SfButton CssClass="e-btn e-outline e-primary"> @item.TAG</SfButton>
+                                                </CardFooterContent>
+                                            </CardFooter>
+                                        </SfCard>
+                                        <br />
+                                        <br />
+                                        <br />
+
+                                        <table class="blueTable">
+
+                                            <tbody>
+                                                <tr>
+                                                    <td>성향진단</td>
+                                                    @{
+                                                        var result = item.CONTENT_MAIN.Replace(".", ".<br> ⊙");
+                                                    }
+                                                    <td>⊙ @((MarkupString)result)</td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                        <br />
+                                        <br />
+                                        <br />
+                                        <table class="blueTable">
+                                            <thead>
+                                                <tr>
+                                                    <th colspan="2" style="text-align:center;">
+                                                        적성적합 학과데이터
+                                                    </th>
+
+                                                </tr>
+                                            </thead>
+
+                                            <tbody>
+                                                <tr>
+                                                    <td>@item.DEPART1_L</td>
+                                                    <td>@item.DEPART1_R</td>
+                                                </tr>
+                                                <tr>
+                                                    <td>@item.DEPART2_L</td>
+                                                    <td>@item.DEPART2_R</td>
+                                                </tr>
+                                                <tr>
+                                                    <td>@item.DEPART3_L</td>
+                                                    <td>@item.DEPART3_R</td>
+                                                </tr>
+                                                @{ if (item.DEPART4_L != null)
+                                                    {
+                                                        <tr>
+                                                            <td>@item.DEPART4_L</td>
+                                                            <td>@item.DEPART4_R</td>
+                                                        </tr>
+                                                    }
+                                                }
+
+                                                @{ if (item.DEPART5_L != null)
+                                                    {
+                                                        <tr>
+                                                            <td>@item.DEPART5_L</td>
+                                                            <td>@item.DEPART5_R</td>
+                                                        </tr>
+                                                    }
+                                                }
+                                                @{ if (item.DEPART6_L != null)
+                                                    {
+                                                        <tr>
+                                                            <td>@item.DEPART6_L</td>
+                                                            <td>@item.DEPART6_R</td>
+                                                        </tr>
+                                                    }
+                                                }
+                                                @{ if (item.DEPART7_L != null)
+                                                    {
+                                                        <tr>
+                                                            <td>@item.DEPART7_L</td>
+                                                            <td>@item.DEPART7_R</td>
+                                                        </tr>
+                                                    }
+                                                }
+
+
+                                            </tbody>
+                                        </table>
+
+                                        <br />
+                                        <br />
+                                        <br />
+
+                                        <table class="blueTable">
+                                            <thead>
+                                                <tr>
+                                                    <th colspan="2" style="text-align:center;">
+                                                        적합직업 직업데이터
+                                                    </th>
+
+                                                </tr>
+                                            </thead>
+
+                                            <tbody>
+                                                <tr>
+                                                    <td>@item.JOB1_L</td>
+                                                    <td>@item.JOB1_R</td>
+                                                </tr>
+                                                <tr>
+                                                    <td>@item.JOB2_L</td>
+                                                    <td>@item.JOB2_R</td>
+                                                </tr>
+                                                <tr>
+                                                    <td>@item.JOB3_L</td>
+                                                    <td>@item.JOB3_R</td>
+                                                </tr>
+                                                @{ if (item.JOB4_L != null)
+                                                    {
+                                                        <tr>
+                                                            <td>@item.JOB4_L</td>
+                                                            <td>@item.JOB4_R</td>
+                                                        </tr>
+                                                    }
+                                                }
+
+                                                @{ if (item.JOB5_L != null)
+                                                    {
+                                                        <tr>
+                                                            <td>@item.JOB5_L</td>
+                                                            <td>@item.JOB5_R</td>
+                                                        </tr>
+                                                    }
+                                                }
+                                                @{ if (item.JOB6_L != null)
+                                                    {
+                                                        <tr>
+                                                            <td>@item.JOB6_L</td>
+                                                            <td>@item.JOB6_R</td>
+                                                        </tr>
+                                                    }
+                                                }
+                                                @{ if (item.JOB7_L != null)
+                                                    {
+                                                        <tr>
+                                                            <td>@item.JOB7_L</td>
+                                                            <td>@item.JOB7_R</td>
+                                                        </tr>
+                                                    }
+                                                }
+                                                @{ if (item.JOB8_L != null)
+                                                    {
+                                                        <tr>
+                                                            <td>@item.JOB8_L</td>
+                                                            <td>@item.JOB8_R</td>
+                                                        </tr>
+                                                    }
+                                                }
+
+
+                                            </tbody>
+                                        </table>
+
+
+                                        <br />
+                                        <br />
+                                        <br />
+
+                                        <table class="blueTable">
+                                            <thead>
+                                                <tr>
+                                                    <th colspan="3" style="text-align:center;">
+                                                        적성적합 직무데이터
+                                                    </th>
+
+                                                </tr>
+                                            </thead>
+
+                                            <tbody>
+                                                <tr>
+                                                    <td width="15%">@item.POSITION1_L</td>
+                                                    <td width="50%">@item.POSITION1_C</td>
+                                                    <td width="35%">@item.POSITION1_R</td>
+                                                </tr>
+                                                <tr>
+                                                    <td>@item.POSITION2_L</td>
+                                                    <td>@item.POSITION2_C</td>
+                                                    <td>@item.POSITION2_R</td>
+                                                </tr>
+                                                <tr>
+                                                    <td>@item.POSITION3_L</td>
+                                                    <td>@item.POSITION3_C</td>
+                                                    <td>@item.POSITION3_R</td>
+                                                </tr>
+                                                @{ if (item.POSITION4_L != null)
+                                                    {
+                                                        <tr>
+                                                            <td>@item.POSITION4_L</td>
+                                                            <td>@item.POSITION4_C</td>
+                                                            <td>@item.POSITION4_R</td>
+                                                        </tr>
+                                                    }
+                                                }
+
+                                                @{ if (item.POSITION5_L != null)
+                                                    {
+                                                        <tr>
+                                                            <td>@item.POSITION5_L</td>
+                                                            <td>@item.POSITION5_C</td>
+                                                            <td>@item.POSITION5_R</td>
+                                                        </tr>
+                                                    }
+                                                }
+                                                @{ if (item.POSITION6_L != null)
+                                                    {
+                                                        <tr>
+                                                            <td>@item.POSITION6_L</td>
+                                                            <td>@item.POSITION6_C</td>
+                                                            <td>@item.POSITION6_R</td>
+                                                        </tr>
+                                                    }
+                                                }
+
+                                            </tbody>
+                                        </table>
+                                        <br />
+                                        <br />
+                                        <br />
+
+                                        <table class="blueTable">
+                                            <tbody>
+                                                <tr>
+                                                    <td>성향진단</td>
+                                                    @{
+                                                        var result2 = item.STUDY_STYLE.Replace(".", ".<br> ");
+                                                    }
+                                                    <td>⊙ @((MarkupString)result2)</td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                        <br />
+                                        <br />
+                                        <br />
+                                        <table class="blueTable">
+                                            <tbody>
+                                                <tr>
+                                                    <td>적합학습법</td>
+                                                    @{
+                                                        var result3 = item.STUDY_WAY.Replace(".", ".<br> ");
+                                                    }
+                                                    <td>⊙ @((MarkupString)result3)</td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+
+
+                                    </div>
+                                </ContentTemplate>
+                            </DashboardLayoutPanel>
+                        </DashboardLayoutPanels>
+                    </SfDashboardLayout>
+
+
+                }
+
+            }
+        </div>
+    </div>
+</div>
+
+<style>
+    e-card .e-card-header .e-card-header-caption .e-card-sub-title {
+        padding-top: 0px;
+    }
+
+    .e-card .e-card-header .e-card-header-caption .e-card-header-title {
+        font-weight: bold;
+    }
+
+    .e-card .e-card-content {
+        padding-top: 0px;
+    }
+
+    #HugeImage {
+        text-align: center
+    }
+
+        #HugeImage > .e-card-image {
+            margin: auto;
+            margin-top: 20px;
+            width: 64px;
+            height: 64px;
+            min-height: 64px;
+        }
+
+    .second-container .e-card .e-card-header .e-card-header-image {
+        height: 48px;
+        width: 48px;
+    }
+
+    #Card_Third {
+        margin-top: 8%;
+    }
+
+    .ChatIcon {
+        background-image: url("images/cards/chat.png");
+        height: 24px;
+        width: 24px;
+    }
+
+    .AlarmIcon {
+        background-image: url("images/cards/alarm.png");
+        height: 24px;
+        width: 24px;
+    }
+
+    .StarIcon {
+        background-image: url("images/cards/star.png");
+        height: 24px;
+        width: 24px;
+    }
+
+    .row {
+        margin: auto;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+
+    table {
+        width: 60%
+    }
+    .e-panel-header {
+        background-color: rgba(0, 0, 0, .1);
+        text-align: center;
+    }
+
+    .e-panel-content {
+        text-align: center;
+        margin-top: 10px;
+    }
+
+    table.blueTable {
+        border: 1px solid #1C6EA4;
+        background-color: #EEEEEE;
+        width: 100%;
+        text-align: left;
+        border-collapse: collapse;
+    }
+
+        table.blueTable td, table.blueTable th {
+            border: 2px solid #AAAAAA;
+            padding: 3px 2px;
+        }
+
+        table.blueTable tbody td {
+            font-size: 13px;
+        }
+
+        table.blueTable thead {
+            background: #1C6EA4;
+            background: -moz-linear-gradient(top, #5592bb 0%, #327cad 66%, #1C6EA4 100%);
+            background: -webkit-linear-gradient(top, #5592bb 0%, #327cad 66%, #1C6EA4 100%);
+            background: linear-gradient(to bottom, #5592bb 0%, #327cad 66%, #1C6EA4 100%);
+            border-bottom: 2px solid #444444;
+        }
+
+            table.blueTable thead th {
+                font-size: 15px;
+                font-weight: bold;
+                color: #FFFFFF;
+                border-left: 2px solid #D0E4F5;
+            }
+
+                table.blueTable thead th:first-child {
+                    border-left: none;
+                }
+
+        table.blueTable tfoot {
+            font-size: 14px;
+            font-weight: bold;
+            color: #FFFFFF;
+            background: #D0E4F5;
+            background: -moz-linear-gradient(top, #dcebf7 0%, #d4e6f6 66%, #D0E4F5 100%);
+            background: -webkit-linear-gradient(top, #dcebf7 0%, #d4e6f6 66%, #D0E4F5 100%);
+            background: linear-gradient(to bottom, #dcebf7 0%, #d4e6f6 66%, #D0E4F5 100%);
+            border-top: 2px solid #444444;
+        }
+
+            table.blueTable tfoot td {
+                font-size: 14px;
+            }
+
+            table.blueTable tfoot .links {
+                text-align: right;
+            }
+
+                table.blueTable tfoot .links a {
+                    display: inline-block;
+                    background: #1C6EA4;
+                    color: #FFFFFF;
+                    padding: 2px 8px;
+                    border-radius: 5px;
+                }
+</style>
+@code {
+
+    [Parameter]
+    public int AptitUserID { get; set; }
+    [Parameter]
+    public int AptitAnswerID { get; set; }
+
+    [Inject] public NavigationManager NavigationManager { get; set; }
+    [Inject] public IJSRuntime JsRuntime { get; set; }
+    public string SearchValue { get; set; }
+    public string SortingValue { get; set; }
+    public string[] FilteringValue { get; set; }
+
+
+
+
+
+}

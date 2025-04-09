@@ -1,0 +1,8 @@
+Drop-Database
+
+Add-Migration InitialCreate
+Update-Database
+
+Add-Migration MyMigration -context SchoolContext
+
+update-database -Context SchoolContext

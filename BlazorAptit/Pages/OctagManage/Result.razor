@@ -1,0 +1,167 @@
+﻿@page "/OctagManage/Result"
+
+@using Syncfusion.Blazor.Grids
+@using Syncfusion.Blazor.Data
+@using BlazorAptit.Models
+@using Syncfusion.Blazor.Popups
+@using Syncfusion.Blazor.Layouts
+
+@using Microsoft.AspNetCore.Hosting
+@using Syncfusion.Blazor.PdfViewerServer
+
+@inject IWebHostEnvironment Environment
+@inject Blazored.SessionStorage.ISessionStorageService sessionStorage
+
+<div class="col-lg-12 control-section">
+    <div class="control_wrapper">
+        <div class="pane1">
+            <SfSplitter CssClass="in-splitter" Height="100%" Width="100%" Orientation="Orientation.Vertical" SeparatorSize="4">
+                <SplitterPanes>
+                    <SplitterPane Size="35%" Min="300px">
+                        <ContentTemplate>
+                            <div class='splitter-default-content'>
+                                <SfGrid DataSource="@InstituteListResult" AllowPaging="true" AllowFiltering="true" RowHeight="25">
+                                    <GridEvents OnToolbarClick="ToolbarClick"
+                                                OnActionComplete="ActionComplete"
+                                                CommandClicked="CommandClickHandler"
+                                                RowSelected="SubRowSelecthandler" TValue="InstituteListView"></GridEvents>
+                                    <GridColumns>
+                                        <GridPageSettings PageSize="20" />
+                                        <GridColumn Field="@nameof(InstituteListView.ins_seq)" HeaderText="Institute Seq"></GridColumn>
+                                        <GridColumn Field="@nameof(InstituteListView.anp_seq)" HeaderText="Answer Progress Seq"></GridColumn>
+                                        <GridColumn Field="@nameof(InstituteListView.ins_name)" HeaderText="Institute Name"></GridColumn>
+                                        <GridColumn Field="@nameof(InstituteListView.ac_id)" HeaderText="Account ID"></GridColumn>
+                                        <GridColumn Field="@nameof(InstituteListView.pe_name)" HeaderText="Person Name"></GridColumn>
+                                        <GridColumn Field="@nameof(InstituteListView.pe_cellphone)" HeaderText="Person Cellphone"></GridColumn>
+                                        <GridColumn Field="@nameof(InstituteListView.anp_start_date)" HeaderText="Answer Start Date"></GridColumn>
+                                        <GridColumn Field="@nameof(InstituteListView.anp_end_date)" HeaderText="Answer End Date"></GridColumn>
+
+                                        <GridColumn HeaderText="성향결과" Width="110">
+                                            <GridCommandColumns>
+                                                <GridCommandColumn Type="CommandButtonType.None" Title="성향결과"
+                                                                   ButtonOption="@(new CommandButtonOptions()
+                                            {
+                                                 Content="Excel결과" , CssClass = "e-small"
+                                            })" />
+                                            </GridCommandColumns>
+                                        </GridColumn>
+                                    </GridColumns>
+                                </SfGrid>
+                            </div>
+                        </ContentTemplate>
+                    </SplitterPane>
+                   
+                </SplitterPanes>
+            </SfSplitter>
+        </div>
+    </div>
+</div>
+
+
+<div class="col-lg-12 control-section">
+    <div class="content-wrapper">
+        <div class="row">
+
+    <SfDialog Target="#main" IsModal="true" Width="90%" Height="900px" ShowCloseIcon="true" @bind-Visible=@(isShowPdfViewer)>
+        <DialogTemplates>
+            <Header></Header>
+            <Content>
+                <SfPdfViewerServer DocumentPath=@(DocumentPath) Width="1300px" Height="750px" />
+            </Content>
+        </DialogTemplates>
+        <DialogButtons>
+            <DialogButton Content="확인" OnClick=@(() => isShowPdfViewer = false) />
+        </DialogButtons>
+        <DialogAnimationSettings Effect="@DialogEffect.None"></DialogAnimationSettings>
+    </SfDialog>
+        </div>
+    </div>
+</div>
+
+
+
+<style>
+    .e-grid .e-headercelldiv {
+        font-size: 12px;
+    }
+
+    .e-grid .e-rowcell {
+        font-size: 12px;
+    }
+</style>
+
+@code{
+
+    List<Data> FilterDropData = new List<Data>
+    {
+        new Data() { Type= "All" },
+        new Data() { Type= "Base" },
+        new Data() { Type= "Replace" },
+        new Data() { Type= "Delta" }
+    };
+    public class Data
+    {
+        public string Type { get; set; }
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            var UserRole = await sessionStorage.GetItemAsync<string>("USERROLE");
+
+            if (UserRole == "user")
+            {
+                NavigationManager.NavigateTo(NavigationManager.ToAbsoluteUri("/account").ToString());
+                StateHasChanged();
+            }
+        }
+    }
+
+    public async Task ActionComplete(ActionEventArgs<InstituteListView> args)
+    {
+        if (args.RequestType == Syncfusion.Blazor.Grids.Action.BeginEdit)
+        {
+            // Triggers once editing operation completes
+        }
+        else if (args.RequestType == Syncfusion.Blazor.Grids.Action.Add)
+        {
+            // Triggers once add operation completes
+        }
+        else if (args.RequestType == Syncfusion.Blazor.Grids.Action.Cancel)
+        {
+            // Triggers once cancel operation completes
+        }
+        else if (args.RequestType == Syncfusion.Blazor.Grids.Action.Save)
+        {
+            // Triggers once save operation completes
+           // await AptitRepository.UserEdit(args.RowData);
+        }
+        else if (args.RequestType == Syncfusion.Blazor.Grids.Action.Delete)
+        {
+            // Triggers once delete operation completes
+        }
+    }
+
+    public async Task ToolbarClick(Syncfusion.Blazor.Navigations.ClickEventArgs args)
+    {
+        if (args.Item.Text == "엑셀 다운로드")
+        {
+            //this.SubGrid.ExportToPdfAsync();
+
+            ExcelExportProperties ExportProperties = new ExcelExportProperties();
+
+            ExportProperties.ExportType = ExportType.AllPages;
+
+            ExportProperties.IncludeTemplateColumn = true;
+
+            ExportProperties.FileName = $"{Users[0].Group_Name}_{DateTime.Today}.xlsx";
+
+            await this.SubGrid.ExcelExport(ExportProperties);
+        }
+
+    }
+
+
+}
+

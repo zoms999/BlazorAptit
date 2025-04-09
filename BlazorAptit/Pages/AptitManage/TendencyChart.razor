@@ -1,0 +1,202 @@
+﻿@page "/AptitManage/TendencyChart"
+@using Syncfusion.Blazor.Charts
+@using Syncfusion.Blazor.Buttons
+@using PointRender
+@using BlazorAptit.Models
+@using Syncfusion.Blazor.DropDowns
+@using Syncfusion.Blazor.Layouts
+@using Syncfusion.Blazor.Navigations
+@using System.Dynamic
+@inject NavigationManager NavigationManager
+@inject BlazorAptit.Models.Dapper.IAptitRepository AptitRepository
+
+
+<div id="TabHeader">
+    <div class="row">
+        <div class="col-xs-6 col-sm-6 col-lg-6 col-md-6">
+            <div class="col-lg-3">
+
+                <SfDropDownList TValue="string" TItem="Countries" Placeholder="순위" DataSource="@Country">
+                    <DropDownListFieldSettings Text="Name" Value="Code"></DropDownListFieldSettings>
+                    <DropDownListEvents TValue="string" TItem="Countries" ValueChange="onValueChange"></DropDownListEvents>
+                </SfDropDownList>
+            </div>
+            <div class="col-lg-3">
+                <SfButton @onclick="ExportChart" Content="Export" CssClass="e-flat" IsPrimary="true"></SfButton>
+            </div>
+
+        </div>
+        <div class="col-xs-6 col-sm-6 col-lg-6 col-md-6">
+
+        </div>
+    </div>
+</div>
+
+<br />
+<br />
+
+
+<SfChart @ref="ChartObj" Title="성향유형별 전체통계" Theme="@Theme">
+    <ChartArea><ChartAreaBorder Width="0"></ChartAreaBorder></ChartArea>
+    <ChartPrimaryXAxis Title="Country" ValueType="Syncfusion.Blazor.Charts.ValueType.Category" Interval="1">
+        <ChartAxisMajorGridLines Width="0"></ChartAxisMajorGridLines>
+    </ChartPrimaryXAxis>
+    <ChartPrimaryYAxis Minimum="0" Maximum="100" Interval="10" Title="Measurements" LabelFormat="{value}">
+        <ChartAxisMajorGridLines Width="0"></ChartAxisMajorGridLines>
+    </ChartPrimaryYAxis>
+    <ChartSeriesCollection>
+        <ChartSeries DataSource="@MedalDetails" XName="X" YName="Y" Type="ChartSeriesType.Column">
+        </ChartSeries>
+    </ChartSeriesCollection>
+    <ChartTooltipSettings Enable="true"></ChartTooltipSettings>
+    <ChartEvents OnPointRender="PointRender"></ChartEvents>
+</SfChart>
+
+
+@code{
+    SfChart ChartObj;
+
+    public EmptyPointMode Mode = EmptyPointMode.Average;
+    List<AptitRankView> aptitRankViews = new List<AptitRankView>();
+
+    //    public class ExportData
+    //    {
+    //        public string xValue { get; set; }
+    //        public double yValue { get; set; }
+    //    }
+    //    public List<ExportData> DataSource = new List<ExportData>
+    //{
+    //        new ExportData {xValue="DEZ", yValue = 35.5},
+    //        new ExportData {xValue="CHN", yValue = 18.3},
+    //        new ExportData {xValue="ITA", yValue = 17.6},
+    //        new ExportData {xValue="JPN", yValue = 13.6},
+    //        new ExportData {xValue="US", yValue = 12},
+    //        new ExportData {xValue="ESP", yValue = 5.6},
+    //        new ExportData {xValue="FRA", yValue = 4.6},
+    //        new ExportData {xValue="AUS", yValue = 3.3},
+    //        new ExportData {xValue="BEL", yValue = 3},
+    //        new ExportData {xValue="UK", yValue = 2.9},
+    //    };
+    public class Countries
+    {
+        public string Name { get; set; }
+
+        public int Code { get; set; }
+    }
+
+    List<Countries> Country = new List<Countries>
+{
+        new Countries() { Name = "1순위", Code = 1 },
+        new Countries() { Name = "2순위", Code = 2 },
+        new Countries() { Name = "3순위", Code = 3 },
+
+    };
+
+    public List<ExpandoObject> MedalDetails { get; set; } = new List<ExpandoObject>();
+    public class ExpandoObject
+    {
+        public string xValue { get; set; }
+        public double yValue { get; set; }
+    }
+
+    public void ExportChart(MouseEventArgs args)
+    {
+        ChartObj.Export(ExportType.PNG, "성향유형전체통계");
+    }
+    string CurrentUri;
+    private Syncfusion.Blazor.Theme Theme { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        CurrentUri = NavigationManager.Uri;
+        Theme = Syncfusion.Blazor.Theme.Bootstrap4;
+        aptitRankViews = await AptitRepository.성향유형전체통계(1);
+ 
+
+        MedalDetails = Enumerable.Range(0, aptitRankViews.Count() - 1).Select((x) =>
+        {
+            dynamic d = new ExpandoObject();
+            d.X = aptitRankViews[x].TITLE;
+            d.Y = Convert.ToDouble(aptitRankViews[x].Cnt);
+            return d;
+        }).Cast<ExpandoObject>().ToList<ExpandoObject>();
+
+        StateHasChanged();
+
+    }
+
+    private async Task onValueChange(Syncfusion.Blazor.DropDowns.ChangeEventArgs<string, Countries> args)
+    {
+        aptitRankViews = await AptitRepository.성향유형전체통계(args.ItemData.Code);
+
+        MedalDetails = Enumerable.Range(0, aptitRankViews.Count() - 1).Select((x) => new ExpandoObject()
+        {
+
+            xValue = aptitRankViews[x].TITLE,
+            yValue = Convert.ToDouble(aptitRankViews[x].Cnt),
+
+        }).ToList();  //.Cast<ExpandoObject>().ToList<ExpandoObject>();
+
+        StateHasChanged();
+    }
+
+
+    /*
+    protected override void OnInitialized()
+    {
+        CurrentUri = NavigationManager.Uri;
+        if (CurrentUri.IndexOf("material") > -1)
+        {
+            Theme = Syncfusion.Blazor.Theme.Material;
+        }
+        else if (CurrentUri.IndexOf("fabric") > -1)
+        {
+            Theme = Syncfusion.Blazor.Theme.Fabric;
+        }
+        else if (CurrentUri.IndexOf("bootstrap") > -1)
+        {
+            Theme = Syncfusion.Blazor.Theme.Bootstrap;
+        }
+        else if (CurrentUri.IndexOf("highcontrast") > -1)
+        {
+            Theme = Syncfusion.Blazor.Theme.HighContrast;
+        }
+        else
+        {
+            Theme = Syncfusion.Blazor.Theme.Bootstrap4;
+        }
+        Theme = Syncfusion.Blazor.Theme.Bootstrap;
+    }
+    */
+
+
+    public void PointRender(PointRenderEventArgs args)
+    {
+        if (CurrentUri.IndexOf("material") > -1)
+        {
+            args.Fill = PointColor.MaterialColors[args.Point.Index % 10];
+        }
+        else if (CurrentUri.IndexOf("fabric") > -1)
+        {
+            args.Fill = PointColor.FabricColors[args.Point.Index % 10];
+        }
+        else if (CurrentUri.IndexOf("bootstrap") > -1)
+        {
+            args.Fill = PointColor.BootstrapColors[args.Point.Index % 10];
+        }
+        else if (CurrentUri.IndexOf("highcontrast") > -1)
+        {
+            args.Fill = PointColor.HighContrastColors[args.Point.Index % 10];
+        }
+        args.Fill = PointColor.BootstrapColors[args.Point.Index % 10];
+    }
+}
+<style>
+    #control-container {
+        padding: 0px !important;
+    }
+
+    .e-play-icon::before {
+        content: '\e720';
+    }
+</style>

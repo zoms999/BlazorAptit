@@ -1,0 +1,243 @@
+﻿@page "/AptitManage/Home"
+@using Syncfusion.Blazor.Layouts
+@using Syncfusion.Blazor.Lists
+@using BlazorAptit.Models
+
+@inject Blazored.SessionStorage.ISessionStorageService sessionStorage
+
+<div class="col-lg-12 control-section">
+    <div class="control_wrapper">
+        <h4>@dt.Month.ToString()월
+             접수단체리스트 </h4>
+        <SfSplitter Height="250px" Width="100%">
+            <SplitterPanes>
+                <SplitterPane Size="15%" Min="25%">
+                    <ContentTemplate>
+                        <div>
+
+                            <SfListView @ref="ListViewObj" ID="ui-list" DataSource="@aptitGroups" Height="250" CssClass="e-list-template"  >
+                                <ListViewEvents TValue="AptitGroup" Clicked="select"></ListViewEvents>
+                                <ListViewFieldSettings TValue="AptitGroup" Id="Group_ID" Text="Group_Name"></ListViewFieldSettings>
+                                @*<ListViewTemplates TValue="AptitGroup">
+                                        <Template>
+                                            @{
+                                                <div class="e-list-wrapper e-list-avatar">
+                                                    <span class="e-list-">@context.Group_Name</span>
+                                                    <span class="e-list-content">@context.Created</span>
+                                                </div>
+                                            }
+                                        </Template>
+                                    </ListViewTemplates>*@
+                            </SfListView>
+                        </div>
+                    </ContentTemplate>
+                </SplitterPane>
+                <SplitterPane Size="85%" Min="45%">
+                    <ContentTemplate>
+                        <div>
+                            @*<div class="profile-name bold">@aptitGroupsSub.Group_Name</div>*@
+                            <table>
+                                <tr>
+                                    <td class="e-bold">회차코드</td>
+                                    <td>@aptitGroupsSub.Group_ID</td>
+                                    <td class="e-bold">단체명</td>
+                                    <td>@aptitGroupsSub.Group_Name</td>
+                                    <td class="e-bold">검사종류</td>
+                                    <td>@aptitGroupsSub.CheckType</td>
+                                </tr>
+                                <tr>
+                                    <td class="e-bold">담당자</td>
+                                    <td>@aptitGroupsSub.Manage_Name</td>
+                                    <td class="e-bold">연락처1</td>
+                                    <td>@aptitGroupsSub.Manage_Tel1</td>
+                                    <td class="e-bold">연락처2</td>
+                                    <td>@aptitGroupsSub.Manage_Tel2</td>
+                                </tr>
+                                <tr>
+                                    <td class="e-bold">신청인원</td>
+                                    <td>@aptitGroupsSub.RegCount</td>
+                                    <td class="e-bold">진행인원</td>
+                                    <td>@aptitGroupsSub.CompletCount</td>
+                                    <td class="e-bold"></td>
+                                    <td></td>
+                                </tr>
+                                <tr>
+                                    <td class="e-bold">시작일</td>
+                                    <td>@aptitGroupsSub.StartDate</td>
+                                    <td class="e-bold">종료일</td>
+                                    <td>@aptitGroupsSub.EndDate</td>
+                                    <td class="e-bold">계약일</td>
+                                    <td>@aptitGroupsSub.Created</td>
+                                </tr>
+                                <tr>
+                                    <td class="e-bold">입금액</td>
+                                    <td>@aptitGroupsSub.Payment</td>
+                                    <td class="e-bold">발급회차</td>
+                                    <td>@aptitGroupsSub.PaymentCount</td>
+                                    <td class="e-bold"></td>
+                                    <td></td>
+                                </tr>
+
+                            </table>
+
+                        </div>
+                    </ContentTemplate>
+                </SplitterPane>
+            </SplitterPanes>
+        </SfSplitter>
+    </div>
+
+
+
+    <div class="control_wrapper">
+        <h4>@dt.Month.ToString()월 검사리스트</h4>
+        <SfSplitter Height="600px" Width="100%">
+            <SplitterPanes>
+                <SplitterPane Size="15%" Min="25%">
+                    <ContentTemplate>
+                        <div>
+
+                            <SfListView @ref="ListViewObj2" ID="ui-list" DataSource="@오늘검사단체" Height="600" CssClass="e-list-template">
+                                <ListViewEvents TValue="AptitUser" Clicked="select"></ListViewEvents>
+                                <ListViewFieldSettings TValue="AptitUser" Id="Group_ID" Text="Group_Name"></ListViewFieldSettings>
+                                <ListViewTemplates TValue="AptitUser">
+                                    <Template>
+                                        @{
+                                            <div class="e-list-wrapper e-list-avatar">
+                                                <span class="e-list-">@context.Group_Name @context.User_Name</span>
+                                            </div>
+                                        }
+                                    </Template>
+                                </ListViewTemplates>
+                            </SfListView>
+                        </div>
+                    </ContentTemplate>
+                </SplitterPane>
+                <SplitterPane Size="85%" Min="45%">
+                    <ContentTemplate>
+                        <div>
+
+                            @*<div class="profile-name bold">@aptitGroupsSub.Group_Name</div>*@
+                            <table>
+                                <tr>
+                                    <td class="e-bold">이름</td>
+                                    <td>@aptitUserSub.User_Name</td>
+                                    <td class="e-bold">이메일</td>
+                                    <td>@aptitUserSub.User_Email</td>
+                                </tr>
+                                <tr>
+                                    <td class="e-bold">나이</td>
+                                    <td>@aptitUserSub.User_Age</td>
+                                    <td class="e-bold">성별</td>
+                                    <td>@aptitUserSub.User_Gender</td>
+                                </tr>
+                                <tr>
+                                    <td class="e-bold">학년</td>
+                                    <td>@aptitUserSub.User_Grade</td>
+                                    <td class="e-bold">전공</td>
+                                    <td>@aptitUserSub.User_Finish</td>
+                                </tr>
+                                <tr>
+                                    <td class="e-bold">검사일</td>
+                                    <td>@aptitUserSub.Created</td>
+                                    <td class="e-bold">진행상태</td>
+                                    <td></td>
+                                </tr>
+
+                            </table>
+
+                        </div>
+                    </ContentTemplate>
+                </SplitterPane>
+            </SplitterPanes>
+        </SfSplitter>
+    </div>
+</div>
+
+@code {
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            var UserRole = await sessionStorage.GetItemAsync<string>("USERROLE");
+
+            if (UserRole == "user")
+            {
+                NavigationManager.NavigateTo(NavigationManager.ToAbsoluteUri("/account").ToString());
+                StateHasChanged();
+            }
+        }
+    }
+
+
+}
+
+
+<style>
+    #splitter .e-avatar.e-avatar-xlarge {
+        font-size: 22px;
+    }
+
+    .header-image {
+        text-align: center;
+        margin-top: 7px;
+    }
+
+    .e-custom-card .e-avatar {
+        font-size: 20px;
+        position: absolute;
+        top: calc(0% - 1.5em);
+        left: calc(50% - 1.5em);
+        box-shadow: 0 16px 28px -8px rgba(0, 0, 0, .36), 0 4px 15px 0 rgba(0, 0, 0, .12), 0 8px 10px -5px rgba(0, 0, 0, .2);
+    }
+    /* ListView template customization */
+    #ui-list.e-listview .showUI {
+        display: flex;
+    }
+
+    #ui-list.e-listview .hideUI {
+        display: none;
+    }
+
+    #ui-list.e-listview .e-list-item {
+        padding: 3px 0;
+    }
+
+    #ui-list.e-listview .R {
+        background: lightgrey;
+    }
+
+    #ui-list.e-listview .M {
+        background: lightblue;
+    }
+
+    .highcontrast #ui-list.e-listview .e-list-item.e-active {
+        background: #ffd939;
+        color: #000000;
+    }
+
+    table {
+        border-collapse: collapse;
+        border-spacing: 0;
+        width: calc(100% - 20px);
+        margin: 10px;
+    }
+
+        table th,
+        table td {
+            font-weight: normal;
+            padding: 5px;
+            text-align: left;
+            border: 1px solid #ddd
+        }
+
+    .e-bold {
+        font-weight: bold;
+    }
+
+    .profile-name {
+        font-weight: 500;
+        font-size: 14px;
+        text-align: center;
+    }
+</style>

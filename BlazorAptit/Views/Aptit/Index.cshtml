@@ -1,0 +1,145 @@
+﻿@model BlazorAptit.Models.AptitUser
+
+@{ ViewData["Title"] = "Index"; }
+
+
+<h1></h1>
+
+@*<form class="form-horizontal" method="post" asp-controller="Aptit" asp-action="Login">*@
+
+<form class="form-horizontal">
+
+
+   
+
+    <div class="form-group text-center">
+
+        <div class="card">
+            <div class="card-body">
+                <h4>세 계 에 서  가 장 정 확 한</h4>
+                <h5 class="card-title">옥타그노시스</h5>
+                <h5 class="card-subtitle mb-2 text-muted">진로적성검사</h5>
+                <p class="card-text text-left">
+                    ■ 세계 최초로 한국진로적성센터에서 독자적으로 연구 개발한 ‘옥타그노시스(OCTAGNOSIS) 검사’는 인간의 8가지 사고력을 기반으로 <br />
+                    15가지 성향과 선호도 및 60가지 인간역량스키마 를 진단해내는 검사입니다.<br />
+                    ■ 104,060명의 국내와 해외 청소년·대학생·성인들의 임상참여자들과 1:1 심층컨설팅을 통한 임상진단 및 누적된 진로연구 데이터들을 <br />
+                    토대로 질적연구와 양적연구가 결집되어 기존<br />
+                    검사들이 판독하지 못하는 자신의 진로데이터를 진단하는 검사입니다.<br />
+                    ■ ‘옥타그노시스(OCTAGNOSIS)검사’는 다면적 입체적성진단시스템(듣기, 말하기, 쓰기,<br />
+                    그리기 등)과 COMPUTER-BASED 온라인적성진단시스템, 지면형적성진단시스템, 집단형<br />
+                    성향유형 압축진단시스템 등 총 4가지 진단시스템으로 구성되어 있습니다.<br />
+                    ■ 지금부터 받아보실 검사는 ‘옥타그노시스(OCTAGNOSIS)검사’ 진단시스템 중[지 면형<br />
+                    적성진단시스템] 기반 검사입니다. 성향 진단-선호도 진단으로 구성된 [지면형적성진단시스템]<br />
+                    기반 이미지반응검사를 통해 자신의 성향과 적성에 맞는 학과와 직업까지 파악할 수 있습니다 .<br />
+                    ■ 문항1부터 문항15까지의 각각 문제 파트들이 15개의 개별 문항으로 이루어져있습니다 .<br />
+                    (각 파트별 총점 120점~20점까지 분포)<br />
+                    ■ 정확하고 구체적인 결과 도출을 위해 평소 자신의 모습을 떠올리며, 각 문항들에 솔직하게 답변해주시기 바랍니다.<br />
+
+
+                    본 저작물은 한국진로적성센터의 연구저작물로서 저작권법에 의거하여 무단전재, 배포, 복제, 도용, 유포가 법으로지 됩금니다.<br />
+                    Copyright 2004. 한국진로적성센터 All rights reserved. ☎ 02. .523 7523
+                </p>
+            </div>
+
+        </div>
+
+        <div class="btn-group">
+            <div class="col-md-12 text-right">
+                <a href="/Aptit/Create" class="btn btn-primary">시작하기</a>
+                <button type="button" class="btn btn-primary" name="btnLink" id="btnLink">계속하기</button>
+            </div>
+        </div>
+
+
+
+        @Html.AntiForgeryToken()
+        <div class="modal fade" id="ModalPopUp" role="dialog">
+            <div class="modal-dialog err-pop" style="">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button id="DivClose" type="button" class="close" data-dismiss="modal">&times;</button>
+                    </div>
+                    <div class="modal-body" style="text-align:center;">
+                        <div class="form-group">
+                            <div class="form-group">
+                                <input asp-for="User_Email" class="form-control" placeholder="Your Email *" value="" />
+                                <span asp-validation-for="User_Email" class="text-danger"></span>
+                            </div>
+                            <div class="form-group">
+                                <input type="password" asp-for="User_Password" class="form-control" placeholder="Your Password *" value="" />
+                                <span asp-validation-for="User_Password" class="text-danger"></span>
+                            </div>
+                            <div class="form-group">
+                                <button type="button" class="btn btn-primary" onclick="onclickApi()">계속하기 </button>
+                            </div>
+
+                            @*<div class="form-group">
+                                <a href="#" class="ForgetPwd">Forget Password?</a>
+                            </div>*@
+
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    @*<script src='https://code.jquery.com/jquery-1.12.4.min.js'></script>*@
+    <script>
+            function onclickApi() {
+                //var API_URI = '/api/Login';
+
+                //$.getJSON(API_URI, function (data) {
+                //    var str = '<dl>';
+                //    $.each(data, function (index, entry) {
+                //        str += '<dt>' + entry.id + '</dt>';
+                //        str += '<dd>' + entry.text + '</dd>';
+                //    });
+                //    str += '</dl>';
+
+                //    $('#print').html(str);
+                //});
+                //var API_URI = '/api/Login';
+
+                //$.postJSON(url, paramData, function (data) {
+                //    $.each(data, function (index, jsonData) {
+                //        //jsonData의 값을 처리.~~
+                //    });
+                //});
+
+
+                var jsonData = { User_Email: $("#User_Email").val(), User_Password: $("#User_Password").val() };
+                var controllerUrl = "@this.Url.Action( "LoginUser",  "Aptit")";
+                // This does a Request to "/Home/EditData"!
+                // But I can see .NET errors (using IE Developer Toolbar):
+                //  1. Description: HTTP 404. The resource you are looking for (or one of its dependencies) could have been removed,
+                //     had its name changed, or is temporarily unavailable. Please review the following URL and make sure that
+                //     it is spelled correctly.../Home/EditData
+                //  2. [HttpException]: A public action method 'EditData' was not found on controller
+                //     'TSSR.Controllers.HomeController'. at System.Web.Mvc.Controller.HandleUnknownAction(String actionName)
+                $.ajax({
+                    method: "POST",
+                    dataType: 'JSON',
+                   contentType: "application/json; charset=utf-8",
+                   url: controllerUrl,
+                   // Changing to true did not fix error.
+                    data: JSON.stringify(jsonData),
+                    async: false,
+                    success: function (data) {
+                        //alert("ajax succeeded");
+                        window.location.href = '@Url.Action("Pages2", "Aptit")';
+                        //convertJsonToHtmlTable(JSON.parse(response), $("#ModalPopUp"));
+                    },
+                    error: function (jqXHR, textStatus, errorThrown)
+                    {
+                         alert("이메일 및 패스워드를 확인하세요. ");
+
+                    }
+                });
+
+
+
+            }
+
+    </script>
+</form>

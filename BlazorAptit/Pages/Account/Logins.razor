@@ -1,0 +1,155 @@
+﻿@page "/account"
+@page "/account/login"
+@layout AuthLayout
+
+@using BlazorAptit.Models.Dapper;
+@using BlazorAptit.Services
+@using System.Net.Http.Json;
+@inject IAccountService AccountService
+@inject IAlertService AlertService
+
+@inject Blazored.SessionStorage.ISessionStorageService sessionStorage
+@inject NavigationManager NavigationManager
+@inject IAptitRepository AptitRepository
+
+@inject HttpClient Http;
+
+ <div class="form-group text-center">
+    <section class="min-vh-100 py-5">
+        <div class="container">
+            <div class="row justify-content-center mb-md-6">
+                <div class="form-group">
+                    <a href="/Account">
+                        <img src="/img/LOGOIMAGE.JPG" height="200" width="250" />
+                    </a>
+                </div>
+            </div>
+        </div>
+    </section>
+</div>
+
+<div class="wrapper">
+    
+        <EditForm class="form-signin"  Model="@model" OnValidSubmit="OnValidSubmit">
+            <DataAnnotationsValidator />
+        <h2 class="form-signin-heading">로그인</h2>
+            <div class="form-group">
+                <label for="inputUsername" class="sr-only"></label>
+                <InputText id="inputUsername"  @bind-Value="model.Username" class="form-control" placeholder="아이디" style="width: 300px;" />
+                <ValidationMessage For="@(() => model.Username)" />
+            </div>
+            <div class="form-group">
+                <label for="inputPassword" class="sr-only">Password</label>
+                <InputText id="inputPassword"  @bind-Value="model.Password" type="password" class="form-control" placeholder="패스워드" style="width: 300px;" />
+                <ValidationMessage For="@(() => model.Password)" />
+            </div>
+
+            <button  class="btn btn-lg btn-primary btn-block">Login</button>
+
+            <label class="text-danger">@error</label>
+        </EditForm>
+</div>
+
+
+@code {
+    private Models.Account.Login model = new Models.Account.Login();
+    private bool loading;
+    string error { get; set; }
+
+    private async void OnValidSubmit()
+    {
+        // reset alerts on submit
+        AlertService.Clear();
+
+        try
+        {
+
+            var result = await AptitRepository.GetGroupMemberLoginCheck(model.Username, model.Password);
+
+            if (result != null)
+            {
+                await sessionStorage.SetItemAsync("USERID", model.Username);
+                if (model.Username.ToLower() == "admin" )
+                {
+                    
+                    await sessionStorage.SetItemAsync("USERROLE", "manager");
+                    NavigationManager.NavigateTo($"/AptitManage/GroupList");
+                }
+                else
+                {
+                    await sessionStorage.SetItemAsync("USERROLE", "user");
+                    NavigationManager.NavigateTo($"/AptitManage/ResultByGroup");
+                }
+                
+            }
+            else 
+                error = "아이디 또는 패스워드를 확인해주세요.";
+            
+
+            //await AccountService.Logins(model);
+            //var returnUrl = NavigationManager.QueryString("returnUrl") ?? "";
+            //NavigationManager.NavigateTo(returnUrl);
+        }
+        catch (Exception ex)
+        {
+            AlertService.Error(ex.Message);
+            loading = false;
+            StateHasChanged();
+        }
+    } 
+}
+
+ <style>
+    body {
+        background: #ffff !important;
+    }
+
+    .wrapper {
+        margin-top: 80px;
+        margin-bottom: 80px;
+    }
+
+    .form-signin {
+        max-width: 380px;
+        padding: 15px 35px 45px;
+        margin: 0 auto;
+        background-color: #fff;
+        border: 1px solid rgba(0, 0, 0, 0.1);
+    }
+
+        .form-signin .form-signin-heading,
+        .form-signin .checkbox {
+            margin-bottom: 30px;
+        }
+
+        .form-signin .checkbox {
+            font-weight: normal;
+        }
+
+        .form-signin .form-control {
+            position: relative;
+            font-size: 16px;
+            height: auto;
+            padding: 10px;
+            -webkit-box-sizing: border-box;
+            -moz-box-sizing: border-box;
+            box-sizing: border-box;
+        }
+
+            .form-signin .form-control:focus {
+                z-index: 2;
+            }
+
+        .form-signin input[type=text] {
+            margin-bottom: -1px;
+            border-bottom-left-radius: 0;
+            border-bottom-right-radius: 0;
+        }
+
+        .form-signin input[type=password] {
+            margin-bottom: 20px;
+            border-top-left-radius: 0;
+            border-top-right-radius: 0;
+        }
+
+</style>

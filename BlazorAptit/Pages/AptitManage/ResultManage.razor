@@ -1,0 +1,250 @@
+﻿@page "/AptitManage/ResultManage"
+@using Syncfusion.Blazor
+@using Syncfusion.Blazor.Grids
+@using Syncfusion.Blazor.Data
+@using System.Collections.ObjectModel;
+@using BlazorAptit.Models
+@using Syncfusion.Blazor.Inputs
+@using System.IO
+@using System.Linq
+@using System.Threading
+@inject BlazorAptit.Models.Dapper.IAptitRepository AptitRepository
+@inject BlazorAptit.Data.AptitService Service;
+@inject Microsoft.AspNetCore.Components.NavigationManager UriHelper
+
+
+<h4>결과관리</h4>
+
+<style>
+    .image img {
+        height: 100px;
+        width: 100px;
+        border-radius: 10px;
+        box-shadow: inset 0 0 1px #e0e0e0, inset 0 0 14px rgba(0,0,0,0.2);
+    }
+</style>
+<div class="col-lg-12 control-section">
+    <div class="content-wrapper">
+        <div class="row">
+
+            <SfGrid DataSource="@resutl" >
+                <GridEvents RowSelected="RowSelecthandler" TValue="AptitResult"></GridEvents>
+                <GridColumns>
+                    <GridColumn Field=@nameof(AptitResult.AptitResultID) HeaderText="문항" IsPrimaryKey="true" ValidationRules="@(new ValidationRules{ Required=true, Number=true})" TextAlign="TextAlign.Left" Width="80"></GridColumn>
+                    <GridColumn Field=@nameof(AptitResult.TITLE) HeaderText="성향유형" Width="100"></GridColumn>
+                </GridColumns>
+            </SfGrid>
+            @*<SfGrid DataSource="@resutl">
+
+            <GridEvents RowSelected="RowSelecthandler" TValue="AptitResult"></GridEvents>
+            <GridColumns>
+                <GridColumn Field=@nameof(AptitResult.AptitResultID) HeaderText="순번" Width="50"> </GridColumn>
+                <GridColumn Field=@nameof(AptitResult.TITLE) HeaderText="제목" Width="50"> </GridColumn>
+
+            </GridColumns>
+        </SfGrid>
+
+        <div class='e-statustext'>Showing orders of Customer: <b>@SelectedCustomer</b></div>*@
+
+            @*<SfButton ID="update" @onclick="UpdateRecord">Update Data</SfButton>*@
+            @*<SfGrid @ref="@SubGrid" DataSource="@ObservableData" Query="@(new Query().Where("ID", "equal", RowIndex))" Toolbar="@(new List<string>() { "Edit", "Update","Cancel" })">
+            <GridEvents TValue="ResultContent" OnActionComplete="OnActionComplete" OnActionBegin="ActionBeginHandler"></GridEvents>
+            <GridEditSettings AllowEditing="true" Mode="EditMode.Normal"></GridEditSettings>
+            <GridColumns>
+                <GridColumn Field=@nameof(ResultContent.ID) HeaderText="ID" Width="80"> </GridColumn>
+                <GridColumn Field=@nameof(ResultContent.COL_NM) HeaderText="문제번호" Width="120"></GridColumn>
+                <GridColumn Field=@nameof(ResultContent.VAL) HeaderText="VAL"></GridColumn>
+            </GridColumns>
+        </SfGrid>*@
+
+            @*<SfGrid TValue="ResultContent" @ref="SubGrid" DataSource="@OrderData" Query="@(new Query().Where("ID", "equal", RowIndex))" Toolbar="@(new List<string>() {"Add","Edit","Delete","Update","Cancel"})">
+            <GridEditSettings AllowEditing="true" ShowDeleteConfirmDialog="true"></GridEditSettings>
+            <GridEvents OnActionBegin="ActionBeginHandler" OnActionComplete="OnActionComplete" TValue="ResultContent"></GridEvents>
+            <GridColumns>
+                <GridColumn Field=@nameof(ResultContent.ID) HeaderText="ID" Width="80"> </GridColumn>
+                <GridColumn Field=@nameof(ResultContent.COL_NM) HeaderText="문제번호" Width="120"></GridColumn>
+                <GridColumn Field=@nameof(ResultContent.VAL) HeaderText="VAL"></GridColumn>
+            </GridColumns>
+        </SfGrid>*@
+
+        <SfGrid DataSource="@OrderData" Query="@(new Query().Where("ID", "equal", RowIndex))" Toolbar="@(new List<string>() {"Edit","Update","Cancel"})">
+            <GridEditSettings AllowEditing="true"></GridEditSettings>
+            <GridEvents CommandClicked="OnCommandClicked" OnActionComplete="OnActionComplete" TValue="ResultContent"></GridEvents>
+            <GridColumns>
+                <GridColumn Field=@nameof(ResultContent.ID) HeaderText="키"  IsIdentity="true" TextAlign="TextAlign.Left" Width="80"></GridColumn>
+                <GridColumn Field=@nameof(ResultContent.COL_NM) HeaderText="순번" IsPrimaryKey="true" Width="140"></GridColumn>
+                <GridColumn Field=@nameof(ResultContent.VAL) HeaderText="문제" ></GridColumn>
+                @*<GridColumn HeaderText="Manage Records" Width="150">
+                    <GridCommandColumns>
+                        <GridCommandColumn Type="CommandButtonType.Edit" ButtonOption="@(new CommandButtonOptions() {IconCss="e-icons e-edit", CssClass="e-flat" })"></GridCommandColumn>
+                        <GridCommandColumn Type="CommandButtonType.Save" ButtonOption="@(new CommandButtonOptions() {IconCss="e-icons e-save", CssClass="e-flat" })"></GridCommandColumn>
+                        <GridCommandColumn Type="CommandButtonType.Cancel" ButtonOption="@(new CommandButtonOptions() {IconCss="e-icons e-cancel-icon", CssClass="e-flat" })"></GridCommandColumn>
+                    </GridCommandColumns>
+                </GridColumn>*@
+            </GridColumns>
+        </SfGrid>
+
+
+            <!--<SfGrid DataSource="@OrderData" Query="@(new Query().Where("AptitResultID", "equal", RowIndex))" Toolbar="@(new List<string>() {"Edit","Update","Cancel"})">-->
+            @*<GridEditSettings  AllowAdding="true" AllowDeleting="true" AllowEditing="true"></GridEditSettings>*@
+            <!--<GridEditSettings AllowAdding="true" AllowDeleting="true" AllowEditing="true" Mode="EditMode.Normal"></GridEditSettings>
+        <GridColumns>
+            <GridColumn Field=@nameof(ResultContent.ID) HeaderText="마스터키" Width="120"></GridColumn>
+            <GridColumn Field=@nameof(ResultContent.COL_NM) HeaderText="문제번호" IsPrimaryKey="true" Width="120"></GridColumn>
+            <GridColumn Field=@nameof(ResultContent.VAL) HeaderText="문제" Width="150">
+            </GridColumn>
+
+            <GridColumn HeaderText="Manage Records" Width="150">
+                <GridCommandColumns>
+                    <GridCommandColumn Type="CommandButtonType.Edit" ButtonOption="@(new CommandButtonOptions() {IconCss="e-icons e-edit", CssClass="e-flat" })"></GridCommandColumn>
+                    <GridCommandColumn Type="CommandButtonType.Save" ButtonOption="@(new CommandButtonOptions() {IconCss="e-icons e-save", CssClass="e-flat" })"></GridCommandColumn>
+                    <GridCommandColumn Type="CommandButtonType.Cancel" ButtonOption="@(new CommandButtonOptions() {IconCss="e-icons e-cancel-icon", CssClass="e-flat" })"></GridCommandColumn>
+                </GridCommandColumns>
+            </GridColumn>
+        </GridColumns>
+    </SfGrid>-->
+
+        </div>
+    </div>
+</div>
+
+<style>
+    .e-grid .e-headercelldiv {
+        font-size: 12px;
+    }
+
+    .e-grid .e-rowcell {
+        font-size: 12px;
+    }
+</style>
+
+@code{
+
+
+    SfGrid<ResultContent> SubGrid;
+
+    public ObservableCollection<ResultContent> ObservableData { get; set; }
+    public List<ResultContent> OrderData { get; set; }
+
+    List<AptitResult> resutl = new List<AptitResult>();
+
+    public IEnumerable<ResultContent> GridData { get; set; }
+    public string SelectedCustomer { get; set; }
+    public int? RowIndex { get; set; } = 1;
+
+    private ResultContent orderFile;
+    private CancellationTokenSource cancelation;
+
+    public  async void OnCommandClicked(CommandClickEventArgs<ResultContent> args)
+    {
+        if (args.CommandColumn.Type == CommandButtonType.Edit)
+        {
+            // Perform required operations here
+        }
+
+        if (args.CommandColumn.Type == CommandButtonType.Save)
+        {
+            await AptitRepository.EditResultManagesAsync(args.RowData.ID.ToString(), args.RowData);
+
+        }
+
+    }
+
+    public void CellSavedHandler(CellSaveArgs<ResultContent> args)
+    {
+        // Here you can customize your code
+    }
+
+
+    public void OnFileRemove(RemovingEventArgs args)
+    {
+        args.PostRawFile = false;
+    }
+
+    public async void RowSelecthandler(RowSelectEventArgs<AptitResult> Args)
+    {
+        SelectedCustomer = Args.Data.AptitResultID.ToString();
+        RowIndex = Args.Data.AptitResultID;
+        OrderData = await AptitRepository.GetResultManagesByID(RowIndex);
+        //GridData = this.OrderData;
+        //ObservableData = new ObservableCollection<ResultContent>(OrderData);
+        //StateHasChanged();
+    }
+
+    public async void ActionBeginHandler(ActionEventArgs<ResultContent> args)
+    {
+        if (args.RequestType == Syncfusion.Blazor.Grids.Action.Save)
+        {
+
+            //var value = OrderData.Find(x => x.ID == args.Data.ID && x.COL_NM == args.Data.COL_NM);
+            //if (args.Action == "add")
+            //{
+            //    await Service.InsertOrderAsync(args.Data);
+            //}
+            //else if (args.Action == "Edit")
+            //{
+            //    //await Service.UpdateOrderAsync(args.Data.ID.ToString(), args.Data);
+            //    //await Service.EditAsync(args.Data.ID.ToString(), args.Data);
+            //    await AptitRepository.EditAsync(args.Data.ID.ToString(), args.Data);
+
+            //}
+            //if (args.RequestType == Syncfusion.Blazor.Grids.Action.Delete)
+            //{
+            //}
+        }
+    }
+
+    public void UpdateRecord()
+    {
+        if (ObservableData.Count() != 0)
+        {
+            //var name = ObservableData.First();
+        }
+    }
+
+    private async Task OnActionComplete(ActionEventArgs<ResultContent> args)
+    {
+        if (args.RequestType == Syncfusion.Blazor.Grids.Action.Add)
+        {
+        }
+        if (args.RequestType == Syncfusion.Blazor.Grids.Action.BeginEdit)
+        {
+            //state = "BeginEdit";
+            ;
+        }
+        else if (args.RequestType == Syncfusion.Blazor.Grids.Action.Delete)
+        {
+        }
+        else if (args.RequestType == Syncfusion.Blazor.Grids.Action.Save)
+        {
+            await AptitRepository.EditResultManagesAsync(args.RowData.ID.ToString(), args.RowData);
+        }
+
+    }
+    public async Task ToolbarClickHandler(Syncfusion.Blazor.Navigations.ClickEventArgs args)
+    {
+        var name = ObservableData.First();
+
+        if (args.Item.Text == "Update")
+        {
+            var subData = SubGrid.GetSelectedRecords();
+        }
+        if (args.Item.Text == "Collapse all")
+        {
+            //await this.Grid.GroupCollapseAll();
+        }
+    }
+
+
+    protected async override Task OnInitializedAsync()
+    {
+        //GridData = this.Orders;
+        resutl = await AptitRepository.GetAllAptitResultManagesAsyns();
+        //GridData = this.resutl;
+
+
+    }
+
+
+    }
+

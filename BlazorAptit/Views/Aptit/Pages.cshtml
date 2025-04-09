@@ -1,0 +1,116 @@
+﻿@model IEnumerable<BlazorAptit.Models.AptitQuestion>
+
+<form class="form-horizontal" method="post" asp-controller="Aptit" asp-action="Edit">
+    <div class="card">
+        <div class="card-header">
+            <h5 class="font-weight-bold text-primary">성향진단 Ⅰ: 다음의 문항들을 읽고 평소의 나를 생각했을 때, 나와 가장 비슷할수록 6점 쪽으로, 나와 다를수록 1점 쪽으로 체크하세요(1~9번).</h5>
+        </div>
+
+        <ul class="list-group list-group-flush">
+
+
+            @foreach (var item in Model)
+            {
+                <li class="list-group-item"><h5 class="font-weight-bold">@Html.DisplayFor(modelItem => item.QUE_1)</h5></li>
+                <li class="list-group-item">
+                    @for (int i = 0; i < item.quiz[0].Choices.Count; i++)
+                    {
+                        @*<input type="radio" class="form-check-input" name="AQ_1" value="@choice" />@choice*@
+
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input" type="radio" name="AQ_1" id="AQ_1" data-toggle="AQ_1" value="@item.quiz[0].Choices[i]">
+                            <label class="form-check-label" for="AQ_1_@i">@item.quiz[0].Choices[i]</label>
+                        </div>
+                    }
+                </li>
+                <li class="list-group-item"><h5 class="font-weight-bold">@Html.DisplayFor(modelItem => item.QUE_2)</h5></li>
+                <li class="list-group-item">
+                    @for (int i = 0; i < item.quiz[0].Choices.Count; i++)
+                    {
+                        @*<input type="radio" class="form-check-input" name="AQ_1" value="@choice" />@choice*@
+
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input" type="radio" name="AQ_2" id="AQ_2_@i" value="@item.quiz[0].Choices[i]">
+                            <label class="form-check-label" for="AQ_2_@i">@item.quiz[0].Choices[i]</label>
+                        </div>
+                    }
+                </li>
+                <li class="list-group-item"><h5 class="font-weight-bold">@Html.DisplayFor(modelItem => item.QUE_3)</h5></li>
+                <li class="list-group-item">
+                    @for (int i = 0; i < item.quiz[0].Choices.Count; i++)
+                    {
+                        @*<input type="radio" class="form-check-input" name="AQ_1" value="@choice" />@choice*@
+
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input" type="radio" name="AQ_3" id="AQ_3_@i" value="@item.quiz[0].Choices[i]">
+                            <label class="form-check-label" for="AQ_3_@i">@item.quiz[0].Choices[i]</label>
+                        </div>
+                    }
+                </li>
+
+                <li class="list-group-item"><h5 class="font-weight-bold">@Html.DisplayFor(modelItem => item.QUE_4)</h5></li>
+                <li class="list-group-item">
+                    @for (int i = 0; i < item.quiz[0].Choices.Count; i++)
+                    {
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input" type="radio" name="AQ_4" id="AQ_4_@i" value="@item.quiz[0].Choices[i]">
+                            <label class="form-check-label" for="AQ_4_@i">@item.quiz[0].Choices[i]</label>
+                        </div>
+                    }
+                </li>
+
+                <li class="list-group-item"><h5 class="font-weight-bold">@Html.DisplayFor(modelItem => item.QUE_5)</h5></li>
+                <li class="list-group-item">
+                    @for (int i = 0; i < item.quiz[0].Choices.Count; i++)
+                    {
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input" type="radio" name="AQ_5" id="AQ_5_@i" value="@item.quiz[0].Choices[i]">
+                            <label class="form-check-label" for="AQ_5_@i">@item.quiz[0].Choices[i]</label>
+                        </div>
+                    }
+                </li>
+
+                <li class="list-group-item"><h5 class="font-weight-bold">@Html.DisplayFor(modelItem => item.QUE_6)</h5></li>
+                <li class="list-group-item">
+                    @for (int i = 0; i < item.quiz[0].Choices.Count; i++)
+                    {
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input" type="radio" name="AQ_6" id="AQ_6_@i" value="@item.quiz[0].Choices[i]">
+                            <label class="form-check-label" for="AQ_6_@i">@item.quiz[0].Choices[i]</label>
+                        </div>
+
+                    }
+
+                </li>
+
+                <li class="list-group-item"><h5 class="font-weight-bold">@Html.DisplayFor(modelItem => item.QUE_7)</h5></li>
+                <li class="list-group-item">
+                    @for (int i = 0; i < item.quiz[0].Choices.Count; i++)
+                    {
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input" type="radio" name="AQ_7" id="AQ_7_@i" value="@item.quiz[0].Choices[i]">
+                            <label class="form-check-label" for="AQ_7_@i">@item.quiz[0].Choices[i]</label>
+                        </div>
+                    }
+                </li>
+
+                <li class="list-group-item"><h5 class="font-weight-bold">@Html.DisplayFor(modelItem => item.QUE_8)</h5></li>
+                <li class="list-group-item">
+                    @for (int i = 0; i < item.quiz[0].Choices.Count; i++)
+                    {
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input" type="radio" name="AQ_8" id="AQ_8_@i" value="@item.quiz[0].Choices[i]">
+                            <label class="form-check-label" for="AQ_8_@i">@item.quiz[0].Choices[i]</label>
+                        </div>
+                    }
+                </li>
+            }
+
+        </ul>
+    </div>
+    <div class="form-group   text-center  col-md-9 col-sm-7">
+        <div class="btn-group m-4">
+            <button type="submit" class="btn btn-primary-3  mx-1" id="btnsumit">NEXT</button>
+        </div>
+    </div>
+</form>

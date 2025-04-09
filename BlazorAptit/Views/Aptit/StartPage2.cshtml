@@ -1,0 +1,265 @@
+﻿@model BlazorAptit.Models.AptitUser
+
+@{ ViewData["Title"] = "Index"; }
+
+
+<h1></h1>
+
+@*<form class="form-horizontal" method="post" asp-controller="Aptit" asp-action="Login">*@
+
+
+
+<form class="form-horizontal">
+
+    <input type="hidden" id="groupID" value="@ViewBag.GroupID" />
+    <input type="hidden" id="groupNM" value="@ViewBag.Group_Name" />
+    <input type="hidden" id="groupNM" value="@ViewBag.Group_City" />
+    <div class="form-group text-center">
+
+        <div class="test-info">
+            <div class="inner">
+                <h1 class="title"><img src="~/pub/img/sub/logo_octagnosis.png" alt="">옥타그노시스(OCTAGNOSIS) 검사</h1>
+                <p class="txt">8가지 사고력 기반 진로적성검사</p>
+                <ul class="info-wrap">
+                    <li class="info-item">
+                        <div class="img-wrap">
+                            <img src="~/pub/img/sub/img_info_item01.png" alt="">
+                        </div>
+                        <p class="txt">
+                            <strong>
+                                한국진로적성센터에서
+                                세계최초로 독자 연구 개발한
+                                옥타그노시스(OGS) 검사
+                            </strong>는 인간의 <strong>
+                                8가지 사고력을
+                                기반으로 15가지 성향,
+                                60가지 인간역량 스키마와 선호도를 진단
+                            </strong>해내는 검사입니다.
+                        </p>
+                    </li>
+                    <li class="info-item">
+                        <div class="img-wrap">
+                            <img src="~/pub/img/sub/img_info_item02.png" alt="">
+                        </div>
+                        <p class="txt">
+                            <strong>
+                                104,060상의 임상결과와
+                                누적된 진로연구 데이터들
+                            </strong>을 토대로 <strong>양적연구가 결집</strong>되어 <strong>
+                                기존 적성검사들이 판독하지 못했던 성향유형과 진로
+                                데이터를 판독해낸 검사
+                            </strong>
+                            입니다.
+                        </p>
+                    </li>
+                    <li class="info-item">
+                        <div class="img-wrap">
+                            <img src="~/pub/img/sub/img_info_item03.png" alt="">
+                        </div>
+                        <p class="txt">
+                            <strong>성향진단과 선호도진단으로 구성,</strong> 내가 잘하는 것과
+                            좋아하는 것을 구분하여
+                            파악할 수 있습니다.
+                        </p>
+                    </li>
+                    <li class="info-item">
+                        <div class="img-wrap">
+                            <img src="~/pub/img/sub/img_info_item04.png" alt="">
+                        </div>
+                        <p class="txt">
+                            <strong>
+                                정확하고 구체적인 결과를
+                                도출하기 위해  평소 내 자신의 모습
+                            </strong>을 떠올리며, 각 문항들에 <strong>솔직하게 답변</strong>바랍니다.
+                        </p>
+                    </li>
+                    <li class="info-item">
+                        <div class="img-wrap">
+                            <img src="~/pub/img/sub/img_info_item05.png" alt="">
+                        </div>
+                        <p class="txt">
+                            본 검사와 결과를 포함한
+                            저작물은 한국진로적성센터의 연구저작물로서, 저작권법에 의거하여 무단전재, 배포, 복제, 도용, 유포가 법으로
+                            금지됩니다.
+                        </p>
+                    </li>
+                </ul>
+                <div class="floating">
+                    <div class="container">
+                        <div class="btn-wrap">
+                            <a href='@Url.Action("Create", "Aptit", new { Group_ID = @ViewBag.Group_ID , Group_Name = @ViewBag.Group_Name , Group_City = @ViewBag.Group_City })' class="btn blue">개인정보입력</a>
+                            <button type="button" class="btn green" name="btnLink" id="btnLink">검사시작하기</button>
+
+                        </div>
+                    </div>
+                </div>
+                <div class="test-bottom">
+                    <img src="~/pub/img/sub/logo.png" alt="">
+                    <p class="copyright">Copyright 2004. 한국진로적성센터. All rights reserved.</p>
+                    <p><span class="link">www.aptitude-x.com</span><span class="phone"><img src="~/pub/img/sub/icon_phone.png">02. 523. 7523</span></p>
+                </div>
+            </div>
+        </div>
+
+        <!--<div class="btn-group">
+            <div class="col-md-12 text-right">-->
+                @*<a href="/Aptit/Create" class="btn btn-primary">시작하기</a>*@
+                <!--<a href='@Url.Action("Create", "Aptit", new { Group_ID = @ViewBag.Group_ID , Group_Name = @ViewBag.Group_Name , Group_City = @ViewBag.Group_City })' class="btn btn-primary">시작하기</a>
+                <button type="button" class="btn btn-primary" name="btnLink" id="btnLink">로그인</button>
+            </div>
+        </div>-->
+
+
+
+        @Html.AntiForgeryToken()
+        <div class="modal fade" id="ModalPopUp" role="dialog">
+            <div class="modal-dialog err-pop" style="">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button id="DivClose" type="button" class="close" data-dismiss="modal">&times;</button>
+                    </div>
+                    <div class="modal-body" style="text-align:center;">
+                        <div class="form-group">
+                            <div class="form-group">
+                                <input asp-for="User_Email" class="form-control" placeholder="이메일 입력 *" value="" />
+                                <span asp-validation-for="User_Email" class="text-danger"></span>
+                            </div>
+                            <div class="form-group">
+                                <input type="password" asp-for="User_Password" class="form-control" placeholder="비밀번호 입력 *" value="" />
+                                <span asp-validation-for="User_Password" class="text-danger"></span>
+                            </div>
+                            <div class="form-group">
+                                <button type="button" class="btn btn-primary" onclick="onclickApi()">로그인 </button>
+                            </div>
+
+                            @*<div class="form-group">
+                                <a href="#" id="passFind" class="ForgetPwd">패스워드 찾기</a>
+                            </div>*@
+
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+        <div class="modal fade" id="ModalFindPass" role="dialog">
+            <div class="modal-dialog err-pop" style="">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button id="DivClose" type="button" class="close" data-dismiss="modal">&times;</button>
+                    </div>
+                    <div class="modal-body" style="text-align:center;">
+                        <div class="form-group">
+                            <div class="form-group">
+                                @*<input asp-for="User_Email" class="form-control" placeholder="이메일 입력 *" value="" />
+
+                                <span asp-validation-for="User_Email" class="text-danger"></span>*@
+
+                                <input class="form-control" id="findEmail" name="findEmail" type="text" value="" placeholder="이메일 입력 *" />
+                            </div>
+                            <div class="form-group">
+                                <button type="button" class="btn btn-primary" onclick="onclickEmailSend()">이메일 전송 </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    @*<script src='https://code.jquery.com/jquery-1.12.4.min.js'></script>*@
+    <script>
+            function onclickApi() {
+                //var API_URI = '/api/Login';
+
+                //$.getJSON(API_URI, function (data) {
+                //    var str = '<dl>';
+                //    $.each(data, function (index, entry) {
+                //        str += '<dt>' + entry.id + '</dt>';
+                //        str += '<dd>' + entry.text + '</dd>';
+                //    });
+                //    str += '</dl>';
+
+                //    $('#print').html(str);
+                //});
+                //var API_URI = '/api/Login';
+
+                //$.postJSON(url, paramData, function (data) {
+                //    $.each(data, function (index, jsonData) {
+                //        //jsonData의 값을 처리.~~
+                //    });
+                //});
+
+
+                var jsonData = { User_Email: $("#User_Email").val(), User_Password: $("#User_Password").val() };
+                var controllerUrl = "@this.Url.Action( "LoginUser",  "Aptit")";
+                // This does a Request to "/Home/EditData"!
+                // But I can see .NET errors (using IE Developer Toolbar):
+                //  1. Description: HTTP 404. The resource you are looking for (or one of its dependencies) could have been removed,
+                //     had its name changed, or is temporarily unavailable. Please review the following URL and make sure that
+                //     it is spelled correctly.../Home/EditData
+                //  2. [HttpException]: A public action method 'EditData' was not found on controller
+                //     'TSSR.Controllers.HomeController'. at System.Web.Mvc.Controller.HandleUnknownAction(String actionName)
+                $.ajax({
+                    method: "POST",
+                    dataType: 'JSON',
+                   contentType: "application/json; charset=utf-8",
+                   url: controllerUrl,
+                   // Changing to true did not fix error.
+                    data: JSON.stringify(jsonData),
+                    async: false,
+                    success: function (data) {
+                        //alert("ajax succeeded");
+                        window.location.href = '@Url.Action("Pages2", "Aptit")';
+                        //convertJsonToHtmlTable(JSON.parse(response), $("#ModalPopUp"));
+                    },
+                    error: function (jqXHR, textStatus, errorThrown)
+                    {
+                         alert("개인정보에 입력하신 이메일과 패스워드를 확인해 주세요.");
+
+                    }
+                });
+
+        }
+
+            function onclickEmailSend() {
+                if ($("#findEmail").val() == "") {
+                    alert('이메일주소를 입력해주세요.');
+                    return;
+                }
+                var jsonData = { ToEmail: $("#findEmail").val(), Subject: "Title", Body: "testMail" };
+                var controllerUrl = "@this.Url.Action("welcome",  "Mail")";
+
+                //alert(controllerUrl);
+                $.ajax({
+                    method: "POST",
+                    dataType: 'JSON',
+                    contentType: "application/json; charset=utf-8",
+                    url: "/api" + controllerUrl,
+                    data: JSON.stringify(jsonData),
+                    //data: { request: jsonData },
+                    //Changing to true did not fix error.
+                    async: false,
+                    success: function (data) {
+                        //alert(data);
+                        if (data == "OK") { alert("비밀번호를 이메일 주소로 발송하였습니다. "); } else { alert("비밀번호 발송이 실패하였습니다."); }
+                    },
+                    complete: function () {
+                        setTimeout(ajax, 1000);
+                    },
+                    error: function (jqXHR, textStatus, errorThrown)
+                    {
+                        if (jqXHR.status != "200")
+                            alert(jqXHR.status);
+                            //alert("이메일 주소를 확인하세요. ");
+
+                    }
+                });
+
+
+
+            }
+
+    </script>
+</form>

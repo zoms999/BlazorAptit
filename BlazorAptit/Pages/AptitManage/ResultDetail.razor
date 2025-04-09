@@ -1,0 +1,301 @@
+﻿@page "/AptitManage/ResultDetail/{AptitUserID:int}/{AptitAnswerID:int}"
+
+@using Syncfusion.Blazor.Buttons
+@using Syncfusion.Blazor.Cards
+@using Syncfusion.Blazor.Data
+@using Syncfusion.Blazor.DropDowns
+@using Syncfusion.Blazor.Inputs
+@using Syncfusion.Blazor.Lists
+@using BlazorAptit.Models
+
+<h4>결과보기</h4>
+<div class="row">
+    <div class="control-section col-lg-12 card-control-section tile_layout">
+        <div>
+            @if (this.AptitResults.Count == 0)
+            {
+                <div class="e-error">
+                    <div class="e-error-content">No results found. Please try a different search.</div>
+                </div>
+            }
+            else
+            {
+                @foreach (var item in AptitResults)
+                {
+                    <div class="col-lg-6 " style="padding: 5px;width: 50rem;height:680px;border: 1px solid;border-radius: 14px;">
+                        <div id="card_sample_1" class="card_sample">
+                            <div class="card ">
+                                @*<img src="..." class="card-img-top" alt="...">*@
+                                <div class="his_table">
+                                    @*<h5 class="card-title">Card title</h5>*@
+                                    <div class="his_y_wrap">
+                                        <span class="his_y"> @item.TITLE</span>
+                                    </div>
+                                    <div class="his_m_wrap">
+                                        <div class="his_m_list">
+                                            <span class="his_m"></span>
+                                            <span class="his_t">
+                                                총점( @item.Point)점
+                                            </span>
+                                        </div>
+                                    </div>
+
+                                </div>
+                                <div class="his_table">
+                                    @*<h4 class="card-title m-2">@item.CONTENT_MAIN</h4>*@
+                                    <div class="his_y_wrap">
+                                        <span class="his_all"> @item.CONTENT_MAIN</span>
+                                    </div>
+                                </div>
+                                <div class="his_table text-center">
+                                    <span class="bg-dark">적성적합 학과 </span>
+                                </div>
+                                <div class="his_table">
+                                    @*<h5 class="card-title">Card title</h5>*@
+                                    <div class="his_y_wrap">
+                                        <span class="his_y"> @item.CONTENT_1</span>
+                                    </div>
+                                    <div class="his_m_wrap">
+                                        <div class="his_m_list">
+                                            <span class="his_m"></span>
+                                            <span class="his_t">
+                                                @item.CONTENT_1_1
+                                            </span>
+                                        </div>
+                                    </div>
+
+                                </div>
+                                <div class="his_table">
+                                    @*<h5 class="card-title">Card title</h5>*@
+                                    <div class="his_y_wrap">
+                                        <span class="his_y"> @item.CONTENT_2</span>
+                                    </div>
+                                    <div class="his_m_wrap">
+                                        <div class="his_m_list">
+                                            <span class="his_m"></span>
+                                            <span class="his_t">
+                                                @item.CONTENT_2_1
+                                            </span>
+                                        </div>
+                                    </div>
+
+                                </div>
+                                <div class="his_table">
+                                    <div class="his_y_wrap">
+                                        <span class="his_y"> @item.CONTENT_3</span>
+                                    </div>
+                                    <div class="his_m_wrap">
+                                        <div class="his_m_list">
+                                            <span class="his_m"></span>
+                                            <span class="his_t">
+                                                @item.CONTENT_3_1
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="his_table text-center">
+                                    <span class="bg-dark">적성적합 직업 </span>
+                                </div>
+
+                                <div class="his_table">
+                                    <div class="his_y_wrap">
+                                        <span class="his_y"> @item.CONTENT_4</span>
+                                    </div>
+                                    <div class="his_m_wrap">
+                                        <div class="his_m_list">
+                                            <span class="his_m"></span>
+                                            <span class="his_t">
+                                                @item.CONTENT_4_1
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="his_table">
+                                    <div class="his_y_wrap">
+                                        <span class="his_y"> @item.CONTENT_5</span>
+                                    </div>
+                                    <div class="his_m_wrap">
+                                        <div class="his_m_list">
+                                            <span class="his_m"></span>
+                                            <span class="his_t">
+                                                @item.CONTENT_5_1
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="his_table">
+                                    <div class="his_y_wrap">
+                                        <span class="his_y"> @item.CONTENT_6</span>
+                                    </div>
+                                    <div class="his_m_wrap">
+                                        <div class="his_m_list">
+                                            <span class="his_m"></span>
+                                            <span class="his_t">
+                                                @item.CONTENT_6_1
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+                                @*<ul class="list-group list-group-flush">
+                                    <li class="list-group-item">적성적합 직업</li>
+                                </ul>*@
+                                @*<div class="card-body">
+                                    <a href="#" class="card-link">Card link</a>
+                                    <a href="#" class="card-link">Another link</a>
+                                </div>*@
+                            </div>
+                        </div>
+                    </div>
+                }
+            }
+            </div>
+        </div>
+    </div>
+                <style>
+                  /*  .main_common {
+                        height: 600px;
+                        border: 1px solid;
+                    }
+*/
+                    .card {
+                        /* Add shadows to create the "card" effect */
+                        box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2);
+                        transition: 0.3s;
+                    }
+
+                    .card-body {
+                        // Enable `flex-grow: 1` for decks and groups so that card blocks take up // as much space as possible, ensuring footers are aligned to the bottom. flex: 1 1 auto;
+                        padding: $card-spacer-x;
+                    }
+
+                    /* On mouse-over, add a deeper shadow */
+                    .card:hover {
+                        box-shadow: 0 8px 16px 0 rgba(0,0,0,0.2);
+                    }
+
+                    .card-title {
+                        margin-bottom: $card-spacer-y;
+                    }
+
+                    /* Add some padding inside the card container */
+                    .container {
+                        padding: 2px 16px;
+                    }
+
+                    .property-panel-section .property-panel-content td {
+                        padding: 0 0 15px 0;
+                    }
+
+                    .tile_layout.card-control-section .e-error {
+                        height: 100px;
+                        width: 100%;
+                    }
+
+                        .tile_layout.card-control-section .e-error .e-error-content {
+                            color: red;
+                            line-height: 100px;
+                            text-align: center;
+                        }
+
+                    .tile_layout.card-control-section .e-card .e-card-image {
+                        height: 180px;
+                        width: inherit;
+                    }
+
+                    .tile_layout.card-control-section .e-card .e-card-header .e-card-header-caption .e-card-header-title {
+                        font-size: 20px;
+                        font-family: Helvetica, 'Segoe UI';
+                        font-weight: bold;
+                    }
+
+                    .tile_layout.card-control-section .e-card .e-card-header .e-card-header-caption .e-card-sub-title {
+                        padding-top: 5px;
+                    }
+
+                    .tile_layout.card-control-section .e-card .e-card-content {
+                        padding-top: 0px;
+                        height: 110px;
+                    }
+
+                    #source_link {
+                        float: right;
+                        margin-right: 10px;
+                    }
+
+                    .his_table {
+                        display: table;
+                        padding: 0px;
+                        width: 98%;
+                        margin: 5px;
+                    }
+
+                        .his_table:not(:last-child) {
+                            border-bottom: 1px solid #ddd;
+                        }
+
+                        .his_table:first-child {
+                            margin-top: 10px;
+                        }
+
+                        .his_table .his_y_wrap {
+                            display: table-cell;
+                            width: 100px;
+                            vertical-align: top;
+                        }
+                        
+
+                        .his_table .his_y {
+                            font-size: 1em;
+                            font-weight: bold;
+                            color: #222;
+                        }
+                        .his_table .his_all {
+                            font-size: 1em;
+                            font-weight: bold;
+                            color: #222;
+                            padding: 5px 5px 5px 5px  ;
+                        }
+
+                        .his_table .his_m_wrap {
+                            display: table-cell;
+                            vertical-align: middle;
+                        }
+
+                            .his_table .his_m_wrap .his_m_list .his_m {
+                                width: 40px;
+                                font-size: 1em;
+                                font-weight: bold;
+                                color: #222;
+                            }
+
+                            .his_table .his_m_wrap .his_m_list .his_t {
+                                font-size: 1em;
+                                color: #333;
+                            }
+
+                        .his_table span {
+                            display: table-cell;
+                        }
+
+                    ​
+                </style>
+
+
+                @code {
+
+                    [Parameter]
+                    public int AptitUserID { get; set; }
+                    [Parameter]
+                    public int AptitAnswerID { get; set; }
+
+                    [Inject] public NavigationManager NavigationManager { get; set; }
+                    [Inject] public IJSRuntime JsRuntime { get; set; }
+                public string SearchValue { get; set; }
+            public string SortingValue { get; set; }
+            public string[] FilteringValue { get; set; }
+
+
+
+
+
+                }

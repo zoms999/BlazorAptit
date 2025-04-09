@@ -1,0 +1,227 @@
+﻿@page "/AptitManage/ResultByGroup"
+@layout MainLayoutByGroup
+@using Syncfusion.Blazor.Grids
+@using Syncfusion.Blazor.Data
+@using BlazorAptit.Models
+@using Syncfusion.Blazor.Popups
+
+
+
+@using Microsoft.AspNetCore.Hosting
+@using Syncfusion.Blazor.PdfViewerServer
+@using System.Collections.ObjectModel;
+
+
+@inject IWebHostEnvironment Environment
+@inject Blazored.SessionStorage.ISessionStorageService sessionStorage
+
+
+<h4>결과보기</h4>
+<div class="col-lg-12 control-section">
+    <div class="content-wrapper">
+        <div class="row">
+
+            <SfGrid TValue="AptitResultUserView" @ref="SubGrid"   DataSource="@Users" AllowPaging="true" AllowFiltering="true" AllowExcelExport="true" Toolbar="@(new List<string>() { "엑셀 다운로드" })">
+                <GridFilterSettings Type="Syncfusion.Blazor.Grids.FilterType.CheckBox"></GridFilterSettings>
+                <GridEditSettings AllowEditing="false" ></GridEditSettings>
+                <GridEvents OnToolbarClick="ToolbarClick"  OnActionComplete="ActionComplete" CommandClicked="CommandClickHandler" RowSelected="SubRowSelecthandler" TValue="AptitResultUserView"></GridEvents>
+                <GridPageSettings PageSize="15" />
+                <GridColumns>
+                    <GridColumn Field=@nameof(AptitResultUserView.Group_ID) HeaderText="회차코드" TextAlign="@TextAlign.Left" HeaderTextAlign="@TextAlign.Center" Width="100" Visible="false" AllowEditing="false"> </GridColumn>
+                    <GridColumn Field=@nameof(AptitResultUserView.ID) HeaderText="순번" IsPrimaryKey="true" TextAlign="@TextAlign.Left" HeaderTextAlign="@TextAlign.Center" Width="80" AllowEditing="false"></GridColumn>
+                    <GridColumn Field=@nameof(AptitResultUserView.User_Name) HeaderText="이름" Width="100" TextAlign="@TextAlign.Left" HeaderTextAlign="@TextAlign.Center"></GridColumn>
+                    <GridColumn Field=@nameof(AptitResultUserView.User_Email) HeaderText="이메일" Width="120" TextAlign="@TextAlign.Left" HeaderTextAlign="@TextAlign.Center" AllowEditing="false"></GridColumn>
+                    <GridColumn Field=@nameof(AptitResultUserView.User_Password) HeaderText="패스워드" Width="100" TextAlign="@TextAlign.Left" HeaderTextAlign="@TextAlign.Center" Visible="false" AllowEditing="false"></GridColumn>
+                    <GridColumn Field=@nameof(AptitResultUserView.User_Gender) HeaderText="성별" Width="100" TextAlign="@TextAlign.Left" HeaderTextAlign="@TextAlign.Center" AllowEditing="false"></GridColumn>
+                    <GridColumn Field=@nameof(AptitResultUserView.User_Age) HeaderText="나이" Width="80" TextAlign="@TextAlign.Left" HeaderTextAlign="@TextAlign.Center" AllowEditing="false"></GridColumn>
+                    @*<GridColumn Field=@nameof(AptitResultUserView.User_Edu) HeaderText="전공여부" Width="140" TextAlign="@TextAlign.Center" HeaderTextAlign="@TextAlign.Center" AllowEditing="false"></GridColumn>*@
+                    <GridColumn Field=@nameof(AptitResultUserView.User_Finish) HeaderText="전공" Width="100" TextAlign="@TextAlign.Left" HeaderTextAlign="@TextAlign.Center" AllowEditing="false"></GridColumn>
+                    <GridColumn Field=@nameof(AptitResultUserView.User_Grade) HeaderText="학년" Width="80" TextAlign="@TextAlign.Left" HeaderTextAlign="@TextAlign.Center" AllowEditing="false"></GridColumn>
+                    <GridColumn Field=@nameof(AptitResultUserView.User_Class) HeaderText="반" Width="50" TextAlign="@TextAlign.Left" HeaderTextAlign="@TextAlign.Center" AllowEditing="false"></GridColumn>
+                    <GridColumn Field=@nameof(AptitResultUserView.USERRANKS) HeaderText="결과"  Width="220"  TextAlign="@TextAlign.Left" HeaderTextAlign="@TextAlign.Center" AllowEditing="false"></GridColumn>
+                    <GridColumn Field=@nameof(AptitResultUserView.Created) HeaderText="등록일" EditType="EditType.DatePickerEdit" Format="d" TextAlign="TextAlign.Left" Type="ColumnType.Date" Width="160" AllowEditing="false"></GridColumn>
+
+                    @*<GridColumn Field=@nameof(AptitResultUserView.AptitAnswerID) HeaderText="답변ID" TextAlign="@TextAlign.Center" HeaderTextAlign="@TextAlign.Center" Width="140">
+                    </GridColumn>*@
+
+                    <GridColumn Field=@nameof(AptitResultUserView.Stage) HeaderText="문항" TextAlign="TextAlign.Left" HeaderTextAlign="@TextAlign.Center" Width="80">
+                        <Template>
+                            @{
+                                var info = context as AptitResultUserView;
+                                if (info.Stage == "16")
+                                {
+                                    <div class="font - weight - bold">완료</div>
+
+                                }
+                                else
+                                {
+                                    <div class="font-weight-bold">@info.Stage </div>
+                                }
+                            }
+
+                        </Template>
+                    </GridColumn>
+                    @*<GridColumn HeaderText="결과보기" Width="150">
+                    <GridCommandColumns>
+                    <GridCommandColumn Type="CommandButtonType.None" Title="abc"
+                    ButtonOption="@(new CommandButtonOptions()
+                    {
+                    IconCss = "remove-image-icon-icon-image", Content="결과보기"
+                    })" />
+                    </GridCommandColumns>
+                    </GridColumn>
+                    <GridColumn HeaderText="결과보기2" Width="150">
+                    <GridCommandColumns>
+                    <GridCommandColumn Type="CommandButtonType.None" Title="abc"
+                    ButtonOption="@(new CommandButtonOptions()
+                    {
+                    IconCss = "remove-image-icon-icon-image", Content="결과보기2"
+                    })" />
+                    </GridCommandColumns>
+                    </GridColumn>*@
+
+                    <GridColumn HeaderText="성향결과" Width="110" >
+                        <GridCommandColumns>
+                            <GridCommandColumn Type="CommandButtonType.None" Title="성향결과"
+                                ButtonOption="@(new CommandButtonOptions() { CssClass = "e-small" ,   Content="PDF_성향결과"})"></GridCommandColumn>
+                        </GridCommandColumns>
+
+                    </GridColumn>
+                    <GridColumn HeaderText="교과목결과" Width="130">
+                        <GridCommandColumns>
+                            <GridCommandColumn Type="CommandButtonType.None" Title="교과목결과"
+                                ButtonOption="@(new CommandButtonOptions() { CssClass = "e-small", Content = "PDF_교과목결과" })"></GridCommandColumn>
+                        </GridCommandColumns>
+                    </GridColumn>
+
+                </GridColumns>
+            </SfGrid>
+        </div>
+    </div>
+</div>
+<div class="control-section">
+
+    <SfDialog Target="#main" IsModal="true" Width="90%" Height="900px" ShowCloseIcon="true" @bind-Visible=@(isShowPdfViewer)>
+        <DialogTemplates>
+            <Header></Header>
+            <Content>
+                <SfPdfViewerServer DocumentPath=@(DocumentPath) Width="1300px" Height="750px" />
+            </Content>
+        </DialogTemplates>
+        <DialogButtons>
+            <DialogButton Content="확인" OnClick=@(() => isShowPdfViewer = false) />
+        </DialogButtons>
+        <DialogAnimationSettings Effect="@DialogEffect.None"></DialogAnimationSettings>
+    </SfDialog>
+
+</div>
+
+<div class="row">
+    <div>
+        <SfButton @onclick="GeneratePDF">Generate PDF</SfButton>
+    </div>
+</div>
+
+
+<style>
+    .e-grid .e-headercelldiv {
+        font-size: 12px;
+    }
+
+    .e-grid .e-rowcell {
+        font-size: 12px;
+    }
+</style>
+
+@code {
+
+
+    List<Data> FilterDropData = new List<Data>
+    {
+        new Data() { Type= "All" },
+        new Data() { Type= "Base" },
+        new Data() { Type= "Replace" },
+        new Data() { Type= "Delta" }
+    };
+    public class Data
+    {
+        public string Type { get; set; }
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            var UserID = await sessionStorage.GetItemAsync<string>("USERID");
+
+            if (UserID == null && UserID == "")
+            {
+                NavigationManager.NavigateTo(NavigationManager.ToAbsoluteUri("/account").ToString());
+                StateHasChanged();
+            }
+            else
+            {
+                await GetNameFromSessionStorage();
+            }
+        }
+    }
+
+    async Task GetNameFromSessionStorage()
+    {
+        var UserID = await sessionStorage.GetItemAsync<string>("USERID");
+        Users = await AptitRepository.GetGroupByID(UserID);
+        GridData = this.Users;
+
+        ObservableData = new ObservableCollection<AptitResultUserView>(Users);
+
+        StateHasChanged();
+
+    }
+
+    public async Task ActionComplete(ActionEventArgs<AptitResultUserView> args)
+    {
+        if (args.RequestType == Syncfusion.Blazor.Grids.Action.BeginEdit)
+        {
+            // Triggers once editing operation completes
+        }
+        else if (args.RequestType == Syncfusion.Blazor.Grids.Action.Add)
+        {
+            // Triggers once add operation completes
+        }
+        else if (args.RequestType == Syncfusion.Blazor.Grids.Action.Cancel)
+        {
+            // Triggers once cancel operation completes
+        }
+        else if (args.RequestType == Syncfusion.Blazor.Grids.Action.Save)
+        {
+            // Triggers once save operation completes
+            // await AptitRepository.UserEdit(args.RowData);
+        }
+        else if (args.RequestType == Syncfusion.Blazor.Grids.Action.Delete)
+        {
+            // Triggers once delete operation completes
+        }
+    }
+
+    public async Task ToolbarClick(Syncfusion.Blazor.Navigations.ClickEventArgs args)
+    {
+        if (args.Item.Text == "엑셀 다운로드")
+        {
+            //this.SubGrid.ExportToPdfAsync();
+
+            ExcelExportProperties ExportProperties = new ExcelExportProperties();
+
+            ExportProperties.ExportType = ExportType.AllPages;
+
+            ExportProperties.IncludeTemplateColumn = true;
+            
+            ExportProperties.FileName = $"{Users[0].Group_Name}_{DateTime.Today}.xlsx";
+
+            await this.SubGrid.ExcelExport(ExportProperties);
+        }
+      
+    }
+
+
+}
+

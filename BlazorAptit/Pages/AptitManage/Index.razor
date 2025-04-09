@@ -1,0 +1,369 @@
+﻿@page "/AptitManage/Index"
+@using Syncfusion.Blazor.Grids
+@using Syncfusion.Blazor.Data
+@using Syncfusion.Blazor.Buttons
+@using System.Collections.ObjectModel;
+@using BlazorAptit.Models
+@using Syncfusion.Blazor.Inputs
+@using System.IO
+@using System.Linq
+@using System.Threading
+@using Microsoft.EntityFrameworkCore
+@using Syncfusion.Blazor.Layouts
+
+@inject BlazorAptit.Models.Dapper.IAptitRepository AptitRepository
+@inject BlazorAptit.Data.AptitService Service;
+@inject Microsoft.AspNetCore.Components.NavigationManager UriHelper
+@inject HttpClient Http
+@inject Blazored.SessionStorage.ISessionStorageService sessionStorage
+
+<h4>검사문항관리</h4>
+
+<style>
+    .image img {
+        height: 100px;
+        width: 100px;
+        border-radius: 10px;
+        box-shadow: inset 0 0 1px #e0e0e0, inset 0 0 14px rgba(0,0,0,0.2);
+    }
+</style>
+<div class="col-lg-12 control-section">
+    <div class="content-wrapper">
+        <div class="row">
+            @*<div class='e-statustext'>문항 : <b>@SelectedCustomer  @SelectedType</b></div>*@
+            <SfSplitter CssClass="out-splitter" Width="100%" Height="1600px" SeparatorSize="6">
+                <SplitterPanes>
+                    <SplitterPane Size="10%" Min="60px">
+                        <SfGrid DataSource="@resutl">
+
+                            <GridEvents RowSelected="RowSelecthandler" TValue="AptitQuestion"></GridEvents>
+                            <GridColumns>
+                                <GridColumn Field=@nameof(AptitQuestion.ID) HeaderText="문항" Width="50" HeaderTextAlign="@TextAlign.Center"> </GridColumn>
+                                <GridColumn Field=@nameof(AptitQuestion.QuestionType) HeaderText="성향유형" Width="100" HeaderTextAlign="@TextAlign.Center"> </GridColumn>
+                            </GridColumns>
+                        </SfGrid>
+                    </SplitterPane>
+                    <SplitterPane Size="90%" Min="60px">
+
+                        @*<SfButton ID="update" @onclick="UpdateRecord">Update Data</SfButton>*@
+                        @*<SfGrid @ref="@SubGrid" DataSource="@ObservableData" Query="@(new Query().Where("ID", "equal", RowIndex))" Toolbar="@(new List<string>() { "Edit", "Update","Cancel" })">
+                                <GridEvents TValue="Order" OnActionComplete="OnActionComplete" OnActionBegin="ActionBeginHandler"></GridEvents>
+                                <GridEditSettings AllowEditing="true" Mode="EditMode.Normal"></GridEditSettings>
+                                <GridColumns>
+                                    <GridColumn Field=@nameof(Order.ID) HeaderText="ID" Width="80"> </GridColumn>
+                                    <GridColumn Field=@nameof(Order.COL_NM) HeaderText="문제번호" Width="120"></GridColumn>
+                                    <GridColumn Field=@nameof(Order.VAL) HeaderText="VAL"></GridColumn>
+                                </GridColumns>
+                            </SfGrid>*@
+
+                        @*<SfGrid TValue="Order" @ref="SubGrid" DataSource="@OrderData" Query="@(new Query().Where("ID", "equal", RowIndex))" Toolbar="@(new List<string>() {"Add","Edit","Delete","Update","Cancel"})">
+                                <GridEditSettings AllowEditing="true" ShowDeleteConfirmDialog="true"></GridEditSettings>
+                                <GridEvents OnActionBegin="ActionBeginHandler" OnActionComplete="OnActionComplete" TValue="Order"></GridEvents>
+                                <GridColumns>
+                                    <GridColumn Field=@nameof(Order.ID) HeaderText="ID" Width="80"> </GridColumn>
+                                    <GridColumn Field=@nameof(Order.COL_NM) HeaderText="문제번호" Width="120"></GridColumn>
+                                    <GridColumn Field=@nameof(Order.VAL) HeaderText="VAL"></GridColumn>
+                                </GridColumns>
+                            </SfGrid>*@
+
+                        <SfGrid TValue="Order" @ref="SubGrid" DataSource="@OrderData" Query="@(new Query().Where("ID", "equal", RowIndex))" Toolbar="@(new List<string>() {"Edit","Update","Cancel"})">
+                            <GridEditSettings AllowEditing="true" ShowDeleteConfirmDialog="true"></GridEditSettings>
+                            <GridEvents OnActionBegin="ActionBeginHandler" OnActionComplete="OnActionComplete" TValue="Order"></GridEvents>
+                            <GridEditSettings AllowEditing="true"></GridEditSettings>
+                            <GridColumns>
+                                <GridColumn Field=@nameof(Order.ID) HeaderText="문항" Width="60" IsIdentity="true" HeaderTextAlign="@TextAlign.Center"></GridColumn>
+                                <GridColumn Field=@nameof(Order.COL_NM) HeaderText="문제번호" IsPrimaryKey="true" Width="100" HeaderTextAlign="@TextAlign.Center"></GridColumn>
+                                <GridColumn Field=@nameof(Order.VAL) HeaderText="문제" HeaderTextAlign="@TextAlign.Center">
+                                    <Template>
+                                        <div class="e-list-wrapper e-list-multi-line e-list-avatar">
+                                            @if (((context as Order).VAL).Contains(".JPG"))
+                                            {
+                                                @((context as Order).VAL)
+                                                <div class="image">
+                                                    <img src="@UriHelper.ToAbsoluteUri($"img/{ (context as Order).ID }/{ (context as Order).VAL }")" alt="이미지" />
+                                                </div>
+                                            }
+                                            else
+                                            {
+                                                @((context as Order).VAL)
+                                            }
+                                        </div>
+                                    </Template>
+                                </GridColumn>
+
+                                <!--<GridColumn Field=@nameof(Order.VAL) HeaderText="문제" HeaderTextAlign="@TextAlign.Center">
+                                    <Template>
+                                        <div class="e-list-wrapper e-list-multi-line e-list-avatar">
+                                            @if (((context as Order).VAL).Contains(".JPG"))
+                                            {
+                                                @((context as Order).VAL)
+                                            <div class="image">
+                                                <img src="@UriHelper.ToAbsoluteUri($"img/{ (context as Order).ID }/{ (context as Order).VAL }")" alt="이미지" @onclick="@uploadFile" />
+
+                                                @{
+                                                    var imageId = (context as Order).ID;
+                                                    var SaveUrl = $"https://localhost:44373/api/SampleData/Save/{content}";-->
+                                                    @*<SfUploader AllowedExtensions=".jpg, .jpeg, .png" MaxFileSize="10000000" Multiple="false">
+                                                        <UploaderAsyncSettings SaveUrl="@SaveUrl"></UploaderAsyncSettings>
+                                                    </SfUploader>*@
+
+                                                    @*<SfUploader ID="UploadFiles" AutoUpload="false">
+                                                        <UploaderEvents ValueChange="OnChange"></UploaderEvents>
+                                                    </SfUploader>*@
+                                                <!--}
+                                            </div>
+                                            }
+                                            else
+                                            {
+                                                @((context as Order).VAL)
+                                            }
+                                        </div>
+
+
+                                    </Template>
+                                    <EditTemplate>
+
+
+                                    </EditTemplate>
+                                </GridColumn>-->
+                                @*<GridColumn Field=@nameof(Order.VAL) HeaderText="문제" Width="150">
+                                        <Template>
+                                            <div class="e-list-wrapper e-list-multi-line e-list-avatar">
+                                                @if (((context as Order).VAL).Contains(".JPG"))
+                                                {
+                                                    @((context as Order).VAL)
+                                                    <div class="image">
+                                                        <img src="@UriHelper.ToAbsoluteUri($"img/{ (context as Order).ID }/{ (context as Order).VAL }")" alt="이미지" />
+                                                    </div>
+                                                    <InputFile OnChange="OnChange" class="form-control" />
+                                                }
+                                                else
+                                                {
+                                                    @((context as Order).VAL)
+                                                }
+                                            </div>
+                                        </Template>
+                                    </GridColumn>*@
+
+
+
+                                @*<GridColumn Field=@nameof(Order.FILE_NM) HeaderText="파일"  Width="150">
+                                        <EditTemplate>
+                                            <SfUploader ID="UploadFiles" DropArea=".control-fluid">
+                                                <UploaderEvents OnRemove="OnFileRemove"></UploaderEvents>
+                                                <UploaderAsyncSettings SaveUrl="https://aspnetmvc.syncfusion.com/services/api/uploadbox/Save" RemoveUrl="https://aspnetmvc.syncfusion.com/services/api/uploadbox/Remove"></UploaderAsyncSettings>
+                                            </SfUploader>
+                                        </EditTemplate>
+                                    </GridColumn>*@
+
+                            </GridColumns>
+                        </SfGrid>
+
+                    </SplitterPane>
+                </SplitterPanes>
+            </SfSplitter>
+        </div>
+    </div>
+</div>
+<style>
+    .e-grid .e-headercelldiv {
+        font-size: 12px;
+    }
+
+    .e-grid .e-rowcell {
+        font-size: 12px;
+    }
+</style>
+@code{
+
+
+    SfGrid<Order> SubGrid;
+
+    public ObservableCollection<Order> ObservableData { get; set; }
+    List<Order> OrderData = new List<Order>();
+
+    List<AptitQuestion> resutl = new List<AptitQuestion>();
+
+    public IEnumerable<Order> GridData { get; set; }
+    public string SelectedCustomer { get; set; }
+    public string SelectedType { get; set; }
+    public int? RowIndex { get; set; } = 1;
+
+    private Order orderFile;
+    private CancellationTokenSource cancelation;
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            var UserRole = await sessionStorage.GetItemAsync<string>("USERROLE");
+
+            if (UserRole == null)
+            {
+                UriHelper.NavigateTo(UriHelper.ToAbsoluteUri("/account").ToString());
+                StateHasChanged();
+            }
+           
+        }
+    }
+
+
+    private async Task OnChange(InputFileChangeEventArgs eventArgs)
+    {
+        //Order orderFile = new Order();
+        //cancelation = new CancellationTokenSource();
+        //orderFile.Picture = eventArgs.File;
+        //FieldIdentifier.Create(() => orderFile.Picture);
+        //// editContext.NotifyFieldChanged(FieldIdentifier.Create(() => person.Picture));
+
+        //using var file = File.OpenWrite(Path.Combine(@"c:\temp\", "AQ.JPG"));
+
+        //using var stream = orderFile.Picture.OpenReadStream();
+
+        //var buffer = new byte[4 * 1096];
+        //int bytesRead;
+        //double totalRead = 0;
+
+        //while ((bytesRead = await stream.ReadAsync(buffer, cancelation.Token)) == 0)
+        //{
+        //    totalRead += bytesRead;
+        //    await file.WriteAsync(buffer, cancelation.Token);
+
+        //    //progressPercent = (int)((totalRead / person.Picture.Size) * 100);
+        //    //StateHasChanged();
+
+        //}
+
+    }
+
+    private async Task OnUpload()
+    {
+        /*
+        using var file = File.OpenWrite(Path.Combine(@"c:\temp\", "AQ.JPG"));
+
+        using var stream = orderFile.Picture.OpenReadStream();
+
+        var buffer = new byte[4 * 1096];
+        int bytesRead;
+        double totalRead = 0;
+
+        while ((bytesRead = await stream.ReadAsync(buffer, cancelation.Token)) == 0)
+        {
+            totalRead += bytesRead;
+            await file.WriteAsync(buffer, cancelation.Token);
+
+            //progressPercent = (int)((totalRead / person.Picture.Size) * 100);
+            //StateHasChanged();
+        }
+        */
+    }
+
+
+
+    public void OnFileRemove(RemovingEventArgs args)
+    {
+        args.PostRawFile = false;
+    }
+
+    public async void RowSelecthandler(RowSelectEventArgs<AptitQuestion> Args)
+    {
+        SelectedCustomer = Args.Data.ID.ToString();
+        SelectedType = Args.Data.QuestionType;
+        RowIndex = Args.Data.ID;
+        OrderData = await AptitRepository.GetQuestionByID(RowIndex);
+        GridData = this.OrderData;
+
+        ObservableData = new ObservableCollection<Order>(OrderData);
+    }
+
+
+
+
+    public async void ActionBeginHandler(ActionEventArgs<Order> args)
+    {
+        if (args.RequestType == Syncfusion.Blazor.Grids.Action.Save)
+        {
+
+            var value = OrderData.Find(x => x.ID == args.Data.ID && x.COL_NM == args.Data.COL_NM);
+
+            if (args.Action == "add")
+            {
+                await Service.InsertOrderAsync(args.Data);
+            }
+            else if (args.Action == "Edit")
+            {
+                //await Service.UpdateOrderAsync(args.Data.ID.ToString(), args.Data);
+                //await Service.EditAsync(args.Data.ID.ToString(), args.Data);
+                await AptitRepository.EditAsync(args.Data.ID.ToString(), args.Data);
+
+            }
+            if (args.RequestType == Syncfusion.Blazor.Grids.Action.Delete)
+            {
+            }
+        }
+    }
+
+    public void UpdateRecord()
+    {
+        if (ObservableData.Count() != 0)
+        {
+            //var name = ObservableData.First();
+        }
+    }
+
+    private async Task OnActionComplete(ActionEventArgs<Order> args)
+    {
+        //if (args.RequestType == Syncfusion.Blazor.Grids.Action.Save)
+        //{
+        //}
+    }
+    public async Task ToolbarClickHandler(Syncfusion.Blazor.Navigations.ClickEventArgs args)
+    {
+        //var name = ObservableData.First();
+        //if (args.Item.Text == "Update")
+        //{
+        //    var subData = SubGrid.GetSelectedRecords();
+        //}
+        //if (args.Item.Text == "Collapse all")
+        //{
+        //    //await this.Grid.GroupCollapseAll();
+        //}
+    }
+
+
+    protected async override Task OnInitializedAsync()
+    {
+        //GridData = this.Orders;
+        resutl = await AptitRepository.GetAllAptitQuestionsAsyns();
+        await Task.Delay(500);
+        //GridData = this.resutl;
+
+
+    }
+
+    public HttpResponseMessage filepath { get; set; }
+    public string responseStr;
+    public MultipartFormDataContent content;
+
+    public async Task uploadFile(MouseEventArgs args)
+    {
+        filepath = await Http.PostAsync("https://localhost:44373/api/SampleData/Save", content);
+        this.responseStr = await filepath.Content.ReadAsStringAsync();
+    }
+
+
+    public void OnChange(UploadChangeEventArgs args)
+    {
+        foreach (var file in args.Files)
+        {
+            var path = @"path" + file.FileInfo.Name;
+            FileStream filestream = new FileStream(path, FileMode.Create, FileAccess.Write);
+            file.Stream.WriteTo(filestream);
+            filestream.Close();
+            file.Stream.Close();
+        }
+    }
+
+
+
+}

@@ -1,0 +1,208 @@
+﻿@page "/AptitManage/Chart2"
+@using Syncfusion.Blazor.Charts
+@using Syncfusion.Blazor.Buttons
+@using System.Dynamic
+@using BlazorAptit.Models
+@using Syncfusion.Blazor.DropDowns
+@using Syncfusion.Blazor.Layouts
+@using Syncfusion.Blazor.Navigations
+@using PointRender
+@inject NavigationManager NavigationManager
+@inject BlazorAptit.Models.Dapper.IAptitRepository AptitRepository
+@inject Blazored.SessionStorage.ISessionStorageService sessionStorage
+@implements IDisposable
+@*<SfChart>
+        <ChartPrimaryXAxis ValueType="Syncfusion.Blazor.Charts.ValueType.Category" />
+        <ChartSeriesCollection>
+            <ChartSeries DataSource="@MedalDetails" XName="X" YName="Y" Type="ChartSeriesType.Column">
+            </ChartSeries>
+        </ChartSeriesCollection>
+    </SfChart>*@
+
+
+<div id="TabHeader">
+    <div class="row">
+        <div class="col-xs-6 col-sm-6 col-lg-6 col-md-6">
+            <div class="col-lg-3">
+
+                <SfDropDownList TValue="string" TItem="Countries" Placeholder="순위" DataSource="@Country">
+                    <DropDownListFieldSettings Text="Name" Value="Code"></DropDownListFieldSettings>
+                    <DropDownListEvents TValue="string" TItem="Countries" ValueChange="onValueChange"></DropDownListEvents>
+                </SfDropDownList>
+            </div>
+            <div class="col-lg-3">
+                <SfButton @onclick="ExportChart" Content="Export" CssClass="e-flat" IsPrimary="true"></SfButton>
+            </div>
+
+        </div>
+        <div class="col-xs-6 col-sm-6 col-lg-6 col-md-6">
+
+        </div>
+    </div>
+</div>
+
+<br />
+<br />
+
+@if (MedalDetails != null && MedalDetails.Any())
+{
+    <SfChart @ref="ChartObj" Title="성향유형별 전체통계" Theme="@Theme">
+        <ChartArea><ChartAreaBorder Width="0"></ChartAreaBorder></ChartArea>
+        <ChartPrimaryXAxis Title="Country" ValueType="Syncfusion.Blazor.Charts.ValueType.Category" Interval="1">
+            <ChartAxisMajorGridLines Width="0"></ChartAxisMajorGridLines>
+        </ChartPrimaryXAxis>
+        <ChartPrimaryYAxis Minimum="0" Maximum="100" Interval="10" Title="Measurements" LabelFormat="{value}">
+            <ChartAxisMajorGridLines Width="0"></ChartAxisMajorGridLines>
+        </ChartPrimaryYAxis>
+        <ChartSeriesCollection>
+            <ChartSeries DataSource="@MedalDetails" XName="X" YName="Y" Type="ChartSeriesType.Column">
+            </ChartSeries>
+        </ChartSeriesCollection>
+        <ChartTooltipSettings Enable="true"></ChartTooltipSettings>
+        <ChartEvents OnPointRender="PointRender"></ChartEvents>
+    </SfChart>
+}
+else
+{
+    <div>데이터를 로딩 중입니다...</div>
+}
+
+<style>
+    #control-container {
+        padding: 0px !important;
+    }
+
+    .e-play-icon::before {
+        content: '\e720';
+    }
+</style>
+
+@code{
+    SfChart ChartObj;
+    public EmptyPointMode Mode = EmptyPointMode.Average;
+    private bool isDisposed = false;
+
+    public class Countries
+    {
+        public string Name { get; set; }
+        public int Code { get; set; }
+    }
+
+    List<Countries> Country = new List<Countries>
+{
+        new Countries() { Name = "1순위", Code = 1 },
+        new Countries() { Name = "2순위", Code = 2 },
+        new Countries() { Name = "3순위", Code = 3 },
+
+    };
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            var UserRole = await sessionStorage.GetItemAsync<string>("USERROLE");
+
+            if (UserRole == "user")
+            {
+                NavigationManager.NavigateTo(NavigationManager.ToAbsoluteUri("/account").ToString());
+                StateHasChanged();
+            }
+        }
+    }
+
+
+    public void ExportChart(MouseEventArgs args)
+    {
+        if (ChartObj != null)
+        {
+            ChartObj.Export(ExportType.PNG, "성향유형전체통계");
+        }
+    }
+
+    List<AptitRankView> aptitRankViews = new List<AptitRankView>();
+    public List<ExpandoObject> MedalDetails { get; set; } = new List<ExpandoObject>();
+    string CurrentUri;
+    private Syncfusion.Blazor.Theme Theme { get; set; }
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            CurrentUri = NavigationManager.Uri;
+            Theme = Syncfusion.Blazor.Theme.Bootstrap4;
+            aptitRankViews = await AptitRepository.성향유형전체통계(1);
+
+            if (aptitRankViews != null && aptitRankViews.Count > 0)
+            {
+                MedalDetails = Enumerable.Range(0, aptitRankViews.Count - 1).Select((x) =>
+                {
+                    dynamic d = new ExpandoObject();
+                    d.X = aptitRankViews[x].TITLE;
+                    d.Y = Convert.ToDouble(aptitRankViews[x].Cnt);
+                    return d;
+                }).Cast<ExpandoObject>().ToList<ExpandoObject>();
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"초기화 중 오류 발생: {ex.Message}");
+        }
+    }
+
+    private async Task onValueChange(Syncfusion.Blazor.DropDowns.ChangeEventArgs<string, Countries> args)
+    {
+        try
+        {
+            if (isDisposed) return;
+
+            CurrentUri = NavigationManager.Uri;
+            Theme = Syncfusion.Blazor.Theme.Bootstrap4;
+            aptitRankViews = await AptitRepository.성향유형전체통계(args.ItemData.Code);
+
+            if (aptitRankViews != null && aptitRankViews.Count > 0)
+            {
+                MedalDetails = Enumerable.Range(0, aptitRankViews.Count - 1).Select((x) =>
+                {
+                    dynamic d = new ExpandoObject();
+                    d.X = aptitRankViews[x].TITLE;
+                    d.Y = Convert.ToDouble(aptitRankViews[x].Cnt);
+                    return d;
+                }).Cast<ExpandoObject>().ToList<ExpandoObject>();
+            }
+
+            StateHasChanged();
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"onValueChange 중 오류 발생: {ex.Message}");
+        }
+    }
+
+    public void PointRender(PointRenderEventArgs args)
+    {
+        if (isDisposed) return;
+        
+        if (CurrentUri.IndexOf("material") > -1)
+        {
+            args.Fill = PointColor.MaterialColors[args.Point.Index % 10];
+        }
+        else if (CurrentUri.IndexOf("fabric") > -1)
+        {
+            args.Fill = PointColor.FabricColors[args.Point.Index % 10];
+        }
+        else if (CurrentUri.IndexOf("bootstrap") > -1)
+        {
+            args.Fill = PointColor.BootstrapColors[args.Point.Index % 10];
+        }
+        else if (CurrentUri.IndexOf("highcontrast") > -1)
+        {
+            args.Fill = PointColor.HighContrastColors[args.Point.Index % 10];
+        }
+        args.Fill = PointColor.BootstrapColors[args.Point.Index % 10];
+    }
+
+    public void Dispose()
+    {
+        isDisposed = true;
+        ChartObj = null;
+    }
+}

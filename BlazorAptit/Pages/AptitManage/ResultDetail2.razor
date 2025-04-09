@@ -1,0 +1,197 @@
+﻿@page "/AptitManage/ResultDetail2/{AptitUserID:int}/{AptitAnswerID:int}"
+
+@using Syncfusion.Blazor.Buttons
+@using Syncfusion.Blazor.Cards
+@using Syncfusion.Blazor.Data
+@using Syncfusion.Blazor.DropDowns
+@using Syncfusion.Blazor.Inputs
+@using Syncfusion.Blazor.Lists
+@using BlazorAptit.Models
+@using Syncfusion.Blazor.Layouts
+
+<h3>결과보기</h3>
+<div class="row">
+    <div class="control-section col-lg-12 card-control-section tile_layout">
+        <div class="e-card-layout">
+            @if (this.AptitResults.Count == 0)
+            {
+                <div class="e-error">
+                    <div class="e-error-content">No results found. Please try a different search.</div>
+                </div>
+            }
+            else
+            {
+               
+            @foreach (var item in AptitResults)
+            {
+
+                <div class="col-lg-4 col-md-4 col-sm-6" style="padding: 1px;">
+                    <div id="card_sample_1" class="card_sample">
+                        <SfCard>
+                            <CardHeader Title="@item.TITLE"  />
+                            <CardContent>
+                                <table>
+                                    <tr>
+                                        <td class="e-bold">@item.TITLE</td>
+                                        <td>총점( @item.Point 점)</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="e-bold" colspan="2">@item.CONTENT_MAIN</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="e-bold">@item.CONTENT_1</td>
+                                        <td class="e-bold">@item.CONTENT_1_1</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="e-bold">@item.CONTENT_2</td>
+                                        <td class="e-bold">@item.CONTENT_2_1</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="e-bold">@item.CONTENT_3</td>
+                                        <td class="e-bold">@item.CONTENT_3_1</td>
+                                    </tr>
+                                </table>
+                            </CardContent>
+
+                                <CardFooter>
+                                    <CardFooterContent>
+                                        
+                                    </CardFooterContent>
+                                </CardFooter>
+</SfCard>
+                    </div>
+                </div>
+
+            }
+                    
+                    }
+                </div>
+            </div>
+</div>
+<style>
+    #splitter .e-avatar.e-avatar-xlarge {
+        font-size: 22px;
+    }
+
+    .header-image {
+        text-align: center;
+        margin-top: 7px;
+    }
+
+    .e-custom-card .e-avatar {
+        font-size: 40px;
+        position: absolute;
+        top: calc(0% - 1.5em);
+        left: calc(50% - 1.5em);
+        box-shadow: 0 16px 28px -8px rgba(0, 0, 0, .36), 0 4px 15px 0 rgba(0, 0, 0, .12), 0 8px 10px -5px rgba(0, 0, 0, .2);
+    }
+    /* ListView template customization */
+    #ui-list.e-listview .showUI {
+        display: flex;
+    }
+
+    #ui-list.e-listview .hideUI {
+        display: none;
+    }
+
+    #ui-list.e-listview .e-list-item {
+        padding: 3px 0;
+    }
+
+    #ui-list.e-listview .R {
+        background: lightgrey;
+    }
+
+    #ui-list.e-listview .M {
+        background: lightblue;
+    }
+
+    .highcontrast #ui-list.e-listview .e-list-item.e-active {
+        background: #ffd939;
+        color: #000000;
+    }
+
+    table {
+        border-collapse: collapse;
+        border-spacing: 0;
+        width: calc(100% - 20px);
+        margin: 10px;
+    }
+
+        table th,
+        table td {
+            font-weight: normal;
+            padding: 5px;
+            text-align: left;
+            border: 1px solid #ddd
+        }
+
+    .e-bold {
+        font-weight: 500;
+    }
+
+    .profile-name {
+        font-weight: 500;
+        font-size: 14px;
+        text-align: center;
+    }
+    .property-panel-section .property-panel-content td {
+        padding: 0 0 0px 0;
+    }
+
+    .tile_layout.card-control-section .e-error {
+        height: 100px;
+        width: 100%;
+    }
+
+        .tile_layout.card-control-section .e-error .e-error-content {
+            color: red;
+            line-height: 100px;
+            text-align: center;
+        }
+
+    .tile_layout.card-control-section .e-card .e-card-image {
+        height: 180px;
+        width: inherit;
+    }
+
+    .tile_layout.card-control-section .e-card .e-card-header .e-card-header-caption .e-card-header-title {
+        font-size: 20px;
+        font-family: Helvetica, 'Segoe UI';
+        font-weight: bold;
+    }
+
+    .tile_layout.card-control-section .e-card .e-card-header .e-card-header-caption .e-card-sub-title {
+        padding-top: 0px;
+    }
+
+    .tile_layout.card-control-section .e-card .e-card-content {
+        padding-top: 0px;
+        height: 500px;
+    }
+
+    #source_link {
+        float: right;
+        margin-right: 0px;
+    }
+</style>
+
+
+@code {
+
+    [Parameter]
+    public int AptitUserID { get; set; }
+    [Parameter]
+    public int AptitAnswerID { get; set; }
+
+    [Inject] public NavigationManager NavigationManager { get; set; }
+    [Inject] public IJSRuntime JsRuntime { get; set; }
+    public string SearchValue { get; set; }
+    public string SortingValue { get; set; }
+    public string[] FilteringValue { get; set; }
+
+
+
+
+
+}

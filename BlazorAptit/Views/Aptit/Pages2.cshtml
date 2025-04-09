@@ -1,0 +1,518 @@
+﻿@model BlazorAptit.Models.AptitAnswer
+<script type="text/javascript">
+    window.history.forward();
+    function noBack() { window.history.forward(); }
+</script>
+<style>
+
+    input {
+        -webkit-appearance: none;
+        -moz-appearance: none;
+        appearance: none;
+        border-radius: 50%;
+        width: 20px;
+        height: 20px;
+        border: 2px solid lightskyblue;
+        transition: 0.2s all linear;
+        margin-right: 5px;
+        position: relative;
+        top: 2px;
+    }
+    input:checked {
+        border: 8px solid #3eb0f7;
+    }
+
+    .pureCSS input[type="checkbox"]:not(old), .pureCSS input[type="radio"]:not(old) {
+        cursor: pointer;
+    }
+
+    .toast {
+        position: fixed;
+        left: 750px;
+        max-width: 350px;
+        font-size: large;
+    }
+
+    
+    .toast-body {
+        padding: .75rem
+    }
+
+    
+
+</style>
+<form  class="form-horizontal" method="post" asp-controller="Aptit" asp-action="Edit">
+    <input asp-for="AptitUserID" value="@Model.AptitUserID" type="hidden" />
+    <input asp-for="AptitAnswerID" value="@Model.AptitAnswerID" type="hidden" />
+    <input asp-for="Stage" value="@Model.Stage" type="hidden" />
+    @*<h3>@Model.Stage</h3>*@
+<div id="chooseSource">
+
+       
+    <div class="col-xl-8 col-lg-9">
+        <h4>
+            검사진행률
+        </h4>
+        <div class="progress-bar progress-bar-striped active" role="progressbar"
+                aria-valuenow="@ViewBag.Percent" aria-valuemin="0" aria-valuemax="100" style="width:@ViewBag.Percent%;height:35px;">
+            @ViewBag.Percent%
+        </div>
+    </div>
+   
+    <br />
+    <div class="card">
+        <div class="card-header">
+            <h5 class="font-weight-bold text-primary">
+                <span class="h4">문항 @Model.Stage&nbsp;&nbsp;</span> 성향진단 Ⅰ <br /> <br />
+                아래의 문항들을 읽고, 평소의 나를 생각하며 나에게 해당하는 것을 선택하세요.
+            </h5>
+        </div>
+
+        <ul class="list-group list-group-flush pureCSS">
+
+            @foreach (var quest in ViewBag.quest)
+            {
+                <li class="list-group-item"><h5 class="font-weight-bold">@quest.QUE_1</h5></li>
+                <li class="list-group-item">
+                    @foreach (var item in ViewData["answer"] as IEnumerable<QuizItem>)
+                    {
+                        int j = 10;
+                        for (int i = 0; i < item.Choices.Count(); i++)
+                        {
+                            <div class="form-check form-check-inline">
+                                <input class="form-check-input" type="radio" name="AQ_1" data-toggle="AQ_1" value="@j">
+                                <label class="form-check-label" for="AQ_1"><span style="margin-right: 40px;">@item.Choices[i]</span></label>
+                            </div>
+                            j = j - 2;
+                        }
+                        <input asp-for="AQ_1" type="hidden" />
+                    }
+                </li>
+                <li class="list-group-item"><h5 class="font-weight-bold">@quest.QUE_2</h5></li>
+                <li class="list-group-item">
+                    @foreach (var item in ViewData["answer"] as IEnumerable<QuizItem>)
+                    {
+                        int j = 10;
+                        for (int i = 0; i < item.Choices.Count(); i++)
+                        {
+                            <div class="form-check form-check-inline">
+                                <input class="form-check-input" type="radio" name="AQ_2" data-toggle="AQ_2" value="@j">
+                                <label class="form-check-label" for="AQ_2"><span style="margin-right: 40px;">@item.Choices[i]</span></label>
+                            </div>
+                            j = j - 2;
+                        }
+                        <input asp-for="AQ_2" type="hidden" />
+                    }
+                </li>
+                <li class="list-group-item"><h5 class="font-weight-bold">@quest.QUE_3</h5></li>
+                <li class="list-group-item">
+                    @foreach (var item in ViewData["answer"] as IEnumerable<QuizItem>)
+                    {
+                        int j = 10;
+                        for (int i = 0; i < item.Choices.Count(); i++)
+                        {
+                            <div class="form-check form-check-inline">
+                                <input class="form-check-input" type="radio" name="AQ_3" data-toggle="AQ_3" value="@j">
+                                <label class="form-check-label" for="AQ_3"><span style="margin-right: 40px;">@item.Choices[i]</span></label>
+                            </div>
+                            j = j - 2;
+                        }
+                        <input asp-for="AQ_3" type="hidden" />
+                    }
+                </li>
+                <li class="list-group-item"><h5 class="font-weight-bold">@quest.QUE_4</h5></li>
+                <li class="list-group-item">
+                    @foreach (var item in ViewData["answer"] as IEnumerable<QuizItem>)
+                    {
+                        int j = 10;
+                        for (int i = 0; i < item.Choices.Count(); i++)
+                        {
+                            <div class="form-check form-check-inline">
+                                <input class="form-check-input" type="radio" name="AQ_4" data-toggle="AQ_4" value="@j">
+                                <label class="form-check-label" for="AQ_4"><span style="margin-right: 40px;">@item.Choices[i]</span></label>
+                            </div>
+                            j = j - 2;
+                        }
+                        <input asp-for="AQ_4" type="hidden" />
+                    }
+                </li>
+                <li class="list-group-item"><h5 class="font-weight-bold">@quest.QUE_5</h5></li>
+                <li class="list-group-item">
+                    @foreach (var item in ViewData["answer"] as IEnumerable<QuizItem>)
+                    {
+                        int j = 10;
+                        for (int i = 0; i < item.Choices.Count(); i++)
+                        {
+                            <div class="form-check form-check-inline">
+                                <input class="form-check-input" type="radio" name="AQ_5" data-toggle="AQ_5" value="@j">
+                                <label class="form-check-label" for="AQ_5"><span style="margin-right: 40px;">@item.Choices[i]</span></label>
+                            </div>
+                            j = j - 2;
+                        }
+                        <input asp-for="AQ_5" type="hidden" />
+                    }
+                </li>
+                <li class="list-group-item"><h5 class="font-weight-bold">@quest.QUE_6</h5></li>
+                <li class="list-group-item">
+                    @foreach (var item in ViewData["answer"] as IEnumerable<QuizItem>)
+                    {
+                        int j = 10;
+                        for (int i = 0; i < item.Choices.Count(); i++)
+                        {
+                            <div class="form-check form-check-inline">
+                                <input class="form-check-input" type="radio" name="AQ_6" data-toggle="AQ_6" value="@j">
+                                <label class="form-check-label" for="AQ_6"><span style="margin-right: 40px;">@item.Choices[i]</span></label>
+                            </div>
+                            j = j - 2;
+                        }
+                        <input asp-for="AQ_6" type="hidden" />
+                    }
+                </li>
+                <li class="list-group-item"><h5 class="font-weight-bold">@quest.QUE_7</h5></li>
+                <li class="list-group-item">
+                    @foreach (var item in ViewData["answer"] as IEnumerable<QuizItem>)
+                    {
+                        int j = 10;
+                        for (int i = 0; i < item.Choices.Count(); i++)
+                        {
+                            <div class="form-check form-check-inline">
+                                <input class="form-check-input" type="radio" name="AQ_7" data-toggle="AQ_7" value="@j">
+                                <label class="form-check-label" for="AQ_7"><span style="margin-right: 40px;">@item.Choices[i]</span></label>
+                            </div>
+                            j = j - 2;
+                        }
+                        <input asp-for="AQ_7" type="hidden" />
+                    }
+                </li>
+                <li class="list-group-item"><h5 class="font-weight-bold">@quest.QUE_8</h5></li>
+                <li class="list-group-item">
+                    @foreach (var item in ViewData["answer"] as IEnumerable<QuizItem>)
+                    {
+                        int j = 10;
+                        for (int i = 0; i < item.Choices.Count(); i++)
+                        {
+                            <div class="form-check form-check-inline">
+                                <input class="form-check-input" type="radio" name="AQ_8" data-toggle="AQ_8" value="@j">
+                                <label class="form-check-label" for="AQ_8"><span style="margin-right: 40px;">@item.Choices[i]</span></label>
+                            </div>
+                            j = j - 2;
+                        }
+                        <input asp-for="AQ_8" type="hidden" />
+                    }
+                </li>
+                <li class="list-group-item"><h5 class="font-weight-bold">@quest.QUE_9</h5></li>
+                <li class="list-group-item">
+                    @foreach (var item in ViewData["answer"] as IEnumerable<QuizItem>)
+                    {
+                        int j = 10;
+                        for (int i = 0; i < item.Choices.Count(); i++)
+                        {
+                            <div class="form-check form-check-inline">
+                                <input class="form-check-input" type="radio" name="AQ_9" data-toggle="AQ_9" value="@j">
+                                <label class="form-check-label" for="AQ_9"><span style="margin-right: 40px;">@item.Choices[i]</span></label>
+                            </div>
+                            j = j - 2;
+                        }
+                        <input asp-for="AQ_9" type="hidden" />
+                    }
+                </li>
+
+            }
+
+        </ul>
+    </div>
+    <br />
+    <br />
+    <br />
+    <div class="card">
+        <div class="card-header">
+            <h5 class="font-weight-bold text-primary">
+                <span class="h4">문항 @Model.Stage&nbsp;&nbsp;</span> 성향진단 Ⅱ <br /> <br />
+                다음의 키워드들을 보고 난 느낌을 선택하세요.
+            </h5>
+        </div>
+        <ul class="list-group list-group-flush pureCSS">
+            @foreach (var quest in ViewBag.quest)
+            {
+                <li class="list-group-item"><h5 class="font-weight-bold">@quest.QUE_10</h5></li>
+                <li class="list-group-item">
+                    @foreach (var item in ViewData["answer2"] as IEnumerable<QuizItem>)
+                    {
+                        int j = 10;
+                        for (int i = 0; i < item.Choices.Count(); i++)
+                        {
+                            @*<input type="radio" class="form-check-input" name="AQ_1" value="@choice" />@choice*@
+
+                            <div class="form-check form-check-inline">
+                                <input class="form-check-input" type="radio" name="AQ_10" data-toggle="AQ_10" value="@j">
+                                <label class="form-check-label" for="AQ_10"><span style="margin-right: 40px;">@item.Choices[i]</span></label>
+                            </div>
+                            j = j - 2;
+                        }
+                        <input asp-for="AQ_10" type="hidden" />
+                    }
+                </li>
+                <li class="list-group-item"><h5 class="font-weight-bold">@quest.QUE_11</h5></li>
+                <li class="list-group-item">
+                    @foreach (var item in ViewData["answer2"] as IEnumerable<QuizItem>)
+                    {
+                        int j = 10;
+                        for (int i = 0; i < item.Choices.Count(); i++)
+                        {
+                            @*<input type="radio" class="form-check-input" name="AQ_1" value="@choice" />@choice*@
+
+                            <div class="form-check form-check-inline">
+                                <input class="form-check-input" type="radio" name="AQ_11" data-toggle="AQ_11" value="@j">
+                                <label class="form-check-label" for="AQ_11"><span style="margin-right: 40px;">@item.Choices[i]</span></label>
+                            </div>
+                            j = j - 2;
+                        }
+                        <input asp-for="AQ_11" type="hidden" />
+                    }
+                </li>
+            }
+        </ul>
+    </div>
+
+    <br />
+    <br />
+    <br />
+    <div class="card">
+        <div class="card-header">
+            <h5 class="font-weight-bold text-primary">
+                <span class="h4">문항 @Model.Stage&nbsp;&nbsp;</span> 선호도진단 Ⅰ<br /><br />
+                다음의 이미지들을 보고 난 느낌을 선택하세요.
+            </h5>
+        </div>
+        <ul class="list-group list-group-flush pureCSS">
+            @foreach (var quest in ViewBag.quest)
+            {
+                <li class="list-group-item" >
+                    <h5 class="font-weight-bold">12. </h5><img src="@ViewBag.Image@quest.QUE_12" alt="Image" width="250" height="200" style="padding-right:15px;">
+                    @foreach (var item in ViewData["answer2"] as IEnumerable<QuizItem>)
+                    {
+                        int j = 10;
+                        for (int i = 0; i < item.Choices.Count(); i++)
+                        {
+                            @*<input type="radio" class="form-check-input" name="AQ_1" value="@choice" />@choice*@
+
+                            <div class="form-check form-check-inline ml-2">
+                                <input class="form-check-input" type="radio" name="AQ_12" data-toggle="AQ_12" value="@j">
+                                <label class="form-check-label" for="AQ_12"><span style="margin-right: 15px;">@item.Choices[i]</span></label>
+                            </div>
+                            j = j - 2;
+                        }
+                        <input asp-for="AQ_12" type="hidden" />
+                    }
+                </li>
+
+                <li class="list-group-item">
+                    <h5 class="font-weight-bold">13. </h5><img src="@ViewBag.Image@quest.QUE_13" alt="Image" width="250" height="200" style="padding-right:15px;">
+                    &nbsp;
+                    @foreach (var item in ViewData["answer2"] as IEnumerable<QuizItem>)
+                    {
+                        int j = 10;
+                        for (int i = 0; i < item.Choices.Count(); i++)
+                        {
+
+                            <div class="form-check form-check-inline  ml-2">
+                                <input class="form-check-input" type="radio" name="AQ_13" data-toggle="AQ_13" value="@j">
+                                <label class="form-check-label" for="AQ_13"><span style="margin-right: 15px;">@item.Choices[i]</span></label>
+                            </div>
+                            j = j - 2;
+                        }
+                        <input asp-for="AQ_13" type="hidden" />
+                    }
+                </li>
+                <li class="list-group-item">
+                    <h5 class="font-weight-bold">14. </h5><img src="@ViewBag.Image@quest.QUE_14" alt="Image" width="250" height="200" style="padding-right:15px;">
+                    &nbsp;
+                    @foreach (var item in ViewData["answer2"] as IEnumerable<QuizItem>)
+                    {
+                        int j = 10;
+                        for (int i = 0; i < item.Choices.Count(); i++)
+                        {
+
+                            <div class="form-check form-check-inline ml-2">
+                                <input class="form-check-input" type="radio" name="AQ_14" data-toggle="AQ_14" value="@j">
+                                <label class="form-check-label" for="AQ_14"><span style="margin-right: 15px;">@item.Choices[i]</span></label>
+                            </div>
+                            j = j - 2;
+                        }
+                        <input asp-for="AQ_14" type="hidden" />
+                    }
+                </li>
+                <li class="list-group-item">
+                    <h5 class="font-weight-bold">15. </h5><img src="@ViewBag.Image@quest.QUE_15" alt="Image" width="250" height="200" style="padding-right:15px;">
+                    &nbsp;
+                    @foreach (var item in ViewData["answer2"] as IEnumerable<QuizItem>)
+                    {
+                        int j = 10;
+                        for (int i = 0; i < item.Choices.Count(); i++)
+                        {
+
+                            <div class="form-check form-check-inline ml-2">
+                                <input class="form-check-input" type="radio" name="AQ_15" data-toggle="AQ_15" value="@j">
+                                <label class="form-check-label" for="AQ_15"><span style="margin-right: 15px;">@item.Choices[i]</span></label>
+                            </div>
+                            j = j - 2;
+                        }
+                        <input asp-for="AQ_15" type="hidden" />
+                    }
+                </li>
+                <li class="list-group-item">
+                    <h5 class="font-weight-bold">16. </h5><img src="@ViewBag.Image@quest.QUE_16" alt="Image" width="250" height="200" style="padding-right:15px;">
+                    &nbsp;
+                    @foreach (var item in ViewData["answer2"] as IEnumerable<QuizItem>)
+                    {
+                        int j = 10;
+                        for (int i = 0; i < item.Choices.Count(); i++)
+                        {
+
+                            <div class="form-check form-check-inline ml-2">
+                                <input class="form-check-input" type="radio" name="AQ_16" data-toggle="AQ_16" value="@j">
+                                <label class="form-check-label" for="AQ_16"><span style="margin-right: 15px;">@item.Choices[i]</span></label>
+                            </div>
+                            j = j - 2;
+                        }
+                        <input asp-for="AQ_16" type="hidden" />
+                    }
+                </li>
+            }
+        </ul>
+    </div>
+
+    <br />
+    <br />
+    <br />
+    <div class="card">
+        <div class="card-header">
+            <h5 class="font-weight-bold text-primary">
+                <span class="h4">문항 @Model.Stage&nbsp;&nbsp;</span> 선호도진단 Ⅱ <br /><br />
+                다음의 이미지들을 보고 난 느낌을 선택하세요.
+            </h5>
+        </div>
+        <ul class="list-group list-group-flush pureCSS">
+            @foreach (var quest in ViewBag.quest)
+            {
+                <li class="list-group-item">
+                    <h5 class="font-weight-bold">17. </h5><img src="@ViewBag.Image@quest.QUE_17" alt="Image" width="250" height="200" style="padding-right:15px;">
+                    &nbsp;
+                    @foreach (var item in ViewData["answer2"] as IEnumerable<QuizItem>)
+                    {
+                        int j = 10;
+                        for (int i = 0; i < item.Choices.Count(); i++)
+                        {
+                            <div class="form-check form-check-inline ml-2">
+                                <input class="form-check-input" type="radio" name="AQ_17" data-toggle="AQ_17" value="@j">
+                                <label class="form-check-label" for="AQ_17"><span style="margin-right: 15px;">@item.Choices[i]</span></label>
+                            </div>
+                            j = j - 2;
+                        }
+                        <input asp-for="AQ_17" type="hidden" />
+                    }
+                </li>
+                <li class="list-group-item">
+                    <h5 class="font-weight-bold">18. </h5><img src="@ViewBag.Image@quest.QUE_18" alt="Image" width="250" height="200" style="padding-right:15px;">
+                    &nbsp;
+                    @foreach (var item in ViewData["answer2"] as IEnumerable<QuizItem>)
+                    {
+                        int j = 10;
+                        for (int i = 0; i < item.Choices.Count(); i++)
+                        {
+                            <div class="form-check form-check-inline ml-2">
+                                <input class="form-check-input" type="radio" name="AQ_18" data-toggle="AQ_18" value="@j">
+                                <label class="form-check-label" for="AQ_18"><span style="margin-right: 15px;">@item.Choices[i]</span></label>
+                            </div>
+                            j = j - 2;
+                        }
+                        <input asp-for="AQ_18" type="hidden" />
+                    }
+                </li>
+            }
+        </ul>
+    </div>
+
+    <br />
+    <br />
+    <br />
+    <div class="card">
+        <div class="card-header">
+            <h5 class="font-weight-bold text-primary">
+                <span class="h4">문항 @Model.Stage&nbsp;&nbsp;</span> 선호도진단 Ⅲ  <br /><br />
+                다음은 자신의 현재와 과거의 모습을 떠올린 뒤, 좋아하는 정도를 상상해서 각각 자신에게 잘 맞는 번호를 진실하게 선택하세요.
+            </h5>
+        </div>
+        <ul class="list-group list-group-flush pureCSS">
+            @foreach (var quest in ViewBag.quest)
+            {
+                <li class="list-group-item"><h5 class="font-weight-bold">@quest.QUE_19</h5></li>
+                <li class="list-group-item">
+                    @foreach (var item in ViewData["answer3"] as IEnumerable<QuizItem>)
+                    {
+                        int j = 10;
+                        for (int i = 0; i < item.Choices.Count(); i++)
+                        {
+                            <div class="form-check form-check-inline">
+                                <input class="form-check-input" type="radio" name="AQ_19" data-toggle="AQ_19" value="@j">
+                                <label class="form-check-label" for="AQ_19"><span style="margin-right: 30px;">@item.Choices[i]</span></label>
+                            </div>
+                            j = j - 2;
+                        }
+                        <input asp-for="AQ_19" type="hidden" />
+                    }
+                </li>
+                <li class="list-group-item"><h5 class="font-weight-bold">@quest.QUE_20</h5></li>
+                <li class="list-group-item">
+                    @foreach (var item in ViewData["answer4"] as IEnumerable<QuizItem>)
+                    {
+                        int j = 10;
+                        for (int i = 0; i < item.Choices.Count(); i++)
+                        {
+                            <div class="form-check form-check-inline">
+                                <input class="form-check-input" type="radio" name="AQ_20" data-toggle="AQ_20" value="@j">
+                                <label class="form-check-label" for="AQ_20"><span style="margin-right: 20px;">@item.Choices[i]</span></label>
+                            </div>
+                            j = j - 2;
+                        }
+                        <input asp-for="AQ_20" type="hidden" />
+                    }
+                </li>
+            }
+        </ul>
+
+    </div>
+    <!--<div id="alert" class="alert alert-danger fade in" role="alert">-->
+    @*<a href="#" class="close" data-dismiss="alert" aria-label="close">×</a>*@
+    <!--<strong>모든항목에 체크하세요!</strong>
+            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                <span aria-hidden="true">×</span>
+            </button>
+    </div>-->
+
+
+    <div class="toast " role="alert" aria-live="assertive" aria-atomic="true" data-delay="6000" style="position: fixed; top: 1rem; right: 1rem;z-index: 10000;">
+        <div class="alert-danger"> 
+            <strong class="mr-auto ml-2" >항목체크</strong>
+            <small></small>
+            @*<button type="button" class="ml-2 mb-1 close" data-dismiss="toast" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>*@
+        </div>
+        <div class="toast-body alert-danger " id="toastbody">
+        </div>
+    </div>
+
+    <div class="modal-body">
+        <div id="response"></div>
+    </div>
+
+
+
+    <div class="form-group  text-center  col-sm-10 ">
+        <div class="btn-group m-4">
+            <button type="button" class="btn btn-primary mx-1" id="btn-next">다음</button>
+        </div>
+    </div>
+</div>
+</form>

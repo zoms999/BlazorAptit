@@ -1,0 +1,149 @@
+﻿@page "/AptitManage/ResultScore/{AptitUserID:int}"
+
+@using Syncfusion.Blazor.Grids
+@using BlazorAptit.Models
+@using Syncfusion.Blazor.Buttons
+
+
+<div class="col-lg-12 control-section">
+    <div class="content-wrapper">
+        <div class="row">
+            <SfGrid @ref="@GridInstance" DataSource="@ObservableData" Toolbar="@(new List<string>() { "Edit", "Update", "Cancel" })" AllowPaging="false">
+                <GridEditSettings AllowEditing="true"  Mode="@EditMode.Dialog" ></GridEditSettings>
+                <GridEvents OnActionBegin="ActionBeginHandler" OnActionComplete="OnActionComplete"    TValue="AptitUserQue"></GridEvents>
+                <GridColumns>
+                    <GridColumn Field=@nameof(AptitUserQue.AptitQuestionID) HeaderText="문항" IsPrimaryKey="true" Visible="false" TextAlign="@TextAlign.Center" HeaderTextAlign="@TextAlign.Center" Width="60">
+                        @*<EditTemplate>
+                            @((context as AptitUserQue).AptitQuestionID)
+                        </EditTemplate>*@
+                    </GridColumn>
+
+                    <GridColumn HeaderText="문항" TextAlign="@TextAlign.Center" HeaderTextAlign="@TextAlign.Center" Width="120">
+                        <Template>
+
+                            @{
+                                var info = context as AptitUserQue;
+                                if (info.AptitQuestionID == 1)
+                                {
+                                    <div class="font-weight-bold btn-primary">1 관찰형</div>
+
+                                }
+                                else if (info.AptitQuestionID == 2)
+                                {
+                                    <div class="font-weight-bold btn-primary">2 교육형</div>
+                                }
+                                else if (info.AptitQuestionID == 3)
+                                {
+                        <div class="font-weight-bold btn-primary">3 규범형</div>
+                                }
+                                else if (info.AptitQuestionID == 4)
+                                {
+                                    <div class="font-weight-bold btn-primary">4 복합형</div>
+                                }
+                                else if (info.AptitQuestionID == 5)
+                                {
+                                    <div class="font-weight-bold btn-primary">5 봉사형</div>
+                                }
+                                else if (info.AptitQuestionID == 6)
+                                {
+                                    <div class="font-weight-bold btn-primary">6 분석형</div>
+                                }
+                                else if (info.AptitQuestionID == 7)
+                                {
+                                    <div class="font-weight-bold btn-primary">7 생명형</div>
+                                }
+                                else if (info.AptitQuestionID == 8)
+                                {
+                                    <div class="font-weight-bold btn-primary">8 소통형</div>
+                                }
+                                else if (info.AptitQuestionID == 9)
+                                {
+                                    <div class="font-weight-bold btn-primary">9 실용형</div>
+                                }
+                                else if (info.AptitQuestionID == 10)
+                                {
+                                    <div class="font-weight-bold btn-primary">10 운동형</div>
+                                }
+                                else if (info.AptitQuestionID == 11)
+                                {
+                                    <div class="font-weight-bold btn-primary">11 원리형</div>
+                                }
+                                else if (info.AptitQuestionID == 12)
+                                {
+                                    <div class="font-weight-bold btn-primary">12 제작형</div>
+                                }
+                                else if (info.AptitQuestionID == 13)
+                                {
+                                    <div class="font-weight-bold btn-primary">13 진취형</div>
+                                }
+                                else if (info.AptitQuestionID == 14)
+                                {
+                                    <div class="font-weight-bold btn-primary">14 창조형</div>
+                                }
+                                else if (info.AptitQuestionID == 15)
+                                {
+                                    <div class="font-weight-bold btn-primary">15 추리형</div>
+                                }
+                            }
+
+                        </Template>
+                        <EditTemplate>
+                        </EditTemplate>
+                    </GridColumn>
+
+
+                    <GridColumn Field=@nameof(AptitUserQue.AQ_1) HeaderText="1번" Width="60" TextAlign="@TextAlign.Center" HeaderTextAlign="@TextAlign.Center" AllowEditing="false"></GridColumn>
+                    <GridColumn Field=@nameof(AptitUserQue.AQ_2) HeaderText="2번" Width="60" TextAlign="@TextAlign.Center" HeaderTextAlign="@TextAlign.Center" AllowEditing="false"></GridColumn>
+                    <GridColumn Field=@nameof(AptitUserQue.AQ_3) HeaderText="3번" Width="60" TextAlign="@TextAlign.Center" HeaderTextAlign="@TextAlign.Center" AllowEditing="false"></GridColumn>
+                    <GridColumn Field=@nameof(AptitUserQue.AQ_4) HeaderText="4번" Width="60" TextAlign="@TextAlign.Center" HeaderTextAlign="@TextAlign.Center" AllowEditing="false"></GridColumn>
+                    <GridColumn Field=@nameof(AptitUserQue.AQ_5) HeaderText="5번" Width="60" TextAlign="@TextAlign.Center" HeaderTextAlign="@TextAlign.Center" AllowEditing="false"></GridColumn>
+                    <GridColumn Field=@nameof(AptitUserQue.AQ_6) HeaderText="6번" Width="60" TextAlign="@TextAlign.Center" HeaderTextAlign="@TextAlign.Center" AllowEditing="false"></GridColumn>
+                    <GridColumn Field=@nameof(AptitUserQue.AQ_7) HeaderText="7번" Width="60" TextAlign="@TextAlign.Center" HeaderTextAlign="@TextAlign.Center" AllowEditing="false"></GridColumn>
+                    <GridColumn Field=@nameof(AptitUserQue.AQ_8) HeaderText="8번" Width="60" TextAlign="@TextAlign.Center" HeaderTextAlign="@TextAlign.Center" AllowEditing="false"></GridColumn>
+                    <GridColumn Field=@nameof(AptitUserQue.AQ_9) HeaderText="9번" Width="60" TextAlign="@TextAlign.Center" HeaderTextAlign="@TextAlign.Center" AllowEditing="false"></GridColumn>
+                    <GridColumn Field=@nameof(AptitUserQue.AQ_10) HeaderText="10번" Width="60" TextAlign="@TextAlign.Center" HeaderTextAlign="@TextAlign.Center" AllowEditing="false"></GridColumn>
+                    <GridColumn Field=@nameof(AptitUserQue.AQ_11) HeaderText="11번" Width="60" TextAlign="@TextAlign.Center" HeaderTextAlign="@TextAlign.Center" AllowEditing="false"></GridColumn>
+                    <GridColumn Field=@nameof(AptitUserQue.AQ_12) HeaderText="12번" Width="60" TextAlign="@TextAlign.Center" HeaderTextAlign="@TextAlign.Center" AllowEditing="false"></GridColumn>
+                    <GridColumn Field=@nameof(AptitUserQue.AQ_13) HeaderText="13번" Width="60" TextAlign="@TextAlign.Center" HeaderTextAlign="@TextAlign.Center" AllowEditing="false"></GridColumn>
+                    <GridColumn Field=@nameof(AptitUserQue.AQ_14) HeaderText="14번" Width="60" TextAlign="@TextAlign.Center" HeaderTextAlign="@TextAlign.Center" AllowEditing="false"></GridColumn>
+                    <GridColumn Field=@nameof(AptitUserQue.AQ_15) HeaderText="15번" Width="60" TextAlign="@TextAlign.Center" HeaderTextAlign="@TextAlign.Center" AllowEditing="false"></GridColumn>
+                    <GridColumn Field=@nameof(AptitUserQue.AQ_16) HeaderText="16번" Width="60" TextAlign="@TextAlign.Center" HeaderTextAlign="@TextAlign.Center" AllowEditing="false"></GridColumn>
+                    <GridColumn Field=@nameof(AptitUserQue.AQ_17) HeaderText="17번" Width="60" TextAlign="@TextAlign.Center" HeaderTextAlign="@TextAlign.Center" AllowEditing="false"></GridColumn>
+                    <GridColumn Field=@nameof(AptitUserQue.AQ_18) HeaderText="18번" Width="60" TextAlign="@TextAlign.Center" HeaderTextAlign="@TextAlign.Center" AllowEditing="false"></GridColumn>
+                    <GridColumn Field=@nameof(AptitUserQue.AQ_19) HeaderText="19번" Width="60" TextAlign="@TextAlign.Center" HeaderTextAlign="@TextAlign.Center" AllowEditing="false"></GridColumn>
+                    <GridColumn Field=@nameof(AptitUserQue.AQ_20) HeaderText="20번" Width="60" TextAlign="@TextAlign.Center" HeaderTextAlign="@TextAlign.Center" AllowEditing="false"></GridColumn>
+                    <GridColumn Field=@nameof(AptitUserQue.Stage_Score) HeaderText="총점" Width="120" TextAlign="@TextAlign.Center" HeaderTextAlign="@TextAlign.Center" AllowEditing="true"></GridColumn>
+                    <GridColumn Field=@nameof(AptitUserQue.Rank) HeaderText="순위" Width="100" TextAlign="@TextAlign.Center" HeaderTextAlign="@TextAlign.Center" AllowEditing="false"></GridColumn>
+                    <GridColumn Field=@nameof(AptitUserQue.Created) HeaderText="등록일" EditType="EditType.DatePickerEdit" Format="d" TextAlign="TextAlign.Center" Type="ColumnType.Date" Width="160" AllowEditing="false"></GridColumn>
+                    <GridColumn Field=@nameof(AptitUserQue.Updated) HeaderText="수정일" EditType="EditType.DatePickerEdit" Format="d" TextAlign="TextAlign.Center" Type="ColumnType.Date" Width="160" AllowEditing="false"></GridColumn>
+
+                </GridColumns>
+            </SfGrid>
+        </div>
+    </div>
+</div>
+
+@code {
+    [Parameter]
+    public int AptitUserID { get; set; }
+
+
+
+    public void RowBound(RowDataBoundEventArgs<AptitUserQue> args)
+    {
+        if (args.Data.AptitQuestionID == 1)
+        {
+            args.Row.AddClass(new string[] { "row-height" });
+        }
+    }
+
+    public void CustomizeCell(QueryCellInfoEventArgs<AptitUserQue> args)
+    {
+        if (args.Column.Field == "AptitQuestionID")
+        {
+            args.Cell.AddClass(new string[] { "btn-primary " });
+
+        }
+    }
+
+}

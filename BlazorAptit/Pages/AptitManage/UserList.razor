@@ -1,0 +1,85 @@
+﻿@page "/AptitManage/UserList"
+
+@using Syncfusion.Blazor.Grids
+@using BlazorAptit.Models
+@using Syncfusion.Blazor.Buttons
+
+@inject Blazored.SessionStorage.ISessionStorageService sessionStorage
+
+<h4>사용자목록</h4>
+
+<div class="col-lg-12 control-section">
+    <div class="content-wrapper">
+        <div class="row">
+
+            @*<SfButton ID="add" @onclick="AddRecord">Add Data</SfButton>
+                <SfButton ID="del" @onclick="DeleteRecord">Delete Data</SfButton>
+                <SfButton ID="update" @onclick="UpdateRecord">Update Data</SfButton>*@
+
+
+            <SfGrid DataSource="@ObservableData" Toolbar="@(new List<string>() {  "Update", "Cancel" })" AllowPaging="true" AllowFiltering="true">
+                <GridEvents OnActionBegin="ActionBegin" OnActionComplete="ActionComplete" TValue="AptitUser"></GridEvents>
+                <GridEditSettings AllowEditing="true" Mode="EditMode.Normal"></GridEditSettings>
+                <GridFilterSettings Type="Syncfusion.Blazor.Grids.FilterType.Excel"></GridFilterSettings>
+                <GridColumns>
+                    <GridColumn Field=@nameof(AptitUser.ID) HeaderText="순번" IsPrimaryKey="true" TextAlign="@TextAlign.Left" HeaderTextAlign="@TextAlign.Center" Width="60"></GridColumn>
+                    <GridColumn Field=@nameof(AptitUser.Group_Name) HeaderText="단체명" TextAlign="@TextAlign.Left" HeaderTextAlign="@TextAlign.Center" Width="150" AllowEditing="false"></GridColumn>
+                    <GridColumn Field=@nameof(AptitUser.User_Name) HeaderText="이름" Width="80" TextAlign="@TextAlign.Left" HeaderTextAlign="@TextAlign.Center"></GridColumn>
+                    <GridColumn Field=@nameof(AptitUser.User_Email) HeaderText="이메일" Width="140" TextAlign="@TextAlign.Left" HeaderTextAlign="@TextAlign.Center" AllowEditing="false"></GridColumn>
+                    <GridColumn Field=@nameof(AptitUser.User_Password) HeaderText="비밀번호" Width="80" TextAlign="@TextAlign.Left" HeaderTextAlign="@TextAlign.Center" AllowEditing="false"></GridColumn>
+                    <GridColumn Field=@nameof(AptitUser.User_Age) HeaderText="나이" Width="80" TextAlign="@TextAlign.Left" HeaderTextAlign="@TextAlign.Center" AllowEditing="false"></GridColumn>
+                    <GridColumn Field=@nameof(AptitUser.User_Gender) HeaderText="성별" Width="80" TextAlign="@TextAlign.Left" HeaderTextAlign="@TextAlign.Center" AllowEditing="false"></GridColumn>
+                    <GridColumn Field=@nameof(AptitUser.User_Grade) HeaderText="학년" Width="100" TextAlign="@TextAlign.Left" HeaderTextAlign="@TextAlign.Center" AllowEditing="false"></GridColumn>
+                    <GridColumn Field=@nameof(AptitUser.User_Class) HeaderText="반" Width="50" TextAlign="@TextAlign.Center" HeaderTextAlign="@TextAlign.Center" AllowEditing="false"></GridColumn>
+                    <GridColumn Field=@nameof(AptitUser.User_Finish) HeaderText="전공" Width="80" TextAlign="@TextAlign.Left" HeaderTextAlign="@TextAlign.Center" AllowEditing="false"></GridColumn>
+                    <GridColumn Field=@nameof(AptitUser.Created) HeaderText="등록일" EditType="EditType.DatePickerEdit" Format="d" TextAlign="TextAlign.Left" HeaderTextAlign="@TextAlign.Center" Type="ColumnType.Date" Width="160" AllowEditing="false"></GridColumn>
+                    <GridColumn HeaderText="상태" TextAlign="TextAlign.Left" HeaderTextAlign="@TextAlign.Center" Width="120" AllowEditing="false">
+                        <Template>
+                            @{
+                                var info = context as AptitUser;
+                                if (info.aptitAnswer.Stage > 15)
+                                {
+                                    <div class="font - weight - bold">완료</div>
+
+                                }
+                                else
+                                {
+                                    <div class="font-weight-bold">@info.aptitAnswer.Stage </div>
+                                }
+                            }
+
+                        </Template>
+                    </GridColumn>
+
+                </GridColumns>
+            </SfGrid>
+        </div>
+    </div>
+    <style>
+        .e-grid .e-headercelldiv {
+            font-size: 12px;
+        }
+
+        .e-grid .e-rowcell {
+            font-size: 12px;
+        }
+    </style>
+</div>
+
+@code{
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            var UserRole = await sessionStorage.GetItemAsync<string>("USERROLE");
+
+            if (UserRole == "user")
+            {
+                NavigationManager.NavigateTo(NavigationManager.ToAbsoluteUri("/account").ToString());
+                StateHasChanged();
+            }
+        }
+    }
+}
+
