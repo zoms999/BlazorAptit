@@ -1,6 +1,7 @@
 ﻿@inherits LayoutComponentBase
 @inject NavigationManager NavigationManager
 @inject Blazored.SessionStorage.ISessionStorageService sessionStorage
+@inject IJSRuntime JSRuntime
 
 @using Syncfusion.Blazor.Navigations
 <div id="wrapper" style="width:100%">
@@ -48,11 +49,39 @@
                             <span class="oi oi-list-rich" aria-hidden="true"></span> 결과지관리
                         </NavLink>
                     </li>
-                    @* <li class="nav-item px-3">
-                        <NavLink class="nav-link" href="/AptitManage/Chart2">
-                            <span class="oi oi-plus" aria-hidden="true"></span>성향유형별 통계
-                        </NavLink>
-                    </li> *@
+                    <li class="nav-item px-3">
+                        <a class="nav-link" href="#" @onclick="ToggleSubMenu">
+                            <span class="oi oi-plus" aria-hidden="true"></span>통계관리
+                        </a>
+                        <ul class="nav flex-column ml-3" style="display: none;" id="subMenu">
+                            <li class="nav-item">
+                                <NavLink class="nav-link" href="/AptitManage/ChartStats/Group">
+                                    그룹별 통계
+                                </NavLink>
+                            </li>
+                            <li class="nav-item">
+                                <NavLink class="nav-link" href="/AptitManage/ChartStats/Gender">
+                                    그룹별 남녀 통계
+                                </NavLink>
+                            </li>
+                            <li class="nav-item">
+                                <NavLink class="nav-link" href="/AptitManage/ChartStats/Class">
+                                    그룹별 반별 통계
+                                </NavLink>
+                            </li>
+                            <li class="nav-item">
+                                <NavLink class="nav-link" href="/AptitManage/ChartStats/Major">
+                                    그룹별 전공
+                                </NavLink>
+                            </li>
+                           
+                            <li class="nav-item">
+                                <NavLink class="nav-link" href="/AptitManage/ChartStats/Age">
+                                    나이별
+                                </NavLink>
+                            </li>
+                        </ul>
+                    </li>
 
                     <li class="nav-item px-3">
                         <NavLink class="nav-link" href="/OctagManage/Result">
@@ -74,8 +103,8 @@
 </div>
 @code {
     SfSidebar Sidebar;
-    public Orientation Orientation = Orientation.Horizontal;
-    public Orientation VerOrientation = Orientation.Vertical;
+    public Syncfusion.Blazor.Navigations.Orientation Orientation = Syncfusion.Blazor.Navigations.Orientation.Horizontal;
+    public Syncfusion.Blazor.Navigations.Orientation VerOrientation = Syncfusion.Blazor.Navigations.Orientation.Vertical;
     public bool SidebarOpen { get; set; } = false;
 
     Dictionary<string, object> HtmlAttribute = new Dictionary<string, object>()
@@ -103,6 +132,10 @@
         NavigationManager.NavigateTo(NavigationManager.ToAbsoluteUri("/account").ToString());
     }
 
+    private async Task ToggleSubMenu()
+    {
+        await JSRuntime.InvokeVoidAsync("toggleSubMenu");
+    }
 }
 <style>
 
@@ -110,7 +143,8 @@
         float: left;
         height: 50px;
         padding: 15px 15px;
-        font-size: 14px;
+        font-size: 18px;
+        font-weight: 700;
         line-height: 20px;
     }
 
@@ -158,12 +192,56 @@
 
     .e-sidebar {
        /* background: black;*/
-        background-image: linear-gradient( 180deg, rgb(5, 39, 103) 0%, #3a0647 70%);
+        background-image: linear-gradient(180deg, #34495e 0%, #2c3e50 100%);
     }
 
     .header-section {
-        background: grey;
+        background: #2c3e50;
+        color: #ecf0f1;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
     }
+
+    .header-list a {
+        color: #ecf0f1;
+        font-weight: 600;
+        transition: color 0.3s ease;
+    }
+
+    .header-list a:hover {
+        color: #3498db;
+    }
+
+    .icon-menu {
+        color: #ecf0f1;
+        transition: transform 0.3s ease;
+    }
+
+    .icon-menu:hover {
+        transform: scale(1.1);
+    }
+
+    .sidebar-menu {
+        background-image: linear-gradient(180deg, #34495e 0%, #2c3e50 100%);
+        color: #ecf0f1;
+        box-shadow: 2px 0 5px rgba(0,0,0,0.1);
+    }
+
+    .nav-link {
+        color: #ecf0f1;
+        padding: 10px 15px;
+        font-weight: 500;
+        transition: background-color 0.3s ease, color 0.3s ease;
+    }
+
+    .nav-link:hover {
+        background-color: #2980b9;
+        color: #ffffff;
+    }
+
+    .nav-item {
+        margin-bottom: 5px;
+    }
+
     /* end of content area styles */
     /* menu styles */
     .sidebar-menu .action-btn {
@@ -221,3 +299,14 @@
 
     /* end of newTab support */
 </style>
+
+<script>
+    function toggleSubMenu() {
+        var subMenu = document.getElementById("subMenu");
+        if (subMenu.style.display === "none") {
+            subMenu.style.display = "block";
+        } else {
+            subMenu.style.display = "none";
+        }
+    }
+</script>

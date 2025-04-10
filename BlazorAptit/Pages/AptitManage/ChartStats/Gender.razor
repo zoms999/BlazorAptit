@@ -1,0 +1,513 @@
+@page "/AptitManage/ChartStats/Gender"
+@namespace BlazorAptit.Pages.AptitManage.ChartStats
+@using BlazorAptit.Models
+@using BlazorAptit.Services
+@using Radzen
+@using Radzen.Blazor
+@inject StatisticsService StatisticsService
+@inject NavigationManager NavigationManager
+@inject IJSRuntime JSRuntime
+@implements IDisposable
+
+<div class="content-wrapper">
+    <div class="page-header">
+        <h2>그룹별 남녀 통계</h2>
+        <div class="filter-section">
+            <div class="form-group">
+                <label for="groupSelect">단체/학교 선택:</label>
+                <select id="groupSelect" class="form-control" @onchange="OnGroupChanged">
+                    @foreach (var group in groups)
+                    {
+                        <option value="@group" selected="@(group == selectedGroup)">@group</option>
+                    }
+                </select>
+            </div>
+        </div>
+    </div>
+
+    @if (isLoading)
+    {
+        <div class="loading-container">
+            <div class="loading-spinner"></div>
+            <p>데이터를 불러오는 중...</p>
+        </div>
+    }
+    else if (statistics != null && statistics.Any())
+    {
+        <div class="statistics-section">
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="gender-summary">
+                        <h4>분석 그룹: @selectedGroup</h4>
+                        <p>전체 분석 대상: @(statistics.FirstOrDefault()?.Total_Users_In_Overall_Group ?? 0)명</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 인원수 차트 -->
+            @* <div class="row mb-4">
+                <div class="col-md-12">
+                    <div class="chart-container">
+                        <h4 class="chart-title">남녀별 적성 유형 분포 (인원수)</h4>
+                        <RadzenChart Style="height: 400px; width: 100%;">
+                            <RadzenLegend Position="LegendPosition.Bottom" />
+                            <RadzenCategoryAxis Padding="20">
+                                <RadzenAxisTitle Text="적성 유형" />
+                            </RadzenCategoryAxis>
+                            <RadzenValueAxis Min="0">
+                                <RadzenGridLines Visible="true" />
+                                <RadzenAxisTitle Text="인원수 (명)" />
+                            </RadzenValueAxis>
+                            <RadzenColumnSeries Data="@chartData" CategoryProperty="AptitudeType" 
+                                Title="남성" ValueProperty="Male" Fill="#3498db" LineType="LineType.Solid" />
+                            <RadzenColumnSeries Data="@chartData" CategoryProperty="AptitudeType" 
+                                Title="여성" ValueProperty="Female" Fill="#e74c3c" LineType="LineType.Solid" />
+                            <RadzenColumnOptions Radius="5" />
+                        </RadzenChart>
+                    </div>
+                </div>
+            </div> *@
+
+            <!-- 테이블 형태로 통계 표시 -->
+            <div class="row">
+                @foreach (var genderGroup in statistics.GroupBy(s => s.User_Gender))
+                {
+                    <div class="col-md-6">
+                        <div class="gender-stats-card">
+                            <h5 class="card-title">@GetGenderDisplay(genderGroup.Key) 통계</h5>
+                            <div class="gender-count">전체 @(genderGroup.First().Total_Users_In_Gender)명</div>
+                            <div class="table-responsive">
+                                <table class="table table-hover">
+                                    <thead>
+                                        <tr>
+                                            <th>순위</th>
+                                            <th>적성 유형</th>
+                                            <th>인원수</th>
+                                            <th>비율(%)</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @foreach (var stat in genderGroup.OrderBy(s => s.Rank_In_Gender))
+                                        {
+                                            <tr>
+                                                <td>@stat.Rank_In_Gender</td>
+                                                <td>@stat.Primary_Aptitude_Type</td>
+                                                <td>@stat.Aptitude_Count_In_Gender</td>
+                                                <td>@stat.Pct_In_Gender%</td>
+                                            </tr>
+                                        }
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                }
+            </div>
+        </div>
+    }
+    else
+    {
+        <div class="no-data-section">
+            <p>데이터가 없습니다. 다른 그룹을 선택하거나 관리자에게 문의하세요.</p>
+        </div>
+    }
+</div>
+
+<style>
+    /* 전체 컨테이너 스타일 */
+    .content-wrapper {
+        padding: 20px;
+        max-width: 1400px;
+        margin: 0 auto;
+    }
+
+    /* 페이지 헤더 스타일 */
+    .page-header {
+        margin-bottom: 30px;
+        border-bottom: 1px solid #eaeaea;
+        padding-bottom: 15px;
+    }
+
+    .page-header h2 {
+        color: #2c3e50;
+        font-weight: 600;
+        margin-bottom: 15px;
+    }
+
+    /* 필터 섹션 스타일 */
+    .filter-section {
+        margin-bottom: 20px;
+    }
+
+    .form-group {
+        margin-bottom: 15px;
+        display: flex;
+        align-items: center;
+    }
+
+    .form-group label {
+        margin-right: 15px;
+        font-weight: 500;
+        min-width: 120px;
+        color: #555;
+    }
+
+    .form-control {
+        padding: 8px 12px;
+        border-radius: 4px;
+        border: 1px solid #ddd;
+        width: 300px;
+        background-color: #fff;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        font-size: 14px;
+    }
+
+    .form-control:focus {
+        border-color: #3498db;
+        box-shadow: 0 0 0 0.2rem rgba(52, 152, 219, 0.25);
+        outline: 0;
+    }
+
+    /* 로딩 스타일 */
+    .loading-container {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        min-height: 300px;
+    }
+
+    .loading-spinner {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        border: 3px solid #f3f3f3;
+        border-top: 3px solid #3498db;
+        animation: spin 1s linear infinite;
+        margin-bottom: 15px;
+    }
+
+    @@keyframes spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+    }
+
+    /* 데이터 없음 스타일 */
+    .no-data-section {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        min-height: 300px;
+        background-color: #f8f9fa;
+        border-radius: 8px;
+        color: #666;
+        font-style: italic;
+    }
+
+    /* 통계 요약 스타일 */
+    .gender-summary {
+        background-color: #f8f9fa;
+        border-left: 4px solid #3498db;
+        padding: 15px 20px;
+        border-radius: 4px;
+        margin-bottom: 25px;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+    }
+
+    .gender-summary h4 {
+        color: #2c3e50;
+        margin-bottom: 10px;
+        font-weight: 600;
+    }
+
+    .gender-summary p {
+        margin-bottom: 0;
+        color: #555;
+        font-size: 16px;
+    }
+
+    /* 차트 스타일 */
+    .chart-container {
+        background-color: white;
+        border-radius: 8px;
+        padding: 20px;
+        margin-bottom: 30px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+
+    .chart-title {
+        color: #2c3e50;
+        font-weight: 600;
+        margin-bottom: 20px;
+        text-align: center;
+        padding-bottom: 10px;
+        border-bottom: 1px solid #eee;
+    }
+
+    /* 테이블 스타일 */
+    .gender-stats-card {
+        background-color: white;
+        border-radius: 8px;
+        padding: 20px;
+        margin-bottom: 30px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        height: 100%;
+    }
+
+    .card-title {
+        color: #2c3e50;
+        font-weight: 600;
+        margin-bottom: 15px;
+        padding-bottom: 10px;
+        border-bottom: 1px solid #eee;
+    }
+
+    .gender-count {
+        font-size: 16px;
+        color: #555;
+        margin-bottom: 15px;
+        font-weight: 500;
+    }
+
+    .table-responsive {
+        overflow-x: auto;
+    }
+
+    .table {
+        width: 100%;
+        margin-bottom: 0;
+        background-color: white;
+        border-collapse: collapse;
+    }
+
+    .table th {
+        background-color: #f0f0f0;
+        color: #333;
+        font-weight: 600;
+        border-bottom: 2px solid #ddd;
+        text-align: center;
+        padding: 12px 8px;
+    }
+
+    .table td {
+        padding: 12px 8px;
+        text-align: center;
+        border-bottom: 1px solid #eee;
+    }
+
+    .table tbody tr:hover {
+        background-color: rgba(52, 152, 219, 0.1);
+    }
+
+    /* 반응형 스타일 */
+    @@media (max-width: 768px) {
+        .form-group {
+            flex-direction: column;
+            align-items: flex-start;
+        }
+
+        .form-group label {
+            margin-bottom: 8px;
+        }
+
+        .form-control {
+            width: 100%;
+        }
+
+        .col-md-6 {
+            width: 100%;
+        }
+        
+        .chart-container {
+            height: auto;
+        }
+    }
+</style>
+
+@code {
+    private List<GenderGroupStatistics> statistics;
+    private List<string> groups = new List<string>();
+    private string selectedGroup = "";
+    private bool isLoading = false;
+    private bool isDisposed = false;
+
+    // Declare chartData here as a field
+    private List<GenderChartData> chartData = new List<GenderChartData>(); // Initialize it
+
+    // Chart data class
+    public class GenderChartData
+    {
+        public string AptitudeType { get; set; }
+        public int Male { get; set; }
+        public int Female { get; set; }
+        // Optional: Helper property for sorting
+        public int Total => Male + Female;
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        // 드롭다운리스트 데이터 로드
+        await LoadGroups();
+        
+        if (groups.Any())
+        {
+            selectedGroup = groups.First();
+            await LoadStatistics();
+        }
+    }
+
+    private async Task LoadGroups()
+    {
+        try
+        {
+            // AptitGroup 테이블에서 Group_Name을 가져옴
+            groups = await StatisticsService.GetGroupNamesAsync();
+            
+            if (!groups.Any())
+            {
+                // 데이터가 없는 경우 기본값 설정
+                groups = new List<string> { "부천송내고등학교", "인천남고등학교", "영등포고등학교" };
+            }
+            
+            Console.WriteLine($"그룹 데이터 로드 완료: {groups.Count}개");
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"그룹 데이터 로드 중 오류 발생: {ex.Message}");
+            // 오류 발생 시 기본값 설정
+            groups = new List<string> { "부천송내고등학교", "인천남고등학교", "영등포고등학교" };
+        }
+    }
+
+    private void LoadSampleData()
+    {
+        // Keep this for fallback/testing
+        chartData = new List<GenderChartData>
+        {
+            new GenderChartData { AptitudeType = "유형A", Male = 35, Female = 25 },
+            new GenderChartData { AptitudeType = "유형B", Male = 28, Female = 32 },
+            new GenderChartData { AptitudeType = "유형C", Male = 15, Female = 20 },
+            new GenderChartData { AptitudeType = "유형D", Male = 22, Female = 18 },
+            new GenderChartData { AptitudeType = "유형E", Male = 18, Female = 12 }
+        };
+        Console.WriteLine("샘플 데이터 로드됨.");
+    }
+
+    private async Task OnGroupChanged(ChangeEventArgs e)
+    {
+        selectedGroup = e.Value.ToString();
+        await LoadStatistics();
+    }
+
+    private async Task LoadStatistics()
+    {
+        isLoading = true;
+        chartData = new List<GenderChartData>(); // Clear previous chart data
+        statistics = null; // Clear previous stats
+        StateHasChanged(); // Show loading
+
+        try
+        {
+            // 1. Fetch Statistics Data
+            statistics = await StatisticsService.GetGenderGroupStatisticsAsync(selectedGroup);
+
+            if (statistics != null && statistics.Any())
+            {
+                Console.WriteLine($"DB 조회 성공: {selectedGroup}, 레코드 수: {statistics.Count}");
+
+                // 2. Get all unique aptitude types from the fetched data
+                var allAptitudeTypes = statistics
+                                        .Select(s => s.Primary_Aptitude_Type)
+                                        .Where(type => !string.IsNullOrEmpty(type)) // Ensure type is not null/empty
+                                        .Distinct()
+                                        .ToList();
+
+                Console.WriteLine($"고유 적성 유형 수: {allAptitudeTypes.Count}");
+                if (!allAptitudeTypes.Any()) {
+                    Console.WriteLine("고유 적성 유형이 없습니다.");
+                    // Optionally load sample data here if this case should show something
+                    // LoadSampleData();
+                } else {
+                    // 3. Create temporary data structure with Male/Female counts for each type
+                    var tempData = new List<GenderChartData>();
+                    foreach (var type in allAptitudeTypes)
+                    {
+                        // Find male count for this type (handle null statistic)
+                        int maleCount = statistics
+                            .FirstOrDefault(s => s.Primary_Aptitude_Type == type && s.User_Gender.ToUpper() == "M")
+                            ?.Aptitude_Count_In_Gender ?? 0;
+
+                        // Find female count for this type (handle null statistic)
+                        int femaleCount = statistics
+                            .FirstOrDefault(s => s.Primary_Aptitude_Type == type && s.User_Gender.ToUpper() == "F")
+                            ?.Aptitude_Count_In_Gender ?? 0;
+
+                        // Only add if there's data for this type
+                        if (maleCount > 0 || femaleCount > 0)
+                        {
+                            tempData.Add(new GenderChartData
+                            {
+                                AptitudeType = type,
+                                Male = maleCount,
+                                Female = femaleCount
+                            });
+                        }
+                    }
+                     Console.WriteLine($"임시 데이터 생성 완료 (유형별 남/여 집계): {tempData.Count} 항목");
+
+                    // 4. Sort by total count (descending) and take top 5
+                    chartData = tempData
+                        .OrderByDescending(d => d.Total) // Use the Total helper property
+                        .ThenBy(d => d.AptitudeType) // Secondary sort for consistent order if totals tie
+                        .Take(5)
+                        .ToList();
+
+                    Console.WriteLine($"최종 차트 데이터 생성 완료 (상위 5개): {chartData.Count} 항목");
+                     foreach (var item in chartData) {
+                         Console.WriteLine($" -> 유형: {item.AptitudeType}, 남성: {item.Male}, 여성: {item.Female}, 총계: {item.Total}");
+                     }
+                }
+            }
+            else
+            {
+                Console.WriteLine($"{selectedGroup}에 대한 DB 데이터가 없습니다.");
+                // LoadSampleData(); // Decide if you want sample data on no results
+            }
+
+             // Fallback to sample data ONLY if chartData is still empty after processing
+            if (!chartData.Any())
+            {
+                Console.WriteLine("처리 후 유효한 차트 데이터가 없어 샘플 데이터를 로드합니다.");
+                LoadSampleData();
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"통계 데이터 로드 중 오류 발생: {ex.Message}\n{ex.StackTrace}");
+            await JSRuntime.InvokeVoidAsync("console.error", "통계 데이터 로드 중 오류 발생:", ex.Message, ex.StackTrace);
+            Console.WriteLine("오류 발생으로 샘플 데이터를 로드합니다.");
+            LoadSampleData(); // Use sample data on error
+        }
+        finally
+        {
+            isLoading = false;
+            StateHasChanged(); // Update UI after loading/processing
+        }
+    }
+
+    private string GetGenderDisplay(string gender)
+    {
+        return gender?.ToUpper() switch // Add null check for safety
+        {
+            "M" => "남성",
+            "F" => "여성",
+            _ => gender ?? "알 수 없음" // Handle null gender string
+        };
+    }
+
+    public void Dispose()
+    {
+        isDisposed = true;
+        // No specific resources to dispose here currently
+    }
+}

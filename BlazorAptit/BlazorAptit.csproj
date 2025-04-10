@@ -1,9 +1,16 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk.Web">
 
   <PropertyGroup>
-    <TargetFramework>net5.0</TargetFramework>
+    <TargetFramework>net6.0</TargetFramework>
     <UserSecretsId>aspnet-BlazorAptit-F72553DC-B66F-43C1-A137-563345937A8F</UserSecretsId>
   </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Remove="Pages\AptitManage\Chart\**" />
+    <Content Remove="Pages\AptitManage\Chart\**" />
+    <EmbeddedResource Remove="Pages\AptitManage\Chart\**" />
+    <None Remove="Pages\AptitManage\Chart\**" />
+  </ItemGroup>
 
   <ItemGroup>
     <Content Remove="wwwroot\NanumBarunGothicBold.ttf" />
@@ -45,6 +52,7 @@
     </PackageReference>
     <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="5.0.1" />
     <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="5.0.1" />
+    <PackageReference Include="Radzen.Blazor" Version="5.9.9" />
     <PackageReference Include="Syncfusion.Blazor.Cards" Version="19.4.0.38" />
     <PackageReference Include="Syncfusion.Blazor.Charts" Version="19.4.0.38" />
     <PackageReference Include="Syncfusion.Blazor.Grid" Version="19.4.0.38" />

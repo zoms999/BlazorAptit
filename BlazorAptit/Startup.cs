@@ -80,6 +80,7 @@ namespace BlazorAptit
             services.AddSingleton<WeatherForecastService>();
             services.AddSingleton<AptitService>();
             services.AddScoped<IRepository, Repository>();
+            services.AddScoped<StatisticsService>();
 
             services.AddBlazoredSessionStorage();
 
@@ -93,6 +94,13 @@ namespace BlazorAptit
              new OctRepository(Configuration.GetConnectionString("PostGreSqlConnection")));
 
             services.AddSyncfusionBlazor();
+            
+            // Radzen 서비스 등록
+            services.AddScoped<Radzen.DialogService>();
+            services.AddScoped<Radzen.NotificationService>();
+            services.AddScoped<Radzen.TooltipService>();
+            services.AddScoped<Radzen.ContextMenuService>();
+            
             services.AddSignalR(e => {
                 e.MaximumReceiveMessageSize = 102400000; // 더 큰 값으로 늘림 (약 100MB)
                 e.ClientTimeoutInterval = TimeSpan.FromSeconds(60); // 클라이언트 타임아웃 60초

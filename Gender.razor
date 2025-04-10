@@ -1,0 +1,343 @@
+@page "/AptitManage/ChartStats/Gender"
+@namespace BlazorAptit.Pages.AptitManage.ChartStats
+@using BlazorAptit.Models
+@using BlazorAptit.Services
+@using Syncfusion.Blazor.Charts
+@using PointRender
+@inject StatisticsService StatisticsService
+@inject NavigationManager NavigationManager
+@inject IJSRuntime JSRuntime
+@implements IDisposable
+
+<div class="control_wrapper">
+    <h4>그룹별 남녀 통계</h4>
+    <div class="details-container">
+        <div class="filter-section">
+            <div class="form-group">
+                <label for="groupSelect">단체/학교 선택:</label>
+                <select id="groupSelect" class="form-control" @onchange="OnGroupChanged">
+                    @foreach (var group in groups)
+                    {
+                        <option value="@group" selected="@(group == selectedGroup)">@group</option>
+                    }
+                </select>
+            </div>
+        </div>
+
+        @if (isLoading)
+        {
+            <div class="loading-section">
+                <p>데이터를 불러오는 중...</p>
+            </div>
+        }
+        else if (statistics != null && statistics.Any())
+        {
+            <div class="statistics-section">
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="gender-summary">
+                            <h5>분석 그룹: @selectedGroup</h5>
+                            <p>전체 분석 대상: @(statistics.FirstOrDefault()?.Total_Users_In_Overall_Group ?? 0)명</p>
+                        </div>
+                    </div>
+                </div>
+
+                @{
+                    // 차트에서 사용할 데이터 준비
+                    var maleStats = statistics.Where(s => s.User_Gender.ToUpper() == "M").OrderBy(s => s.Rank_In_Gender).ToList();
+                    var femaleStats = statistics.Where(s => s.User_Gender.ToUpper() == "F").OrderBy(s => s.Rank_In_Gender).ToList();
+                    
+                    // 차트 데이터 변환
+                    var chartData = new List<GenderChartData>();
+                    foreach (var male in maleStats.Take(5))
+                    {
+                        chartData.Add(new GenderChartData { 
+                            AptitudeType = male.Primary_Aptitude_Type,
+                            Male = male.Aptitude_Count_In_Gender,
+                            Female = femaleStats.FirstOrDefault(f => f.Primary_Aptitude_Type == male.Primary_Aptitude_Type)?.Aptitude_Count_In_Gender ?? 0
+                        });
+                    }
+                }
+
+                <!-- 인원수 차트 -->
+                <div class="row mb-4">
+                    <div class="col-md-12">
+                        <div class="chart-container">
+                            <SfChart @ref="ChartObj" Title="남녀별 적성 유형 분포 (인원수)" Width="100%" Theme="@Theme">
+                                <ChartArea><ChartAreaBorder Width="0"></ChartAreaBorder></ChartArea>
+                                <ChartPrimaryXAxis ValueType="Syncfusion.Blazor.Charts.ValueType.Category" Title="적성 유형">
+                                    <ChartAxisMajorGridLines Width="0"></ChartAxisMajorGridLines>
+                                    <ChartAxisMajorTickLines Width="0"></ChartAxisMajorTickLines>
+                                </ChartPrimaryXAxis>
+                                <ChartPrimaryYAxis Title="인원수 (명)">
+                                    <ChartAxisMajorTickLines Width="0"></ChartAxisMajorTickLines>
+                                    <ChartAxisLineStyle Width="0"></ChartAxisLineStyle>
+                                </ChartPrimaryYAxis>
+                                <ChartTooltipSettings Enable="true"></ChartTooltipSettings>
+                                <ChartSeriesCollection>
+                                    <ChartSeries DataSource="@chartData" XName="AptitudeType" YName="Male"
+                                                 Type="ChartSeriesType.Column" Name="남성" Fill="#1F77B4">
+                                    </ChartSeries>
+                                    <ChartSeries DataSource="@chartData" XName="AptitudeType" YName="Female"
+                                                 Type="ChartSeriesType.Column" Name="여성" Fill="#FF7F0E">
+                                    </ChartSeries>
+                                </ChartSeriesCollection>
+                                <ChartLegendSettings Visible="true"></ChartLegendSettings>
+                                @* REMOVED: <ChartEvents OnPointRender="PointRender"></ChartEvents> *@
+                            </SfChart>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 테이블 형태로 통계 표시 -->
+                <div class="row">
+                    @foreach (var genderGroup in statistics.GroupBy(s => s.User_Gender))
+                    {
+                        <div class="col-md-6">
+                            <div class="gender-stats-card">
+                                <h5 class="card-title">@GetGenderDisplay(genderGroup.Key)</h5>
+                                <div class="gender-count">전체 @(genderGroup.First().Total_Users_In_Gender)명</div>
+                                <table class="table table-hover">
+                                    <thead>
+                                        <tr>
+                                            <th>순위</th>
+                                            <th>적성 유형</th>
+                                            <th>인원수</th>
+                                            <th>비율(%)</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @foreach (var stat in genderGroup.OrderBy(s => s.Rank_In_Gender))
+                                        {
+                                            <tr>
+                                                <td>@stat.Rank_In_Gender</td>
+                                                <td>@stat.Primary_Aptitude_Type</td>
+                                                <td>@stat.Aptitude_Count_In_Gender</td>
+                                                <td>@stat.Pct_In_Gender%</td>
+                                            </tr>
+                                        }
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    }
+                </div>
+            </div>
+        }
+        else
+        {
+            <div class="no-data-section">
+                <p>데이터가 없습니다. 다른 그룹을 선택하거나 관리자에게 문의하세요.</p>
+            </div>
+        }
+    </div>
+</div>
+
+<style>
+    /* 통계 페이지 스타일 */
+    .filter-section {
+        margin-bottom: 20px;
+    }
+
+    .form-group {
+        margin-bottom: 15px;
+    }
+
+    .form-control {
+        padding: 8px 12px;
+        border-radius: 4px;
+        border: 1px solid #ddd;
+        width: 300px;
+    }
+
+    .loading-section, .no-data-section {
+        padding: 30px;
+        text-align: center;
+        color: #666;
+    }
+
+    .gender-stats-card {
+        background-color: #f8f9fa;
+        border-radius: 8px;
+        padding: 20px;
+        margin-bottom: 20px;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    }
+
+    .card-title {
+        color: #555;
+        font-weight: 600;
+        margin-bottom: 15px;
+        padding-bottom: 10px;
+        border-bottom: 1px solid #eee;
+    }
+
+    .gender-count {
+        font-size: 16px;
+        color: #666;
+        margin-bottom: 15px;
+    }
+
+    .table {
+        width: 100%;
+        margin-bottom: 0;
+        background-color: white;
+        border-radius: 4px;
+    }
+
+    .table th {
+        background-color: #f0f0f0;
+        color: #555;
+        font-weight: 600;
+    }
+
+    .table td, .table th {
+        padding: 12px;
+        text-align: center;
+    }
+
+    .gender-summary {
+        margin-bottom: 20px;
+        padding: 15px;
+        background-color: #e9ecef;
+        border-radius: 5px;
+    }
+
+    .gender-summary h5 {
+        margin-bottom: 10px;
+        color: #495057;
+    }
+
+    /* 차트 스타일 */
+    .chart-container {
+        background-color: white;
+        border-radius: 8px;
+        padding: 20px;
+        margin-bottom: 20px;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        height: 500px;
+    }
+
+    /* 반응형 스타일 */
+    @@media (max-width: 768px) {
+        .col-md-6 {
+            width: 100%;
+        }
+        
+        .chart-container {
+            height: 400px;
+        }
+    }
+</style>
+
+@code {
+    private List<GenderGroupStatistics> statistics;
+    private List<string> groups = new List<string> { "부천송내고등학교", "인천남고등학교", "영등포고등학교" };
+    private string selectedGroup = "부천송내고등학교";
+    private bool isLoading = false;
+    private SfChart ChartObj;
+    private bool isDisposed = false;
+    private Syncfusion.Blazor.Theme Theme { get; set; } = Syncfusion.Blazor.Theme.Bootstrap4;
+    // private string CurrentUri; // Remove if only used for PointRender
+
+    // Declare chartData here as a field
+    private List<GenderChartData> chartData = new List<GenderChartData>(); // Initialize it
+
+    // Chart data class (keep this)
+    public class GenderChartData
+    {
+        public string AptitudeType { get; set; }
+        public int Male { get; set; }
+        public int Female { get; set; }
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        // CurrentUri = NavigationManager.Uri; // Remove if only used for PointRender
+        await LoadStatistics();
+    }
+
+    private async Task OnGroupChanged(ChangeEventArgs e)
+    {
+        selectedGroup = e.Value.ToString();
+        await LoadStatistics();
+    }
+
+    private async Task LoadStatistics()
+    {
+        try
+        {
+            isLoading = true;
+            StateHasChanged(); // Update UI to show loading
+
+            statistics = await StatisticsService.GetGenderGroupStatisticsAsync(selectedGroup);
+
+            // --> Use the FIELD chartData now <--
+            chartData = new List<GenderChartData>(); // Clear previous data
+
+            if (statistics != null && statistics.Any())
+            {
+                var maleStats = statistics.Where(s => s.User_Gender.ToUpper() == "M").OrderBy(s => s.Rank_In_Gender).ToList();
+                var femaleStats = statistics.Where(s => s.User_Gender.ToUpper() == "F").OrderBy(s => s.Rank_In_Gender).ToList();
+
+                foreach (var male in maleStats.Take(5)) // Taking top 5 based on male stats
+                {
+                    // Add to the FIELD chartData
+                    chartData.Add(new GenderChartData
+                        {
+                            AptitudeType = male.Primary_Aptitude_Type,
+                            Male = male.Aptitude_Count_In_Gender,
+                            Female = femaleStats.FirstOrDefault(f => f.Primary_Aptitude_Type == male.Primary_Aptitude_Type)?.Aptitude_Count_In_Gender ?? 0
+                        });
+                }
+
+                // --- DEBUGGING (Now correctly accesses the field) ---
+                Console.WriteLine($"--- Chart Data for {selectedGroup} ---");
+                Console.WriteLine($"Total items: {chartData.Count}");
+                foreach (var item in chartData)
+                {
+                    Console.WriteLine($"Type: {item.AptitudeType}, Male: {item.Male}, Female: {item.Female}");
+                }
+                Console.WriteLine($"--- End Chart Data ---");
+                // --- END DEBUGGING ---
+            }
+            else
+            {
+                Console.WriteLine($"Statistics data is null or empty for {selectedGroup}.");
+                // Ensure chartData is empty if statistics is empty
+                chartData = new List<GenderChartData>();
+            }
+        }
+        catch (Exception ex)
+        {
+            await JSRuntime.InvokeVoidAsync("console.error", "통계 데이터 로드 중 오류 발생:", ex.Message, ex.StackTrace);
+            statistics = null; // Ensure statistics is null on error
+            chartData = new List<GenderChartData>(); // Clear chart data on error
+        }
+        finally
+        {
+            isLoading = false;
+            StateHasChanged(); // Update UI after loading/processing
+        }
+    }
+
+    // Remove PointRender method if not needed
+    // public void PointRender(PointRenderEventArgs args) { ... }
+
+    private string GetGenderDisplay(string gender)
+    {
+        return gender.ToUpper() switch
+        {
+            "M" => "남성",
+            "F" => "여성",
+            _ => gender
+        };
+    }
+
+    public void Dispose()
+    {
+        isDisposed = true;
+        ChartObj = null;
+        // Consider disposing other resources if needed
+    }
+} 

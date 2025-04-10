@@ -9,7 +9,7 @@
     <div class="control_wrapper">
         <h4>@dt.Month.ToString()월
              접수단체리스트 </h4>
-        <SfSplitter Height="250px" Width="100%">
+        <SfSplitter Height="300px" Width="100%">
             <SplitterPanes>
                 <SplitterPane Size="15%" Min="25%">
                     <ContentTemplate>
@@ -31,54 +31,77 @@
                             </SfListView>
                         </div>
                     </ContentTemplate>
-                </SplitterPane>
+                </SplitterPane>R
                 <SplitterPane Size="85%" Min="45%">
                     <ContentTemplate>
                         <div>
                             @*<div class="profile-name bold">@aptitGroupsSub.Group_Name</div>*@
-                            <table>
-                                <tr>
-                                    <td class="e-bold">회차코드</td>
-                                    <td>@aptitGroupsSub.Group_ID</td>
-                                    <td class="e-bold">단체명</td>
-                                    <td>@aptitGroupsSub.Group_Name</td>
-                                    <td class="e-bold">검사종류</td>
-                                    <td>@aptitGroupsSub.CheckType</td>
-                                </tr>
-                                <tr>
-                                    <td class="e-bold">담당자</td>
-                                    <td>@aptitGroupsSub.Manage_Name</td>
-                                    <td class="e-bold">연락처1</td>
-                                    <td>@aptitGroupsSub.Manage_Tel1</td>
-                                    <td class="e-bold">연락처2</td>
-                                    <td>@aptitGroupsSub.Manage_Tel2</td>
-                                </tr>
-                                <tr>
-                                    <td class="e-bold">신청인원</td>
-                                    <td>@aptitGroupsSub.RegCount</td>
-                                    <td class="e-bold">진행인원</td>
-                                    <td>@aptitGroupsSub.CompletCount</td>
-                                    <td class="e-bold"></td>
-                                    <td></td>
-                                </tr>
-                                <tr>
-                                    <td class="e-bold">시작일</td>
-                                    <td>@aptitGroupsSub.StartDate</td>
-                                    <td class="e-bold">종료일</td>
-                                    <td>@aptitGroupsSub.EndDate</td>
-                                    <td class="e-bold">계약일</td>
-                                    <td>@aptitGroupsSub.Created</td>
-                                </tr>
-                                <tr>
-                                    <td class="e-bold">입금액</td>
-                                    <td>@aptitGroupsSub.Payment</td>
-                                    <td class="e-bold">발급회차</td>
-                                    <td>@aptitGroupsSub.PaymentCount</td>
-                                    <td class="e-bold"></td>
-                                    <td></td>
-                                </tr>
-
-                            </table>
+                            <div class="details-container">
+                                <div class="detail-row">
+                                    <div class="detail-item">
+                                        <span class="e-bold detail-label">회차코드:</span>
+                                        <span class="detail-value">@aptitGroupsSub.Group_ID</span>
+                                    </div>
+                                    <div class="detail-item">
+                                        <span class="e-bold detail-label">단체명:</span>
+                                        <span class="detail-value">@aptitGroupsSub.Group_Name</span>
+                                    </div>
+                                    <div class="detail-item">
+                                        <span class="e-bold detail-label">검사종류:</span>
+                                        <span class="detail-value">@aptitGroupsSub.CheckType</span>
+                                    </div>
+                                </div>
+                                <div class="detail-row">
+                                    <div class="detail-item">
+                                        <span class="e-bold detail-label">담당자:</span>
+                                        <span class="detail-value">@aptitGroupsSub.Manage_Name</span>
+                                    </div>
+                                    <div class="detail-item">
+                                        <span class="e-bold detail-label">연락처1:</span>
+                                        <span class="detail-value">@aptitGroupsSub.Manage_Tel1</span>
+                                    </div>
+                                    <div class="detail-item">
+                                        <span class="e-bold detail-label">연락처2:</span>
+                                        <span class="detail-value">@aptitGroupsSub.Manage_Tel2</span>
+                                    </div>
+                                </div>
+                                <div class="detail-row">
+                                    <div class="detail-item">
+                                        <span class="e-bold detail-label">신청인원:</span>
+                                        <span class="detail-value">@aptitGroupsSub.RegCount</span>
+                                    </div>
+                                    <div class="detail-item">
+                                        <span class="e-bold detail-label">진행인원:</span>
+                                        <span class="detail-value">@aptitGroupsSub.CompletCount</span>
+                                    </div>
+                                    <div class="detail-item"></div>
+                                </div>
+                                <div class="detail-row">
+                                    <div class="detail-item">
+                                        <span class="e-bold detail-label">시작일:</span>
+                                        <span class="detail-value">@aptitGroupsSub.StartDate</span>
+                                    </div>
+                                    <div class="detail-item">
+                                        <span class="e-bold detail-label">종료일:</span>
+                                        <span class="detail-value">@aptitGroupsSub.EndDate</span>
+                                    </div>
+                                    <div class="detail-item">
+                                        <span class="e-bold detail-label">계약일:</span>
+                                        <span class="detail-value">@aptitGroupsSub.Created</span>
+                                    </div>
+                                </div>
+                                <div class="detail-row">
+                                    <div class="detail-item">
+                                        <span class="e-bold detail-label">입금액:</span>
+                                        <span class="detail-value">@aptitGroupsSub.Payment</span>
+                                    </div>
+                                    <div class="detail-item">
+                                        <span class="e-bold detail-label">발급회차:</span>
+                                        <span class="detail-value">@aptitGroupsSub.PaymentCount</span>
+                                    </div>
+                                    <div class="detail-item"></div>
+                                </div>
+                            </div>
 
                         </div>
                     </ContentTemplate>
@@ -87,11 +110,9 @@
         </SfSplitter>
     </div>
 
-
-
     <div class="control_wrapper">
         <h4>@dt.Month.ToString()월 검사리스트</h4>
-        <SfSplitter Height="600px" Width="100%">
+        <SfSplitter Height="500px" Width="100%">
             <SplitterPanes>
                 <SplitterPane Size="15%" Min="25%">
                     <ContentTemplate>
@@ -118,33 +139,48 @@
                         <div>
 
                             @*<div class="profile-name bold">@aptitGroupsSub.Group_Name</div>*@
-                            <table>
-                                <tr>
-                                    <td class="e-bold">이름</td>
-                                    <td>@aptitUserSub.User_Name</td>
-                                    <td class="e-bold">이메일</td>
-                                    <td>@aptitUserSub.User_Email</td>
-                                </tr>
-                                <tr>
-                                    <td class="e-bold">나이</td>
-                                    <td>@aptitUserSub.User_Age</td>
-                                    <td class="e-bold">성별</td>
-                                    <td>@aptitUserSub.User_Gender</td>
-                                </tr>
-                                <tr>
-                                    <td class="e-bold">학년</td>
-                                    <td>@aptitUserSub.User_Grade</td>
-                                    <td class="e-bold">전공</td>
-                                    <td>@aptitUserSub.User_Finish</td>
-                                </tr>
-                                <tr>
-                                    <td class="e-bold">검사일</td>
-                                    <td>@aptitUserSub.Created</td>
-                                    <td class="e-bold">진행상태</td>
-                                    <td></td>
-                                </tr>
-
-                            </table>
+                            <div class="details-container">
+                                <div class="detail-row">
+                                    <div class="detail-item">
+                                        <span class="e-bold detail-label">이름:</span>
+                                        <span class="detail-value">@aptitUserSub.User_Name</span>
+                                    </div>
+                                    <div class="detail-item">
+                                        <span class="e-bold detail-label">이메일:</span>
+                                        <span class="detail-value">@aptitUserSub.User_Email</span>
+                                    </div>
+                                </div>
+                                <div class="detail-row">
+                                    <div class="detail-item">
+                                        <span class="e-bold detail-label">나이:</span>
+                                        <span class="detail-value">@aptitUserSub.User_Age</span>
+                                    </div>
+                                    <div class="detail-item">
+                                        <span class="e-bold detail-label">성별:</span>
+                                        <span class="detail-value">@aptitUserSub.User_Gender</span>
+                                    </div>
+                                </div>
+                                <div class="detail-row">
+                                    <div class="detail-item">
+                                        <span class="e-bold detail-label">학년:</span>
+                                        <span class="detail-value">@aptitUserSub.User_Grade</span>
+                                    </div>
+                                    <div class="detail-item">
+                                        <span class="e-bold detail-label">전공:</span>
+                                        <span class="detail-value">@aptitUserSub.User_Finish</span>
+                                    </div>
+                                </div>
+                                <div class="detail-row">
+                                    <div class="detail-item">
+                                        <span class="e-bold detail-label">검사일:</span>
+                                        <span class="detail-value">@aptitUserSub.Created</span>
+                                    </div>
+                                    <div class="detail-item">
+                                        <span class="e-bold detail-label">진행상태:</span>
+                                        <span class="detail-value"></span> @* Placeholder for status? *@
+                                    </div>
+                                </div>
+                            </div>
 
                         </div>
                     </ContentTemplate>
@@ -216,7 +252,8 @@
         color: #000000;
     }
 
-    table {
+    /* Remove table styles as they are no longer used for details */
+    /* table {
         border-collapse: collapse;
         border-spacing: 0;
         width: calc(100% - 20px);
@@ -229,7 +266,7 @@
             padding: 5px;
             text-align: left;
             border: 1px solid #ddd
-        }
+        } */
 
     .e-bold {
         font-weight: bold;
@@ -239,5 +276,67 @@
         font-weight: 500;
         font-size: 14px;
         text-align: center;
+    }
+
+    /* New styles for detail layout */
+    .details-container {
+        padding: 25px;
+        font-size: 16px;
+        background-color: #fdfdfd;
+        border: 1px solid #dcdcdc;
+        border-radius: 10px;
+        box-shadow: 0 5px 10px rgba(0,0,0,0.1);
+        transition: box-shadow 0.3s ease, transform 0.3s ease;
+    }
+
+    .detail-row {
+        display: flex;
+        margin-bottom: 10px;
+        gap: 15px;
+        flex-wrap: wrap;
+    }
+
+    .detail-item {
+        flex: 1;
+        min-width: 240px;
+        background-color: #f8f8f8;
+        padding: 12px 18px;
+        border-radius: 8px;
+        border: 1px solid #ddd;
+        box-shadow: 0 3px 6px rgba(0,0,0,0.05);
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .detail-item:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 6px 12px rgba(0,0,0,0.15);
+    }
+
+    .detail-label {
+        margin-right: 12px;
+        color: #777;
+    }
+
+    .detail-value {
+        font-size: 14px;
+        color: #111;
+    }
+
+    h4 {
+        padding: 15px 25px;
+        background-color: #eaeaea;
+        border-bottom: 1px solid #bbb;
+        margin-bottom: 0;
+        font-size: 1.3em;
+        font-weight: 700;
+        color: #444;
+    }
+
+    .control_wrapper {
+        border: 1px solid #bbb;
+        margin-bottom: 30px;
+        box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        border-radius: 10px;
+        overflow: hidden;
     }
 </style>
