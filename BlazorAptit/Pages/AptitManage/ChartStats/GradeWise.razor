@@ -1,0 +1,502 @@
+@page "/AptitManage/ChartStats/GradeWise"
+@namespace BlazorAptit.Pages.AptitManage.ChartStats
+@using BlazorAptit.Models
+@using BlazorAptit.Services
+@using Radzen
+@using Radzen.Blazor
+@inject StatisticsService StatisticsService
+@inject NavigationManager NavigationManager
+@inject IJSRuntime JSRuntime
+@implements IDisposable
+
+<div class="content-wrapper">
+    <div class="page-header">
+        <h2>학년/반별 적성 유형 통계</h2>
+        <div class="filter-section">
+            <div class="form-group">
+                <label for="searchInput">단체/학교 검색:</label>
+                <div class="search-container">
+                    <input id="searchInput" type="text" class="form-control" 
+                           placeholder="단체명 검색..." 
+                           @bind="searchText" 
+                           @bind:event="oninput" 
+                           @onkeyup="FilterGroups" />
+                    <button class="search-clear" @onclick="ClearSearch" title="검색어 지우기">
+                        <span>×</span>
+                    </button>
+                </div>
+            </div>
+            <div class="form-group">
+                <label for="groupSelect">단체/학교 선택:</label>
+                <select id="groupSelect" class="form-control" @onchange="OnGroupChanged">
+                    @foreach (var group in filteredGroups)
+                    {
+                        <option value="@group" selected="@(group == selectedGroup)">@group</option>
+                    }
+                </select>
+                <span class="group-count">@filteredGroups.Count 개 단체</span>
+            </div>
+        </div>
+    </div>
+
+    @if (isLoading)
+    {
+        <div class="loading-container">
+            <div class="loading-spinner"></div>
+            <p>데이터를 불러오는 중...</p>
+        </div>
+    }
+    else if (statistics != null && statistics.Any())
+    {
+        <div class="statistics-section">
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="grade-summary">
+                        <h4>분석 그룹: @selectedGroup</h4>
+                        <p>전체 분석 대상: @(statistics.FirstOrDefault()?.Total_Users_In_Overall_Group ?? 0)명</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 학년/반별 통계 표시 -->
+            <div class="row">
+                @foreach (var gradeGroup in statistics.GroupBy(s => s.User_Grade).OrderBy(g => g.Key))
+                {
+                    <div class="col-md-12 mb-4">
+                        <div class="grade-header">
+                            <h4>@gradeGroup.Key 학년</h4>
+                        </div>
+                        
+                        <div class="row">
+                            @foreach (var classGroup in gradeGroup.GroupBy(s => s.User_Class).OrderBy(c => c.Key))
+                            {
+                                <div class="col-md-4 mb-3">
+                                    <div class="class-stats-card">
+                                        <h5 class="card-title">@classGroup.Key 반</h5>
+                                        <div class="class-count">전체 @(classGroup.First().Total_Users_In_Grade_Class)명</div>
+                                        <div class="table-responsive">
+                                            <table class="table table-hover">
+                                                <thead>
+                                                    <tr>
+                                                        <th>순위</th>
+                                                        <th>적성 유형</th>
+                                                        <th>인원수</th>
+                                                        <th>비율(%)</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    @foreach (var stat in classGroup.OrderBy(s => s.Rank_In_Grade_Class))
+                                                    {
+                                                        <tr>
+                                                            <td>@stat.Rank_In_Grade_Class</td>
+                                                            <td>@stat.Primary_Aptitude_Type</td>
+                                                            <td>@stat.Aptitude_Count_In_Grade_Class</td>
+                                                            <td>@stat.Pct_In_Grade_Class%</td>
+                                                        </tr>
+                                                    }
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                </div>
+                            }
+                        </div>
+                    </div>
+                }
+            </div>
+        </div>
+    }
+    else
+    {
+        <div class="no-data-section">
+            <p>데이터가 없습니다. 다른 그룹을 선택하거나 관리자에게 문의하세요.</p>
+        </div>
+    }
+</div>
+
+<style>
+    /* 전체 컨테이너 스타일 */
+    .content-wrapper {
+        padding: 20px;
+        max-width: 1400px;
+        margin: 0 auto;
+    }
+
+    /* 페이지 헤더 스타일 */
+    .page-header {
+        margin-bottom: 30px;
+        border-bottom: 1px solid #eaeaea;
+        padding-bottom: 15px;
+    }
+
+    .page-header h2 {
+        color: #2c3e50;
+        font-weight: 600;
+        margin-bottom: 15px;
+    }
+
+    /* 필터 섹션 스타일 */
+    .filter-section {
+        margin-bottom: 20px;
+    }
+
+    .form-group {
+        margin-bottom: 15px;
+        display: flex;
+        align-items: center;
+    }
+
+    .form-group label {
+        margin-right: 15px;
+        font-weight: 500;
+        min-width: 120px;
+        color: #555;
+    }
+
+    .search-container {
+        position: relative;
+        width: 300px;
+    }
+
+    .search-clear {
+        position: absolute;
+        right: 10px;
+        top: 50%;
+        transform: translateY(-50%);
+        background: none;
+        border: none;
+        font-size: 18px;
+        color: #999;
+        cursor: pointer;
+        padding: 0 5px;
+    }
+
+    .search-clear:hover {
+        color: #555;
+    }
+
+    .group-count {
+        margin-left: 15px;
+        font-size: 14px;
+        color: #666;
+    }
+
+    .form-control {
+        padding: 8px 12px;
+        border-radius: 4px;
+        border: 1px solid #ddd;
+        width: 300px;
+        background-color: #fff;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        font-size: 14px;
+    }
+
+    .form-control:focus {
+        border-color: #3498db;
+        box-shadow: 0 0 0 0.2rem rgba(52, 152, 219, 0.25);
+        outline: 0;
+    }
+
+    /* 로딩 스타일 */
+    .loading-container {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        min-height: 300px;
+    }
+
+    .loading-spinner {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        border: 3px solid #f3f3f3;
+        border-top: 3px solid #3498db;
+        animation: spin 1s linear infinite;
+        margin-bottom: 15px;
+    }
+
+    @@keyframes spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+    }
+
+    /* 데이터 없음 스타일 */
+    .no-data-section {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        min-height: 300px;
+        background-color: #f8f9fa;
+        border-radius: 8px;
+        color: #666;
+        font-style: italic;
+    }
+
+    /* 통계 요약 스타일 */
+    .grade-summary {
+        background-color: #f8f9fa;
+        border-left: 4px solid #3498db;
+        padding: 15px 20px;
+        border-radius: 4px;
+        margin-bottom: 25px;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+    }
+
+    .grade-summary h4 {
+        color: #2c3e50;
+        margin-bottom: 10px;
+        font-weight: 600;
+    }
+
+    .grade-summary p {
+        margin-bottom: 0;
+        color: #555;
+        font-size: 16px;
+    }
+
+    /* 학년 헤더 스타일 */
+    .grade-header {
+        background-color: #e9f7fe;
+        border-left: 4px solid #3498db;
+        padding: 10px 15px;
+        border-radius: 4px;
+        margin-bottom: 15px;
+    }
+
+    .grade-header h4 {
+        color: #2c3e50;
+        margin: 0;
+        font-weight: 600;
+        font-size: 18px;
+    }
+
+    /* 반별 카드 스타일 */
+    .class-stats-card {
+        background-color: white;
+        border-radius: 8px;
+        padding: 20px;
+        margin-bottom: 15px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        height: 100%;
+    }
+
+    .card-title {
+        color: #2c3e50;
+        font-weight: 600;
+        margin-bottom: 15px;
+        padding-bottom: 10px;
+        border-bottom: 1px solid #eee;
+    }
+
+    .class-count {
+        font-size: 16px;
+        color: #555;
+        margin-bottom: 15px;
+        font-weight: 500;
+    }
+
+    .table-responsive {
+        overflow-x: auto;
+    }
+
+    .table {
+        width: 100%;
+        margin-bottom: 0;
+        background-color: white;
+        border-collapse: collapse;
+    }
+
+    .table th {
+        background-color: #f0f0f0;
+        color: #333;
+        font-weight: 600;
+        border-bottom: 2px solid #ddd;
+        text-align: center;
+        padding: 12px 8px;
+    }
+
+    .table td {
+        padding: 12px 8px;
+        text-align: center;
+        border-bottom: 1px solid #eee;
+    }
+
+    .table tbody tr:hover {
+        background-color: rgba(52, 152, 219, 0.1);
+    }
+
+    /* 반응형 스타일 */
+    @@media (max-width: 768px) {
+        .form-group {
+            flex-direction: column;
+            align-items: flex-start;
+        }
+
+        .form-group label {
+            margin-bottom: 8px;
+        }
+
+        .form-control {
+            width: 100%;
+        }
+
+        .search-container {
+            width: 100%;
+        }
+
+        .col-md-4 {
+            width: 100%;
+        }
+
+        .group-count {
+            margin-left: 0;
+            margin-top: 5px;
+        }
+    }
+</style>
+
+@code {
+    private List<GradeWiseStatistics> statistics;
+    private List<string> groups = new List<string>();
+    private List<string> filteredGroups = new List<string>();
+    private string selectedGroup = "";
+    private string searchText = "";
+    private bool isLoading = false;
+    private bool isDisposed = false;
+
+    protected override async Task OnInitializedAsync()
+    {
+        // 드롭다운리스트 데이터 로드
+        await LoadGroups();
+        
+        if (groups.Any())
+        {
+            filteredGroups = groups.ToList();
+            selectedGroup = filteredGroups.First();
+            await LoadStatistics();
+        }
+    }
+
+    private async Task LoadGroups()
+    {
+        try
+        {
+            // AptitGroup 테이블에서 Group_Name을 가져옴
+            groups = await StatisticsService.GetGroupNamesAsync();
+            
+            if (!groups.Any())
+            {
+                // 데이터가 없는 경우 기본값 설정
+                groups = new List<string> { "인천세무고등학교", "부천송내고등학교", "인천남고등학교" };
+            }
+            
+            Console.WriteLine($"그룹 데이터 로드 완료: {groups.Count}개");
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"그룹 데이터 로드 중 오류 발생: {ex.Message}");
+            // 오류 발생 시 기본값 설정
+            groups = new List<string> { "인천세무고등학교", "부천송내고등학교", "인천남고등학교" };
+        }
+    }
+
+    private void FilterGroups()
+    {
+        if (string.IsNullOrWhiteSpace(searchText))
+        {
+            filteredGroups = groups.ToList();
+        }
+        else
+        {
+            filteredGroups = groups
+                .Where(g => g.Contains(searchText, StringComparison.OrdinalIgnoreCase))
+                .ToList();
+        }
+
+        // 검색 결과가 없으면 빈 메시지 표시
+        if (!filteredGroups.Any())
+        {
+            filteredGroups = new List<string> { "검색 결과가 없습니다" };
+        }
+        
+        // 검색 후 자동으로 첫 번째 항목 선택
+        if (filteredGroups.Count > 0 && filteredGroups[0] != "검색 결과가 없습니다")
+        {
+            selectedGroup = filteredGroups[0];
+            LoadStatistics().GetAwaiter();
+        }
+
+        StateHasChanged();
+    }
+
+    private void ClearSearch()
+    {
+        searchText = "";
+        filteredGroups = groups.ToList();
+        
+        if (filteredGroups.Any())
+        {
+            selectedGroup = filteredGroups[0];
+            LoadStatistics().GetAwaiter();
+        }
+        
+        StateHasChanged();
+    }
+
+    private async Task OnGroupChanged(ChangeEventArgs e)
+    {
+        selectedGroup = e.Value.ToString();
+        await LoadStatistics();
+    }
+
+    private async Task LoadStatistics()
+    {
+        isLoading = true;
+        statistics = null; // Clear previous stats
+        StateHasChanged(); // Show loading
+
+        try
+        {
+            // 1. Fetch Statistics Data
+            statistics = await StatisticsService.GetGradeWiseStatisticsAsync(selectedGroup);
+
+            if (statistics != null && statistics.Any())
+            {
+                Console.WriteLine($"DB 조회 성공: {selectedGroup}, 레코드 수: {statistics.Count}");
+                
+                // 디버깅: 가져온 데이터의 구조 확인
+                foreach (var stat in statistics.Take(5))
+                {
+                    Console.WriteLine($"데이터 샘플: 학년={stat.User_Grade}, 반={stat.User_Class}, 유형={stat.Primary_Aptitude_Type}, 인원수={stat.Aptitude_Count_In_Grade_Class}, 순위={stat.Rank_In_Grade_Class}");
+                }
+            }
+            else
+            {
+                Console.WriteLine($"{selectedGroup}에 대한 DB 데이터가 없습니다.");
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"통계 데이터 로드 중 오류 발생: {ex.Message}\n{ex.StackTrace}");
+            await JSRuntime.InvokeVoidAsync("console.error", "통계 데이터 로드 중 오류 발생:", ex.Message, ex.StackTrace);
+            
+            // 오류 상세 내용을 좀 더 구체적으로 로깅
+            if (ex.InnerException != null)
+            {
+                Console.WriteLine($"내부 예외: {ex.InnerException.Message}");
+            }
+        }
+        finally
+        {
+            isLoading = false;
+            StateHasChanged(); // UI 업데이트
+        }
+    }
+
+    public void Dispose()
+    {
+        isDisposed = true;
+        // No specific resources to dispose here currently
+    }
+} 

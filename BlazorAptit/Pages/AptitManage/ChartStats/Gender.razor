@@ -14,13 +14,27 @@
         <h2>그룹별 남녀 통계</h2>
         <div class="filter-section">
             <div class="form-group">
+                <label for="searchInput">단체/학교 검색:</label>
+                <div class="search-container">
+                    <input id="searchInput" type="text" class="form-control" 
+                           placeholder="단체명 검색..." 
+                           @bind="searchText" 
+                           @bind:event="oninput" 
+                           @onkeyup="FilterGroups" />
+                    <button class="search-clear" @onclick="ClearSearch" title="검색어 지우기">
+                        <span>×</span>
+                    </button>
+                </div>
+            </div>
+            <div class="form-group">
                 <label for="groupSelect">단체/학교 선택:</label>
                 <select id="groupSelect" class="form-control" @onchange="OnGroupChanged">
-                    @foreach (var group in groups)
+                    @foreach (var group in filteredGroups)
                     {
                         <option value="@group" selected="@(group == selectedGroup)">@group</option>
                     }
                 </select>
+                <span class="group-count">@filteredGroups.Count 개 단체</span>
             </div>
         </div>
     </div>
@@ -45,10 +59,22 @@
             </div>
 
             <!-- 인원수 차트 -->
-            @* <div class="row mb-4">
+           @*  <div class="row mb-4">
                 <div class="col-md-12">
                     <div class="chart-container">
                         <h4 class="chart-title">남녀별 적성 유형 분포 (인원수)</h4>
+                        <div class="chart-description">
+                            <p>※ 이 차트는 남녀 각각의 상위 적성 유형을 기준으로 작성되었습니다. 괄호 안은 각 성별 내 순위입니다.</p>
+                        </div>
+                        
+                        <!-- 실제 데이터 사용 시 디버깅 정보 표시 (개발 단계에서만 사용) -->
+                        @if(chartData.Count > 0 && chartData[0].AptitudeType != "유형A")
+                        {
+                            <div class="debug-info">
+                                <p>실제 데이터 사용 중: @chartData.Count 항목</p>
+                            </div>
+                        }
+                        
                         <RadzenChart Style="height: 400px; width: 100%;">
                             <RadzenLegend Position="LegendPosition.Bottom" />
                             <RadzenCategoryAxis Padding="20">
@@ -63,10 +89,31 @@
                             <RadzenColumnSeries Data="@chartData" CategoryProperty="AptitudeType" 
                                 Title="여성" ValueProperty="Female" Fill="#e74c3c" LineType="LineType.Solid" />
                             <RadzenColumnOptions Radius="5" />
+                            <RadzenTooltipOptions/>
                         </RadzenChart>
                     </div>
                 </div>
             </div> *@
+
+            <!-- 차트 설명 및 디버깅 정보 스타일 -->
+            <style>
+                .chart-description {
+                    text-align: center;
+                    margin-bottom: 15px;
+                    font-size: 14px;
+                    color: #666;
+                    font-style: italic;
+                }
+                
+                .debug-info {
+                    margin-bottom: 10px;
+                    padding: 5px 10px;
+                    background-color: #f8f9fa;
+                    border-left: 3px solid #28a745;
+                    font-size: 14px;
+                    color: #333;
+                }
+            </style>
 
             <!-- 테이블 형태로 통계 표시 -->
             <div class="row">
@@ -150,6 +197,34 @@
         font-weight: 500;
         min-width: 120px;
         color: #555;
+    }
+
+    .search-container {
+        position: relative;
+        width: 300px;
+    }
+
+    .search-clear {
+        position: absolute;
+        right: 10px;
+        top: 50%;
+        transform: translateY(-50%);
+        background: none;
+        border: none;
+        font-size: 18px;
+        color: #999;
+        cursor: pointer;
+        padding: 0 5px;
+    }
+
+    .search-clear:hover {
+        color: #555;
+    }
+
+    .group-count {
+        margin-left: 15px;
+        font-size: 14px;
+        color: #666;
     }
 
     .form-control {
@@ -314,6 +389,10 @@
             width: 100%;
         }
 
+        .search-container {
+            width: 100%;
+        }
+
         .col-md-6 {
             width: 100%;
         }
@@ -321,13 +400,20 @@
         .chart-container {
             height: auto;
         }
+
+        .group-count {
+            margin-left: 0;
+            margin-top: 5px;
+        }
     }
 </style>
 
 @code {
     private List<GenderGroupStatistics> statistics;
     private List<string> groups = new List<string>();
+    private List<string> filteredGroups = new List<string>();
     private string selectedGroup = "";
+    private string searchText = "";
     private bool isLoading = false;
     private bool isDisposed = false;
 
@@ -340,8 +426,22 @@
         public string AptitudeType { get; set; }
         public int Male { get; set; }
         public int Female { get; set; }
-        // Optional: Helper property for sorting
+        
+        // 순위 정보 추가
+        public int MaleRank { get; set; }
+        public int FemaleRank { get; set; }
+        
+        // 합계 속성 (정렬용)
         public int Total => Male + Female;
+        
+        // 적성 유형에 순위 정보를 추가하는 메서드
+        public string GetFormattedAptitudeType()
+        {
+            string maleRankText = MaleRank > 0 ? $"남:{MaleRank}위" : "-";
+            string femaleRankText = FemaleRank > 0 ? $"여:{FemaleRank}위" : "-";
+            
+            return $"{AptitudeType} ({maleRankText} {femaleRankText})";
+        }
     }
 
     protected override async Task OnInitializedAsync()
@@ -351,7 +451,8 @@
         
         if (groups.Any())
         {
-            selectedGroup = groups.First();
+            filteredGroups = groups.ToList();
+            selectedGroup = filteredGroups.First();
             await LoadStatistics();
         }
     }
@@ -377,6 +478,49 @@
             // 오류 발생 시 기본값 설정
             groups = new List<string> { "부천송내고등학교", "인천남고등학교", "영등포고등학교" };
         }
+    }
+
+    private void FilterGroups()
+    {
+        if (string.IsNullOrWhiteSpace(searchText))
+        {
+            filteredGroups = groups.ToList();
+        }
+        else
+        {
+            filteredGroups = groups
+                .Where(g => g.Contains(searchText, StringComparison.OrdinalIgnoreCase))
+                .ToList();
+        }
+
+        // 검색 결과가 없으면 빈 메시지 표시
+        if (!filteredGroups.Any())
+        {
+            filteredGroups = new List<string> { "검색 결과가 없습니다" };
+        }
+        
+        // 검색 후 자동으로 첫 번째 항목 선택
+        if (filteredGroups.Count > 0 && filteredGroups[0] != "검색 결과가 없습니다")
+        {
+            selectedGroup = filteredGroups[0];
+            LoadStatistics().GetAwaiter();
+        }
+
+        StateHasChanged();
+    }
+
+    private void ClearSearch()
+    {
+        searchText = "";
+        filteredGroups = groups.ToList();
+        
+        if (filteredGroups.Any())
+        {
+            selectedGroup = filteredGroups[0];
+            LoadStatistics().GetAwaiter();
+        }
+        
+        StateHasChanged();
     }
 
     private void LoadSampleData()
@@ -414,84 +558,126 @@
             if (statistics != null && statistics.Any())
             {
                 Console.WriteLine($"DB 조회 성공: {selectedGroup}, 레코드 수: {statistics.Count}");
-
-                // 2. Get all unique aptitude types from the fetched data
-                var allAptitudeTypes = statistics
-                                        .Select(s => s.Primary_Aptitude_Type)
-                                        .Where(type => !string.IsNullOrEmpty(type)) // Ensure type is not null/empty
-                                        .Distinct()
-                                        .ToList();
-
-                Console.WriteLine($"고유 적성 유형 수: {allAptitudeTypes.Count}");
-                if (!allAptitudeTypes.Any()) {
-                    Console.WriteLine("고유 적성 유형이 없습니다.");
-                    // Optionally load sample data here if this case should show something
-                    // LoadSampleData();
-                } else {
-                    // 3. Create temporary data structure with Male/Female counts for each type
-                    var tempData = new List<GenderChartData>();
-                    foreach (var type in allAptitudeTypes)
-                    {
-                        // Find male count for this type (handle null statistic)
-                        int maleCount = statistics
-                            .FirstOrDefault(s => s.Primary_Aptitude_Type == type && s.User_Gender.ToUpper() == "M")
-                            ?.Aptitude_Count_In_Gender ?? 0;
-
-                        // Find female count for this type (handle null statistic)
-                        int femaleCount = statistics
-                            .FirstOrDefault(s => s.Primary_Aptitude_Type == type && s.User_Gender.ToUpper() == "F")
-                            ?.Aptitude_Count_In_Gender ?? 0;
-
-                        // Only add if there's data for this type
-                        if (maleCount > 0 || femaleCount > 0)
-                        {
-                            tempData.Add(new GenderChartData
-                            {
-                                AptitudeType = type,
-                                Male = maleCount,
-                                Female = femaleCount
-                            });
-                        }
-                    }
-                     Console.WriteLine($"임시 데이터 생성 완료 (유형별 남/여 집계): {tempData.Count} 항목");
-
-                    // 4. Sort by total count (descending) and take top 5
-                    chartData = tempData
-                        .OrderByDescending(d => d.Total) // Use the Total helper property
-                        .ThenBy(d => d.AptitudeType) // Secondary sort for consistent order if totals tie
-                        .Take(5)
-                        .ToList();
-
-                    Console.WriteLine($"최종 차트 데이터 생성 완료 (상위 5개): {chartData.Count} 항목");
-                     foreach (var item in chartData) {
-                         Console.WriteLine($" -> 유형: {item.AptitudeType}, 남성: {item.Male}, 여성: {item.Female}, 총계: {item.Total}");
-                     }
+                
+                // 디버깅: 가져온 데이터의 구조 확인
+                foreach (var stat in statistics.Take(5))
+                {
+                    Console.WriteLine($"데이터 샘플: 성별={stat.User_Gender}, 유형={stat.Primary_Aptitude_Type}, 인원수={stat.Aptitude_Count_In_Gender}, 순위={stat.Rank_In_Gender}");
                 }
+
+                // 남자/여자 데이터가 있는지 확인
+                bool hasMaleData = statistics.Any(s => s.User_Gender?.ToUpper() == "M");
+                bool hasFemaleData = statistics.Any(s => s.User_Gender?.ToUpper() == "F");
+                
+                Console.WriteLine($"남성 데이터 있음: {hasMaleData}, 여성 데이터 있음: {hasFemaleData}");
+
+                // 남자 순위 데이터 추출
+                var maleStats = statistics
+                    .Where(s => s.User_Gender?.ToUpper() == "M")
+                    .Where(s => !string.IsNullOrEmpty(s.Primary_Aptitude_Type)) // 빈 유형 필터링
+                    .Where(s => s.Aptitude_Count_In_Gender > 0) // 0명인 유형 필터링
+                    .OrderBy(s => s.Rank_In_Gender)
+                    .ToList();
+
+                // 여자 순위 데이터 추출
+                var femaleStats = statistics
+                    .Where(s => s.User_Gender?.ToUpper() == "F")
+                    .Where(s => !string.IsNullOrEmpty(s.Primary_Aptitude_Type)) // 빈 유형 필터링
+                    .Where(s => s.Aptitude_Count_In_Gender > 0) // 0명인 유형 필터링
+                    .OrderBy(s => s.Rank_In_Gender)
+                    .ToList();
+
+                Console.WriteLine($"추출된 남성 통계 수: {maleStats.Count}, 여성 통계 수: {femaleStats.Count}");
+
+                // 2. 차트 데이터 생성 (각 성별의 상위 5개 유형만 포함)
+                var maleTypes = maleStats.Take(5).Select(s => s.Primary_Aptitude_Type).ToList();
+                var femaleTypes = femaleStats.Take(5).Select(s => s.Primary_Aptitude_Type).ToList();
+                
+                // 남성과 여성 순위 데이터를 합쳐서 고유한 적성 유형 리스트 생성
+                var allTopTypes = maleTypes.Union(femaleTypes).Distinct().ToList();
+
+                Console.WriteLine($"상위 적성 유형 수: {allTopTypes.Count}");
+                Console.WriteLine($"남성 상위 유형: {string.Join(", ", maleTypes)}");
+                Console.WriteLine($"여성 상위 유형: {string.Join(", ", femaleTypes)}");
+
+                // 각 성별의 상위 적성 유형에 대한 데이터 생성
+                foreach (var type in allTopTypes)
+                {
+                    // 해당 유형의 남성 통계 검색
+                    var maleData = maleStats.FirstOrDefault(s => s.Primary_Aptitude_Type == type);
+                    int maleCount = maleData?.Aptitude_Count_In_Gender ?? 0;
+                    int maleRank = maleData?.Rank_In_Gender ?? 0;
+
+                    // 해당 유형의 여성 통계 검색
+                    var femaleData = femaleStats.FirstOrDefault(s => s.Primary_Aptitude_Type == type);
+                    int femaleCount = femaleData?.Aptitude_Count_In_Gender ?? 0;
+                    int femaleRank = femaleData?.Rank_In_Gender ?? 0;
+
+                    // 차트 데이터에 추가 (순위 정보 포함)
+                    chartData.Add(new GenderChartData
+                    {
+                        AptitudeType = $"{type} (남:{maleRank}위 여:{femaleRank}위)",
+                        Male = maleCount,
+                        Female = femaleCount,
+                        MaleRank = maleRank,
+                        FemaleRank = femaleRank
+                    });
+                    
+                    Console.WriteLine($"차트 데이터 추가: 유형={type}, 남성={maleCount}명({maleRank}위), 여성={femaleCount}명({femaleRank}위)");
+                }
+
+                // 4. 합계 기준으로 내림차순 정렬 (합계가 같으면 적성 유형 이름으로 정렬)
+                chartData = chartData
+                    .OrderByDescending(d => d.Total)
+                    .ThenBy(d => d.AptitudeType)
+                    .ToList();
+
+                Console.WriteLine($"최종 차트 데이터 생성 완료: {chartData.Count} 항목");
             }
             else
             {
                 Console.WriteLine($"{selectedGroup}에 대한 DB 데이터가 없습니다.");
-                // LoadSampleData(); // Decide if you want sample data on no results
+                // 이 부분은 샘플 데이터를 로드하는 부분입니다. 실제 데이터가 없을 때만 사용합니다.
+                LoadSampleData();
+                Console.WriteLine("샘플 데이터 로드됨 (DB 데이터 없음)");
             }
 
-             // Fallback to sample data ONLY if chartData is still empty after processing
-            if (!chartData.Any())
+            // 차트 데이터가 없을 경우에만 샘플 데이터 사용
+            if (chartData == null || !chartData.Any())
             {
-                Console.WriteLine("처리 후 유효한 차트 데이터가 없어 샘플 데이터를 로드합니다.");
+                Console.WriteLine("유효한 차트 데이터가 없어 샘플 데이터를 로드합니다.");
                 LoadSampleData();
+                Console.WriteLine("샘플 데이터 로드됨 (차트 데이터 없음)");
+            }
+            else
+            {
+                // 실제 데이터가 있는 경우, 명확하게 로그 출력
+                Console.WriteLine($"실제 데이터 사용 중: {chartData.Count} 항목");
+                foreach (var item in chartData)
+                {
+                    Console.WriteLine($" -> 유형: {item.AptitudeType}, 남성: {item.Male}, 여성: {item.Female}, 총계: {item.Total}");
+                }
             }
         }
         catch (Exception ex)
         {
             Console.WriteLine($"통계 데이터 로드 중 오류 발생: {ex.Message}\n{ex.StackTrace}");
             await JSRuntime.InvokeVoidAsync("console.error", "통계 데이터 로드 중 오류 발생:", ex.Message, ex.StackTrace);
+            
+            // 오류 상세 내용을 좀 더 구체적으로 로깅
+            if (ex.InnerException != null)
+            {
+                Console.WriteLine($"내부 예외: {ex.InnerException.Message}");
+            }
+            
             Console.WriteLine("오류 발생으로 샘플 데이터를 로드합니다.");
-            LoadSampleData(); // Use sample data on error
+            LoadSampleData();
+            Console.WriteLine("샘플 데이터 로드됨 (오류 발생)");
         }
         finally
         {
             isLoading = false;
-            StateHasChanged(); // Update UI after loading/processing
+            StateHasChanged(); // UI 업데이트
         }
     }
 
