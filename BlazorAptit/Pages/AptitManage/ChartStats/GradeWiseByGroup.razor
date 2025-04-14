@@ -17,6 +17,28 @@
 <div class="content-wrapper">
     <div class="page-header">
         <h2>학년/반별 적성 유형 통계</h2>
+        
+        <!-- 데이터 조회 탭 -->
+        <div class="tab-container">
+            <div class="tab @(activeTab == "byName" ? "active" : "")" @onclick="@(() => ChangeTab("byName"))">
+                <span>그룹명으로 조회</span>
+            </div>
+            <div class="tab @(activeTab == "byID" ? "active" : "")" @onclick="@(() => ChangeTab("byID"))">
+                <span>그룹 ID로 조회</span>
+            </div>
+        </div>
+        
+        <!-- 현재 그룹 정보 표시 -->
+        <div class="current-group-info">
+            @if (activeTab == "byName")
+            {
+                <p><strong>현재 그룹명:</strong> @selectedGroup</p>
+            }
+            else
+            {
+                <p><strong>현재 그룹 ID:</strong> @selectedGroupID</p>
+            }
+        </div>
     </div>
 
     @if (isLoading)
@@ -32,7 +54,7 @@
             <div class="row">
                 <div class="col-md-12">
                     <div class="grade-summary">
-                        <h4>분석 그룹: @selectedGroup</h4>
+                        <h4>분석 그룹: @(activeTab == "byName" ? selectedGroup : $"[{selectedGroupID}]")</h4>
                         <p>전체 분석 대상: @(statistics.FirstOrDefault()?.Total_Users_In_Overall_Group ?? 0)명</p>
                     </div>
                 </div>
@@ -113,6 +135,46 @@
         color: #2c3e50;
         font-weight: 600;
         margin-bottom: 15px;
+    }
+    
+    /* 탭 스타일 */
+    .tab-container {
+        display: flex;
+        margin-bottom: 20px;
+        border-bottom: 1px solid #ddd;
+    }
+    
+    .tab {
+        padding: 10px 20px;
+        cursor: pointer;
+        background-color: #f8f9fa;
+        border: 1px solid #ddd;
+        border-bottom: none;
+        border-radius: 5px 5px 0 0;
+        margin-right: 5px;
+        transition: all 0.2s ease;
+    }
+    
+    .tab:hover {
+        background-color: #e9ecef;
+    }
+    
+    .tab.active {
+        background-color: #3498db;
+        color: white;
+        border-color: #3498db;
+    }
+    
+    .current-group-info {
+        margin-top: 10px;
+        padding: 10px;
+        background-color: #f8f9fa;
+        border-radius: 4px;
+    }
+    
+    .current-group-info p {
+        margin: 0;
+        font-size: 15px;
     }
 
     /* 로딩 스타일 */
@@ -258,6 +320,8 @@
     private AptitResultUserView GridData;
     private ObservableCollection<AptitResultUserView> ObservableData;
     private string selectedGroup = "";
+    private string selectedGroupID = "";
+    private string activeTab = "byName"; // 기본값은 그룹명으로 조회
     private bool isLoading = false;
     private bool isDisposed = false;
 
@@ -299,10 +363,26 @@
         Users = await AptitRepository.GetGroupByID(UserID);
         GridData = Users.FirstOrDefault();
         
-        if (GridData != null && !string.IsNullOrEmpty(GridData.Group_Name))
+        if (GridData != null)
         {
-            selectedGroup = GridData.Group_Name;
-            await LoadStatistics();
+            if (!string.IsNullOrEmpty(GridData.Group_Name))
+            {
+                selectedGroup = GridData.Group_Name;
+            }
+            
+            if (!string.IsNullOrEmpty(GridData.Group_ID))
+            {
+                selectedGroupID = GridData.Group_ID;
+            }
+            
+            if (activeTab == "byName" && !string.IsNullOrEmpty(selectedGroup))
+            {
+                await LoadStatisticsByName();
+            }
+            else if (activeTab == "byID" && !string.IsNullOrEmpty(selectedGroupID))
+            {
+                await LoadStatisticsByID();
+            }
         }
         else
         {
@@ -313,7 +393,26 @@
         StateHasChanged();
     }
 
-    private async Task LoadStatistics()
+    private async Task ChangeTab(string tab)
+    {
+        if (tab == activeTab) return; // 이미 선택된 탭이면 무시
+        
+        activeTab = tab;
+        
+        // 탭에 따라 적절한 방식으로 통계 로드
+        if (activeTab == "byName" && !string.IsNullOrEmpty(selectedGroup))
+        {
+            await LoadStatisticsByName();
+        }
+        else if (activeTab == "byID" && !string.IsNullOrEmpty(selectedGroupID))
+        {
+            await LoadStatisticsByID();
+        }
+        
+        StateHasChanged();
+    }
+
+    private async Task LoadStatisticsByName()
     {
         isLoading = true;
         statistics = null; // Clear previous stats
@@ -337,6 +436,50 @@
             else
             {
                 Console.WriteLine($"{selectedGroup}에 대한 DB 데이터가 없습니다.");
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"통계 데이터 로드 중 오류 발생: {ex.Message}\n{ex.StackTrace}");
+            await JSRuntime.InvokeVoidAsync("console.error", "통계 데이터 로드 중 오류 발생:", ex.Message, ex.StackTrace);
+            
+            // 오류 상세 내용을 좀 더 구체적으로 로깅
+            if (ex.InnerException != null)
+            {
+                Console.WriteLine($"내부 예외: {ex.InnerException.Message}");
+            }
+        }
+        finally
+        {
+            isLoading = false;
+            StateHasChanged(); // UI 업데이트
+        }
+    }
+
+    private async Task LoadStatisticsByID()
+    {
+        isLoading = true;
+        statistics = null; // Clear previous stats
+        StateHasChanged(); // Show loading
+
+        try
+        {
+            // 그룹 ID로 통계 데이터 조회 - 새로 구현한 메서드 사용
+            statistics = await StatisticsService.GetGradeWiseStatisticsByIDAsync(selectedGroupID);
+
+            if (statistics != null && statistics.Any())
+            {
+                Console.WriteLine($"DB 조회 성공: 그룹 ID {selectedGroupID}, 레코드 수: {statistics.Count}");
+                
+                // 디버깅: 가져온 데이터의 구조 확인
+                foreach (var stat in statistics.Take(5))
+                {
+                    Console.WriteLine($"데이터 샘플: 학년={stat.User_Grade}, 반={stat.User_Class}, 유형={stat.Primary_Aptitude_Type}, 인원수={stat.Aptitude_Count_In_Grade_Class}, 순위={stat.Rank_In_Grade_Class}");
+                }
+            }
+            else
+            {
+                Console.WriteLine($"그룹 ID {selectedGroupID}에 대한 DB 데이터가 없습니다.");
             }
         }
         catch (Exception ex)

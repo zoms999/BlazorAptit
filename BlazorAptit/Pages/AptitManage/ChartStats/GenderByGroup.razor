@@ -17,7 +17,28 @@
 <div class="content-wrapper">
     <div class="page-header">
         <h2>그룹별 남녀 통계</h2>
-        <!-- 검색 및 선택 필터 섹션 제거 -->
+        
+        <!-- 데이터 조회 탭 -->
+        <div class="tab-container">
+            <div class="tab @(activeTab == "byName" ? "active" : "")" @onclick="@(() => ChangeTab("byName"))">
+                <span>그룹명으로 조회</span>
+            </div>
+            <div class="tab @(activeTab == "byID" ? "active" : "")" @onclick="@(() => ChangeTab("byID"))">
+                <span>그룹 ID로 조회</span>
+            </div>
+        </div>
+        
+        <!-- 현재 그룹 정보 표시 -->
+        <div class="current-group-info">
+            @if (activeTab == "byName")
+            {
+                <p><strong>현재 그룹명:</strong> @selectedGroup</p>
+            }
+            else
+            {
+                <p><strong>현재 그룹 ID:</strong> @selectedGroupID</p>
+            }
+        </div>
     </div>
 
     @if (isLoading)
@@ -33,7 +54,7 @@
             <div class="row">
                 <div class="col-md-12">
                     <div class="gender-summary">
-                        <h4>분석 그룹: @selectedGroup</h4>
+                        <h4>분석 그룹: @(activeTab == "byName" ? selectedGroup : $"[{selectedGroupID}]")</h4>
                         <p>전체 분석 대상: @(statistics.FirstOrDefault()?.Total_Users_In_Overall_Group ?? 0)명</p>
                     </div>
                 </div>
@@ -160,6 +181,46 @@
         color: #2c3e50;
         font-weight: 600;
         margin-bottom: 15px;
+    }
+    
+    /* 탭 스타일 */
+    .tab-container {
+        display: flex;
+        margin-bottom: 20px;
+        border-bottom: 1px solid #ddd;
+    }
+    
+    .tab {
+        padding: 10px 20px;
+        cursor: pointer;
+        background-color: #f8f9fa;
+        border: 1px solid #ddd;
+        border-bottom: none;
+        border-radius: 5px 5px 0 0;
+        margin-right: 5px;
+        transition: all 0.2s ease;
+    }
+    
+    .tab:hover {
+        background-color: #e9ecef;
+    }
+    
+    .tab.active {
+        background-color: #3498db;
+        color: white;
+        border-color: #3498db;
+    }
+    
+    .current-group-info {
+        margin-top: 10px;
+        padding: 10px;
+        background-color: #f8f9fa;
+        border-radius: 4px;
+    }
+    
+    .current-group-info p {
+        margin: 0;
+        font-size: 15px;
     }
 
     /* 로딩 스타일 */
@@ -311,6 +372,8 @@
     private AptitResultUserView GridData;
     private ObservableCollection<AptitResultUserView> ObservableData;
     private string selectedGroup = "";
+    private string selectedGroupID = "";
+    private string activeTab = "byName"; // 기본값은 그룹명으로 조회
     private bool isLoading = false;
     private bool isDisposed = false;
 
@@ -379,10 +442,26 @@
         Users = await AptitRepository.GetGroupByID(UserID);
         GridData = Users.FirstOrDefault();
         
-        if (GridData != null && !string.IsNullOrEmpty(GridData.Group_Name))
+        if (GridData != null)
         {
-            selectedGroup = GridData.Group_Name;
-            await LoadStatistics();
+            if (!string.IsNullOrEmpty(GridData.Group_Name))
+            {
+                selectedGroup = GridData.Group_Name;
+            }
+            
+            if (!string.IsNullOrEmpty(GridData.Group_ID))
+            {
+                selectedGroupID = GridData.Group_ID;
+            }
+            
+            if (activeTab == "byName" && !string.IsNullOrEmpty(selectedGroup))
+            {
+                await LoadStatisticsByName();
+            }
+            else if (activeTab == "byID" && !string.IsNullOrEmpty(selectedGroupID))
+            {
+                await LoadStatisticsByID();
+            }
         }
         else
         {
@@ -390,6 +469,25 @@
             Console.WriteLine("사용자의 그룹 정보를 찾을 수 없습니다.");
         }
 
+        StateHasChanged();
+    }
+
+    private async Task ChangeTab(string tab)
+    {
+        if (tab == activeTab) return; // 이미 선택된 탭이면 무시
+        
+        activeTab = tab;
+        
+        // 탭에 따라 적절한 방식으로 통계 로드
+        if (activeTab == "byName" && !string.IsNullOrEmpty(selectedGroup))
+        {
+            await LoadStatisticsByName();
+        }
+        else if (activeTab == "byID" && !string.IsNullOrEmpty(selectedGroupID))
+        {
+            await LoadStatisticsByID();
+        }
+        
         StateHasChanged();
     }
 
@@ -407,7 +505,7 @@
         Console.WriteLine("샘플 데이터 로드됨.");
     }
 
-    private async Task LoadStatistics()
+    private async Task LoadStatisticsByName()
     {
         isLoading = true;
         chartData = new List<GenderChartData>(); // Clear previous chart data
@@ -416,133 +514,167 @@
 
         try
         {
-            // 1. Fetch Statistics Data
+            // 그룹명으로 통계 데이터 조회
             statistics = await StatisticsService.GetGenderGroupStatisticsAsync(selectedGroup);
-
-            if (statistics != null && statistics.Any())
-            {
-                Console.WriteLine($"DB 조회 성공: {selectedGroup}, 레코드 수: {statistics.Count}");
-                
-                // 디버깅: 가져온 데이터의 구조 확인
-                foreach (var stat in statistics.Take(5))
-                {
-                    Console.WriteLine($"데이터 샘플: 성별={stat.User_Gender}, 유형={stat.Primary_Aptitude_Type}, 인원수={stat.Aptitude_Count_In_Gender}, 순위={stat.Rank_In_Gender}");
-                }
-
-                // 남자/여자 데이터가 있는지 확인
-                bool hasMaleData = statistics.Any(s => s.User_Gender?.ToUpper() == "M");
-                bool hasFemaleData = statistics.Any(s => s.User_Gender?.ToUpper() == "F");
-                
-                Console.WriteLine($"남성 데이터 있음: {hasMaleData}, 여성 데이터 있음: {hasFemaleData}");
-
-                // 남자 순위 데이터 추출
-                var maleStats = statistics
-                    .Where(s => s.User_Gender?.ToUpper() == "M")
-                    .Where(s => !string.IsNullOrEmpty(s.Primary_Aptitude_Type)) // 빈 유형 필터링
-                    .Where(s => s.Aptitude_Count_In_Gender > 0) // 0명인 유형 필터링
-                    .OrderBy(s => s.Rank_In_Gender)
-                    .ToList();
-
-                // 여자 순위 데이터 추출
-                var femaleStats = statistics
-                    .Where(s => s.User_Gender?.ToUpper() == "F")
-                    .Where(s => !string.IsNullOrEmpty(s.Primary_Aptitude_Type)) // 빈 유형 필터링
-                    .Where(s => s.Aptitude_Count_In_Gender > 0) // 0명인 유형 필터링
-                    .OrderBy(s => s.Rank_In_Gender)
-                    .ToList();
-
-                Console.WriteLine($"추출된 남성 통계 수: {maleStats.Count}, 여성 통계 수: {femaleStats.Count}");
-
-                // 2. 차트 데이터 생성 (각 성별의 상위 5개 유형만 포함)
-                var maleTypes = maleStats.Take(5).Select(s => s.Primary_Aptitude_Type).ToList();
-                var femaleTypes = femaleStats.Take(5).Select(s => s.Primary_Aptitude_Type).ToList();
-                
-                // 남성과 여성 순위 데이터를 합쳐서 고유한 적성 유형 리스트 생성
-                var allTopTypes = maleTypes.Union(femaleTypes).Distinct().ToList();
-
-                Console.WriteLine($"상위 적성 유형 수: {allTopTypes.Count}");
-                Console.WriteLine($"남성 상위 유형: {string.Join(", ", maleTypes)}");
-                Console.WriteLine($"여성 상위 유형: {string.Join(", ", femaleTypes)}");
-
-                // 각 성별의 상위 적성 유형에 대한 데이터 생성
-                foreach (var type in allTopTypes)
-                {
-                    // 해당 유형의 남성 통계 검색
-                    var maleData = maleStats.FirstOrDefault(s => s.Primary_Aptitude_Type == type);
-                    int maleCount = maleData?.Aptitude_Count_In_Gender ?? 0;
-                    int maleRank = maleData?.Rank_In_Gender ?? 0;
-
-                    // 해당 유형의 여성 통계 검색
-                    var femaleData = femaleStats.FirstOrDefault(s => s.Primary_Aptitude_Type == type);
-                    int femaleCount = femaleData?.Aptitude_Count_In_Gender ?? 0;
-                    int femaleRank = femaleData?.Rank_In_Gender ?? 0;
-
-                    // 차트 데이터에 추가 (순위 정보 포함)
-                    chartData.Add(new GenderChartData
-                    {
-                        AptitudeType = $"{type} (남:{maleRank}위 여:{femaleRank}위)",
-                        Male = maleCount,
-                        Female = femaleCount,
-                        MaleRank = maleRank,
-                        FemaleRank = femaleRank
-                    });
-                    
-                    Console.WriteLine($"차트 데이터 추가: 유형={type}, 남성={maleCount}명({maleRank}위), 여성={femaleCount}명({femaleRank}위)");
-                }
-
-                // 4. 합계 기준으로 내림차순 정렬 (합계가 같으면 적성 유형 이름으로 정렬)
-                chartData = chartData
-                    .OrderByDescending(d => d.Total)
-                    .ThenBy(d => d.AptitudeType)
-                    .ToList();
-
-                Console.WriteLine($"최종 차트 데이터 생성 완료: {chartData.Count} 항목");
-            }
-            else
-            {
-                Console.WriteLine($"{selectedGroup}에 대한 DB 데이터가 없습니다.");
-                // 이 부분은 샘플 데이터를 로드하는 부분입니다. 실제 데이터가 없을 때만 사용합니다.
-                LoadSampleData();
-                Console.WriteLine("샘플 데이터 로드됨 (DB 데이터 없음)");
-            }
-
-            // 차트 데이터가 없을 경우에만 샘플 데이터 사용
-            if (chartData == null || !chartData.Any())
-            {
-                Console.WriteLine("유효한 차트 데이터가 없어 샘플 데이터를 로드합니다.");
-                LoadSampleData();
-                Console.WriteLine("샘플 데이터 로드됨 (차트 데이터 없음)");
-            }
-            else
-            {
-                // 실제 데이터가 있는 경우, 명확하게 로그 출력
-                Console.WriteLine($"실제 데이터 사용 중: {chartData.Count} 항목");
-                foreach (var item in chartData)
-                {
-                    Console.WriteLine($" -> 유형: {item.AptitudeType}, 남성: {item.Male}, 여성: {item.Female}, 총계: {item.Total}");
-                }
-            }
+            await ProcessStatistics();
         }
         catch (Exception ex)
         {
-            Console.WriteLine($"통계 데이터 로드 중 오류 발생: {ex.Message}\n{ex.StackTrace}");
-            await JSRuntime.InvokeVoidAsync("console.error", "통계 데이터 로드 중 오류 발생:", ex.Message, ex.StackTrace);
-            
-            // 오류 상세 내용을 좀 더 구체적으로 로깅
-            if (ex.InnerException != null)
-            {
-                Console.WriteLine($"내부 예외: {ex.InnerException.Message}");
-            }
-            
-            Console.WriteLine("오류 발생으로 샘플 데이터를 로드합니다.");
-            LoadSampleData();
-            Console.WriteLine("샘플 데이터 로드됨 (오류 발생)");
+            await HandleLoadError(ex);
         }
         finally
         {
             isLoading = false;
             StateHasChanged(); // UI 업데이트
         }
+    }
+
+    private async Task LoadStatisticsByID()
+    {
+        isLoading = true;
+        chartData = new List<GenderChartData>(); // Clear previous chart data
+        statistics = null; // Clear previous stats
+        StateHasChanged(); // Show loading
+
+        try
+        {
+            // 그룹 ID로 통계 데이터 조회 - 새로 구현한 메서드 사용
+            statistics = await StatisticsService.GetGenderGroupStatisticsByIDAsync(selectedGroupID);
+            await ProcessStatistics();
+        }
+        catch (Exception ex)
+        {
+            await HandleLoadError(ex);
+        }
+        finally
+        {
+            isLoading = false;
+            StateHasChanged(); // UI 업데이트
+        }
+    }
+
+    private async Task ProcessStatistics()
+    {
+        if (statistics != null && statistics.Any())
+        {
+            Console.WriteLine($"DB 조회 성공: 레코드 수: {statistics.Count}");
+            
+            // 디버깅: 가져온 데이터의 구조 확인
+            foreach (var stat in statistics.Take(5))
+            {
+                Console.WriteLine($"데이터 샘플: 성별={stat.User_Gender}, 유형={stat.Primary_Aptitude_Type}, 인원수={stat.Aptitude_Count_In_Gender}, 순위={stat.Rank_In_Gender}");
+            }
+
+            // 남자/여자 데이터가 있는지 확인
+            bool hasMaleData = statistics.Any(s => s.User_Gender?.ToUpper() == "M");
+            bool hasFemaleData = statistics.Any(s => s.User_Gender?.ToUpper() == "F");
+            
+            Console.WriteLine($"남성 데이터 있음: {hasMaleData}, 여성 데이터 있음: {hasFemaleData}");
+
+            // 남자 순위 데이터 추출
+            var maleStats = statistics
+                .Where(s => s.User_Gender?.ToUpper() == "M")
+                .Where(s => !string.IsNullOrEmpty(s.Primary_Aptitude_Type)) // 빈 유형 필터링
+                .Where(s => s.Aptitude_Count_In_Gender > 0) // 0명인 유형 필터링
+                .OrderBy(s => s.Rank_In_Gender)
+                .ToList();
+
+            // 여자 순위 데이터 추출
+            var femaleStats = statistics
+                .Where(s => s.User_Gender?.ToUpper() == "F")
+                .Where(s => !string.IsNullOrEmpty(s.Primary_Aptitude_Type)) // 빈 유형 필터링
+                .Where(s => s.Aptitude_Count_In_Gender > 0) // 0명인 유형 필터링
+                .OrderBy(s => s.Rank_In_Gender)
+                .ToList();
+
+            Console.WriteLine($"추출된 남성 통계 수: {maleStats.Count}, 여성 통계 수: {femaleStats.Count}");
+
+            // 2. 차트 데이터 생성 (각 성별의 상위 5개 유형만 포함)
+            var maleTypes = maleStats.Take(5).Select(s => s.Primary_Aptitude_Type).ToList();
+            var femaleTypes = femaleStats.Take(5).Select(s => s.Primary_Aptitude_Type).ToList();
+            
+            // 남성과 여성 순위 데이터를 합쳐서 고유한 적성 유형 리스트 생성
+            var allTopTypes = maleTypes.Union(femaleTypes).Distinct().ToList();
+
+            Console.WriteLine($"상위 적성 유형 수: {allTopTypes.Count}");
+            Console.WriteLine($"남성 상위 유형: {string.Join(", ", maleTypes)}");
+            Console.WriteLine($"여성 상위 유형: {string.Join(", ", femaleTypes)}");
+
+            // 각 성별의 상위 적성 유형에 대한 데이터 생성
+            foreach (var type in allTopTypes)
+            {
+                // 해당 유형의 남성 통계 검색
+                var maleData = maleStats.FirstOrDefault(s => s.Primary_Aptitude_Type == type);
+                int maleCount = maleData?.Aptitude_Count_In_Gender ?? 0;
+                int maleRank = maleData?.Rank_In_Gender ?? 0;
+
+                // 해당 유형의 여성 통계 검색
+                var femaleData = femaleStats.FirstOrDefault(s => s.Primary_Aptitude_Type == type);
+                int femaleCount = femaleData?.Aptitude_Count_In_Gender ?? 0;
+                int femaleRank = femaleData?.Rank_In_Gender ?? 0;
+
+                // 차트 데이터에 추가 (순위 정보 포함)
+                chartData.Add(new GenderChartData
+                {
+                    AptitudeType = $"{type} (남:{maleRank}위 여:{femaleRank}위)",
+                    Male = maleCount,
+                    Female = femaleCount,
+                    MaleRank = maleRank,
+                    FemaleRank = femaleRank
+                });
+                
+                Console.WriteLine($"차트 데이터 추가: 유형={type}, 남성={maleCount}명({maleRank}위), 여성={femaleCount}명({femaleRank}위)");
+            }
+
+            // 4. 합계 기준으로 내림차순 정렬 (합계가 같으면 적성 유형 이름으로 정렬)
+            chartData = chartData
+                .OrderByDescending(d => d.Total)
+                .ThenBy(d => d.AptitudeType)
+                .ToList();
+
+            Console.WriteLine($"최종 차트 데이터 생성 완료: {chartData.Count} 항목");
+        }
+        else
+        {
+            var sourceType = activeTab == "byName" ? selectedGroup : selectedGroupID;
+            Console.WriteLine($"{sourceType}에 대한 DB 데이터가 없습니다.");
+            // 이 부분은 샘플 데이터를 로드하는 부분입니다. 실제 데이터가 없을 때만 사용합니다.
+            LoadSampleData();
+            Console.WriteLine("샘플 데이터 로드됨 (DB 데이터 없음)");
+        }
+
+        // 차트 데이터가 없을 경우에만 샘플 데이터 사용
+        if (chartData == null || !chartData.Any())
+        {
+            Console.WriteLine("유효한 차트 데이터가 없어 샘플 데이터를 로드합니다.");
+            LoadSampleData();
+            Console.WriteLine("샘플 데이터 로드됨 (차트 데이터 없음)");
+        }
+        else
+        {
+            // 실제 데이터가 있는 경우, 명확하게 로그 출력
+            Console.WriteLine($"실제 데이터 사용 중: {chartData.Count} 항목");
+            foreach (var item in chartData)
+            {
+                Console.WriteLine($" -> 유형: {item.AptitudeType}, 남성: {item.Male}, 여성: {item.Female}, 총계: {item.Total}");
+            }
+        }
+    }
+
+    private async Task HandleLoadError(Exception ex)
+    {
+        Console.WriteLine($"통계 데이터 로드 중 오류 발생: {ex.Message}\n{ex.StackTrace}");
+        await JSRuntime.InvokeVoidAsync("console.error", "통계 데이터 로드 중 오류 발생:", ex.Message, ex.StackTrace);
+        
+        // 오류 상세 내용을 좀 더 구체적으로 로깅
+        if (ex.InnerException != null)
+        {
+            Console.WriteLine($"내부 예외: {ex.InnerException.Message}");
+        }
+        
+        Console.WriteLine("오류 발생으로 샘플 데이터를 로드합니다.");
+        LoadSampleData();
+        Console.WriteLine("샘플 데이터 로드됨 (오류 발생)");
     }
 
     private string GetGenderDisplay(string gender)
