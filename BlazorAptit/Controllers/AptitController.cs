@@ -64,7 +64,9 @@ namespace BlazorAptit.Controllers
         {  
             if (ModelState.IsValid)   
             {  
-                var obj = _context.AptitGroups.Where(a => a.Group_ID.Equals(objUser.Group_ID) && a.Password.Equals(objUser.Password)).FirstOrDefault();
+                var objList = _context.AptitGroups.Where(a => a.Group_ID.Equals(objUser.Group_ID) && a.Password.Equals(objUser.Password)).ToList();
+                var obj = objList.FirstOrDefault();
+                
                 if (obj != null)
                 {
                     DateTime T1 = new DateTime();
