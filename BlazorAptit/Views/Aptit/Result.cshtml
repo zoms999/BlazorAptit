@@ -2,7 +2,7 @@
 
 <div style="margin-bottom: 0;">
     <div class="test-info">
-        <div class="inner">
+        <div class="inner result-fade-in">
             <p class="tit-finish">축하드립니다!</p>
             <img src="~/pub/img/sub/img_finish.png" alt="" class="img-finish">
             <p class="headline-finish">
@@ -23,7 +23,7 @@
                 <p class="copyright">Copyright 2004. 한국진로적성센터. All rights reserved.</p>
                 <p>
                     <span class="link">
-                        <a href="https://aptitude-x.com/" class="btn btn-primary btn-sm" target="_blank">www.aptitude-x.com</a>
+                        <a href="https://aptitude-x.com/" class="btn btn-sm result-link-btn" target="_blank">www.aptitude-x.com</a>
                     </span><span class="phone"><img src="~/pub/img/sub/icon_phone.png">02. 523. 7523</span>
                 </p>
             </div>
@@ -32,4 +32,32 @@
 
 </div>
 
+<style>
+    .result-link-btn {
+        background-color: #0D4F8A;
+        color: #fff;
+        font-weight: 700;
+    }
+
+    .result-link-btn:hover {
+        background-color: #0a3d6d;
+        color: #fff;
+    }
+
+    .result-fade-in {
+        animation: resultFadeIn 0.6s ease both;
+    }
+
+    @@keyframes resultFadeIn {
+        from {
+            opacity: 0;
+            transform: translateY(12px);
+        }
+
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+</style>
 

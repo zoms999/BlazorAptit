@@ -212,6 +212,29 @@
         border-color: #2f88c4;
     }
 
+    .dev-tools {
+        position: sticky;
+        top: 70px;
+        z-index: 61;
+        display: flex;
+        justify-content: flex-end;
+        margin-bottom: 8px;
+    }
+
+    #btn-dev-fill {
+        background-color: #fff3cd;
+        border: 1px dashed #e0a800;
+        color: #7a5c00;
+        font-weight: 700;
+        font-size: 12.5px;
+        padding: 6px 14px;
+        border-radius: 20px;
+    }
+
+    #btn-dev-fill:hover {
+        background-color: #ffe8a1;
+    }
+
 </style>
 <form  class="form-horizontal" method="post" asp-controller="Aptit" asp-action="Edit">
     <input asp-for="AptitUserID" value="@Model.AptitUserID" type="hidden" />
@@ -221,6 +244,24 @@
 <div id="chooseSource">
 
        
+    @if (Context.Request.Host.Host == "localhost")
+    {
+        <div class="dev-tools">
+            <button type="button" id="btn-dev-fill" onclick="devFillAllAnswers()">⚙ 전체선택 (테스트 전용)</button>
+        </div>
+        <script>
+            function devFillAllAnswers() {
+                for (var n = 1; n <= 20; n++) {
+                    var radios = document.getElementsByName('AQ_' + n);
+                    if (radios.length > 0) {
+                        var idx = Math.floor(Math.random() * radios.length);
+                        radios[idx].checked = true;
+                    }
+                }
+            }
+        </script>
+    }
+
     <div class="col-xl-8 col-lg-9 progress-wrap">
         <h4>
             검사진행률
