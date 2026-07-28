@@ -113,31 +113,27 @@
 
         @Html.AntiForgeryToken()
         <div class="modal fade" id="ModalPopUp" role="dialog">
-            <div class="modal-dialog err-pop" style="">
+            <div class="modal-dialog modal-dialog-centered aptit-modal">
                 <div class="modal-content">
-                    <div class="modal-header">
-                        <button id="DivClose" type="button" class="close" data-dismiss="modal">&times;</button>
+                    <div class="modal-header aptit-modal-header">
+                        <h5 class="modal-title">로그인</h5>
+                        <button id="DivClose" type="button" class="close" data-dismiss="modal" aria-label="닫기">&times;</button>
                     </div>
-                    <div class="modal-body" style="text-align:center;">
+                    <div class="modal-body aptit-modal-body">
                         <div class="form-group">
-                            <div class="form-group">
-                                <input asp-for="User_Email" class="form-control" placeholder="이메일 입력 *" value="" />
-                                <span asp-validation-for="User_Email" class="text-danger"></span>
-                            </div>
-                            <div class="form-group">
-                                <input type="password" asp-for="User_Password" class="form-control" placeholder="비밀번호 입력 *" value="" />
-                                <span asp-validation-for="User_Password" class="text-danger"></span>
-                            </div>
-                            <div class="form-group">
-                                <button type="button" class="btn btn-primary" onclick="onclickApi()">로그인 </button>
-                            </div>
-
-                            @*<div class="form-group">
-                                <a href="#" id="passFind" class="ForgetPwd">패스워드 찾기</a>
-                            </div>*@
-
-
+                            <input asp-for="User_Email" class="form-control" placeholder="이메일 입력 *" value="" />
+                            <span asp-validation-for="User_Email" class="text-danger"></span>
                         </div>
+                        <div class="form-group">
+                            <input type="password" asp-for="User_Password" class="form-control" placeholder="비밀번호 입력 *" value="" />
+                            <span asp-validation-for="User_Password" class="text-danger"></span>
+                        </div>
+                        <div class="form-group">
+                            <button type="button" class="btn aptit-modal-submit btn-block" onclick="onclickApi()">로그인</button>
+                        </div>
+                        @*<div class="form-group text-center mb-0">
+                            <a href="#" id="passFind" class="aptit-modal-link">비밀번호를 잊으셨나요?</a>
+                        </div>*@
                     </div>
                 </div>
             </div>
@@ -145,29 +141,101 @@
 
 
         <div class="modal fade" id="ModalFindPass" role="dialog">
-            <div class="modal-dialog err-pop" style="">
+            <div class="modal-dialog modal-dialog-centered aptit-modal">
                 <div class="modal-content">
-                    <div class="modal-header">
-                        <button id="DivClose" type="button" class="close" data-dismiss="modal">&times;</button>
+                    <div class="modal-header aptit-modal-header">
+                        <h5 class="modal-title">비밀번호 찾기</h5>
+                        <button id="DivClose" type="button" class="close" data-dismiss="modal" aria-label="닫기">&times;</button>
                     </div>
-                    <div class="modal-body" style="text-align:center;">
+                    <div class="modal-body aptit-modal-body">
+                        <p class="aptit-modal-hint">가입 시 등록한 이메일 주소를 입력하시면 비밀번호를 보내드립니다.</p>
                         <div class="form-group">
-                            <div class="form-group">
-                                @*<input asp-for="User_Email" class="form-control" placeholder="이메일 입력 *" value="" />
-
-                                <span asp-validation-for="User_Email" class="text-danger"></span>*@
-
-                                <input class="form-control" id="findEmail" name="findEmail" type="text" value="" placeholder="이메일 입력 *" />
-                            </div>
-                            <div class="form-group">
-                                <button type="button" class="btn btn-primary" onclick="onclickEmailSend()">이메일 전송 </button>
-                            </div>
+                            <input class="form-control" id="findEmail" name="findEmail" type="text" value="" placeholder="이메일 입력 *" />
+                        </div>
+                        <div class="form-group">
+                            <button type="button" class="btn aptit-modal-submit btn-block" onclick="onclickEmailSend()">이메일 전송</button>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
     </div>
+
+    <style>
+        .aptit-modal .modal-content {
+            border: none;
+            border-radius: 14px;
+            overflow: hidden;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+        }
+
+        .aptit-modal-header {
+            background: #0D4F8A;
+            border-bottom: none;
+            padding: 16px 20px;
+        }
+
+        .aptit-modal-header .modal-title {
+            color: #fff;
+            font-weight: 700;
+            font-size: 1.1em;
+        }
+
+        .aptit-modal-header .close {
+            color: #fff;
+            opacity: 0.85;
+            text-shadow: none;
+        }
+
+        .aptit-modal-header .close:hover {
+            opacity: 1;
+            color: #fff;
+        }
+
+        .aptit-modal-body {
+            padding: 28px 26px 24px;
+            text-align: center;
+        }
+
+        .aptit-modal-hint {
+            font-size: 13px;
+            color: #666;
+            margin-bottom: 18px;
+        }
+
+        .aptit-modal-body .form-control {
+            padding: 10px 12px;
+            border-radius: 8px;
+            border: 1px solid #dfe3e8;
+            text-align: left;
+        }
+
+        .aptit-modal-body .form-control:focus {
+            outline: none;
+            border-color: #0D4F8A;
+            box-shadow: 0 0 0 3px rgba(13,79,138,0.15);
+        }
+
+        .aptit-modal-submit {
+            background: #0D4F8A;
+            color: #fff;
+            font-weight: 700;
+            border-radius: 8px;
+            padding: 10px;
+            border: none;
+        }
+
+        .aptit-modal-submit:hover {
+            background: #0a3d6d;
+            color: #fff;
+        }
+
+        .aptit-modal-link {
+            font-size: 13px;
+            color: #0D4F8A;
+            text-decoration: underline;
+        }
+    </style>
     @*<script src='https://code.jquery.com/jquery-1.12.4.min.js'></script>*@
     <script>
             function onclickApi() {

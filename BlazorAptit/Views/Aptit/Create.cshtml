@@ -31,43 +31,88 @@
         font-weight: bold;
         color: black;
     }
-   
+
+    .create-card {
+        max-width: 720px;
+        margin: 32px auto;
+        background: #fff;
+        border-radius: 14px;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+        padding: 32px 36px 28px;
+    }
+
+    .create-card h2 {
+        color: #0D4F8A;
+        font-weight: 800;
+        font-size: 1.4em;
+    }
+
+    .section-label {
+        font-size: 12px;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        color: #7f8c9a;
+        margin: 22px 0 8px;
+    }
+
+    .section-label:first-of-type {
+        margin-top: 0;
+    }
+
+    .field-label {
+        font-size: 12.5px;
+        color: #555;
+        margin-bottom: 4px;
+        display: block;
+    }
+
+    .terms-box {
+        max-height: 220px;
+        overflow-y: auto;
+        white-space: pre-line;
+        border: 1px solid #ced4da;
+        border-radius: 6px;
+        padding: 12px 14px;
+        font-size: 13px;
+        color: #444;
+        background: #fbfbfb;
+        line-height: 1.5;
+    }
 </style>
 <div class="container">
+    <div class="create-card">
     <form class="form-horizontal"  method="post" asp-controller="Aptit" role="form" asp-action="Create"   id="frm" >
-     
+
             <div class="row justify-content-center w-300">
-                <div class="col-md-10">
+                <div class="col-md-12">
                     <div class="form-group mt-4 mb-4">
                         <h2>기본정보 입력</h2>
                     </div>
+
+                    <div class="section-label">단체 정보</div>
                     <div class="form-row ">
-                        @*<label for="Group_Name" class="col-sm-3 control-label">기관(학교)명</label>*@
                         <div class="form-group col-sm-5">
                             <input asp-for="Group_ID" class="form-control " placeholder="회차코드" style="background-color:#e8eefc;box-shadow: none;" readonly />
-                            @*<span asp-validation-for="Group_Name" class="text-danger"></span>*@
                         </div>
                     </div>
                     <div class="form-row">
-                        @*<label for="Group_Name" class="col-sm-3 control-label">기관(학교)명</label>*@
                         <div class="form-group col-sm-5">
                             <input asp-for="Group_City" class="form-control" placeholder="지역" style="background-color:#e8eefc;box-shadow: none;" readonly />
-                            @*<span asp-validation-for="Group_Name" class="text-danger"></span>*@
                         </div>
                         <div class="form-group col-sm-5">
                             <input asp-for="Group_Name" class="form-control" placeholder="단체명" style="background-color:#e8eefc;box-shadow: none;" readonly />
-                            @*<span asp-validation-for="Group_Name" class="text-danger"></span>*@
                         </div>
                     </div>
+
+                    <div class="section-label">계정 정보</div>
                     <div class="form-row">
-                        @*<label for="User_Email" class="col-sm-3 control-label">이메일</label>*@
                         <div class="form-group col-sm-10">
                             <input asp-for="User_Email" class="form-control" placeholder="이메일 입력" autocomplete="false" />
                             <span asp-validation-for="User_Email" class="text-danger"></span>
                         </div>
                     </div>
                     <div class="form-row">
-                        @*<label for="User_Password" class="col-sm-3 control-label">패스워드</label>*@
                         <div class="form-group col-sm-5">
                             <input asp-for="User_Password" id="pwd1" class="form-control" placeholder="패스워드(네 글자까지 입력)" type="password" autocomplete="new-password" />
                             <span asp-validation-for="User_Password" class="text-danger"></span>
@@ -80,14 +125,15 @@
 
                     </div>
 
+                    <div class="section-label">개인 정보</div>
                     <div class="form-row">
-                        @*<label for="User_Name" class="col-sm-3 control-label">이름</label>*@
                         <div class="form-group col-sm-10">
                             <input asp-for="User_Name" class="form-control" placeholder="이름 입력" autocomplete="off" />
                             <span asp-validation-for="User_Name" class="text-danger"></span>
                         </div>
                     </div>
-                    
+
+                    <label class="field-label">구분</label>
                     <div class="form-row">
                         <div class="btn-group col-sm-10" data-toggle="buttons">
                             <label class="btn btn-light">
@@ -167,12 +213,12 @@
 
 
                     <div class="form-row">
-                        @*<label for="User_Age" class="col-sm-3 control-label">나이</label>*@
                         <div class="form-group col-sm-10">
                             <input asp-for="User_Age" class="form-control" placeholder="나이" />
                             <span asp-validation-for="User_Age" class="text-danger"></span>
                         </div>
                     </div>
+                    <label class="field-label">성별</label>
                     <div class="form-row">
                         <div class="btn-group col-sm-10" data-toggle="buttons">
                             <label class="btn btn-light">
@@ -190,9 +236,10 @@
                             @Html.ValidationMessageFor(model => model.User_Gender, "", new { @class = "text-danger" })
                         </div>
                     </div>
+                    <div class="section-label">약관 동의</div>
                     <div class="form-row">
                         <div class='termsbox  col-sm-10'>
-                        <textarea class="form-control" readonly rows="5" >제1장 총칙
+                        <div class="terms-box">제1장 총칙
 
 제1조 (목적)
 
@@ -572,7 +619,7 @@
 
 4. 동의를 거부할 권리 및 동의 거부에 따른 불이익
 
-가. 수집하는 개인정보의 항목 중 필수 정보에 대해서는 수집 및 이용에 동의를 하셔야 이후 절차를 진행할 수 있습니다. 동의를 하지 않을 경우 서비스 이용이 제한되고, 로그인이 필요한 서비스의 이용이 제한됩니다. 선택정보에 대해서는 동의를 거부할 수 있으며, 이를 거부하더라도 서비스 이용에 대한 불이익은 없습니다.</textarea>
+가. 수집하는 개인정보의 항목 중 필수 정보에 대해서는 수집 및 이용에 동의를 하셔야 이후 절차를 진행할 수 있습니다. 동의를 하지 않을 경우 서비스 이용이 제한되고, 로그인이 필요한 서비스의 이용이 제한됩니다. 선택정보에 대해서는 동의를 거부할 수 있으며, 이를 거부하더라도 서비스 이용에 대한 불이익은 없습니다.</div>
                             <fieldset class="fregister_agree text-right">
                                 <label for="agree11">회원가입약관의 내용에 동의합니다.</label>
                                 <input asp-for="agree11" type="checkbox" />
@@ -594,7 +641,7 @@
                     <div class="form-group">
                         <div class="col-sm-10 col-sm-offset-3 text-right">
                             <a href="/Aptit/MainLogin" class="btn btn-secondary">취소</a>
-                            <button type="submit" class="btn btn-primary" id="btnStart">시작</button>
+                            <button type="submit" class="btn create-submit" id="btnStart">시작</button>
                         </div>
                     </div>
 
@@ -604,7 +651,21 @@
 
 
 </form> <!-- /form -->
+    </div>
 </div> <!-- ./container -->
+
+<style>
+    .create-submit {
+        background-color: #0D4F8A;
+        color: #fff;
+        font-weight: 700;
+    }
+
+    .create-submit:hover {
+        background-color: #0a3d6d;
+        color: #fff;
+    }
+</style>
 @section Scripts {
   @*  @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
     <script>

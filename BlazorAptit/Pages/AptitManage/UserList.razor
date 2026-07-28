@@ -7,10 +7,16 @@
 
 @inject Blazored.SessionStorage.ISessionStorageService sessionStorage
 
-<h4>사용자목록</h4>
+<div class="page-header">
+    <span class="oi oi-people page-header-icon" aria-hidden="true"></span>
+    <div>
+        <h4>사용자목록</h4>
+        <p class="page-header-sub">검사에 응시한 전체 사용자 목록입니다.</p>
+    </div>
+</div>
 
 <div class="col-lg-12 control-section">
-    <div class="content-wrapper">
+    <div class="content-wrapper grid-card">
         <div class="row">
 
             @*<SfButton ID="add" @onclick="AddRecord">Add Data</SfButton>
@@ -22,6 +28,14 @@
                 <GridEvents OnActionBegin="ActionBegin" OnActionComplete="ActionComplete" TValue="AptitUser"></GridEvents>
                 <GridEditSettings AllowEditing="true" Mode="EditMode.Normal"></GridEditSettings>
                 <GridFilterSettings Type="Syncfusion.Blazor.Grids.FilterType.Excel"></GridFilterSettings>
+                <GridTemplates>
+                    <EmptyRecordTemplate>
+                        <div class="empty-state">
+                            <span class="oi oi-inbox" aria-hidden="true"></span>
+                            <p>표시할 사용자 데이터가 없습니다.</p>
+                        </div>
+                    </EmptyRecordTemplate>
+                </GridTemplates>
                 <GridColumns>
                     <GridColumn Field=@nameof(AptitUser.ID) HeaderText="순번" IsPrimaryKey="true" TextAlign="@TextAlign.Left" HeaderTextAlign="@TextAlign.Center" Width="60"></GridColumn>
                     <GridColumn Field=@nameof(AptitUser.Group_Name) HeaderText="단체명" TextAlign="@TextAlign.Left" HeaderTextAlign="@TextAlign.Center" Width="150" AllowEditing="false"></GridColumn>
@@ -40,12 +54,11 @@
                                 var info = context as AptitUser;
                                 if (info.aptitAnswer.Stage > 15)
                                 {
-                                    <div class="font - weight - bold">완료</div>
-
+                                    <span class="status-badge status-done">완료</span>
                                 }
                                 else
                                 {
-                                    <div class="font-weight-bold">@info.aptitAnswer.Stage </div>
+                                    <span class="status-badge status-progress">@info.aptitAnswer.Stage 단계</span>
                                 }
                             }
 
@@ -57,12 +70,96 @@
         </div>
     </div>
     <style>
+        .page-header {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            padding: 16px 4px 18px;
+        }
+
+        .page-header-icon {
+            font-size: 20px;
+            color: #3498db;
+            background: rgba(52,152,219,0.12);
+            border-radius: 8px;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+
+        .page-header h4 {
+            margin: 0;
+            font-size: 1.2em;
+            font-weight: 700;
+            color: #2c3e50;
+        }
+
+        .page-header-sub {
+            margin: 2px 0 0;
+            font-size: 12.5px;
+            color: #8a94a0;
+        }
+
+        .grid-card {
+            border: 1px solid #e2e6ea;
+            border-radius: 10px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+            padding: 10px;
+            background: #fff;
+        }
+
+        .empty-state {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 160px;
+            color: #9aa5b1;
+            text-align: center;
+        }
+
+        .empty-state .oi {
+            font-size: 24px;
+            margin-bottom: 8px;
+            opacity: 0.6;
+        }
+
+        .empty-state p {
+            font-size: 13px;
+            margin: 0;
+        }
+
+        .status-badge {
+            display: inline-block;
+            padding: 3px 10px;
+            border-radius: 999px;
+            font-size: 12px;
+            font-weight: 700;
+        }
+
+        .status-done {
+            background: rgba(46,204,113,0.15);
+            color: #1e8a4c;
+        }
+
+        .status-progress {
+            background: rgba(52,152,219,0.15);
+            color: #2472a4;
+        }
+
         .e-grid .e-headercelldiv {
             font-size: 12px;
         }
 
         .e-grid .e-rowcell {
             font-size: 12px;
+        }
+
+        .e-grid .e-row:hover .e-rowcell {
+            background-color: #eef4fa;
         }
     </style>
 </div>

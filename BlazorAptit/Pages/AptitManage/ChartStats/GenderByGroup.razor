@@ -5,6 +5,7 @@
 @using BlazorAptit.Models
 @using BlazorAptit.Models.Dapper
 @using BlazorAptit.Services
+@using Syncfusion.Blazor.Charts
 
 @using System.Collections.ObjectModel
 @inject StatisticsService StatisticsService
@@ -60,41 +61,32 @@
             </div>
 
             <!-- 인원수 차트 -->
-           @*  <div class="row mb-4">
-                <div class="col-md-12">
-                    <div class="chart-container">
-                        <h4 class="chart-title">남녀별 적성 유형 분포 (인원수)</h4>
-                        <div class="chart-description">
-                            <p>※ 이 차트는 남녀 각각의 상위 적성 유형을 기준으로 작성되었습니다. 괄호 안은 각 성별 내 순위입니다.</p>
-                        </div>
-                        
-                        <!-- 실제 데이터 사용 시 디버깅 정보 표시 (개발 단계에서만 사용) -->
-                        @if(chartData.Count > 0 && chartData[0].AptitudeType != "유형A")
-                        {
-                            <div class="debug-info">
-                                <p>실제 데이터 사용 중: @chartData.Count 항목</p>
+            @if (chartData.Any())
+            {
+                <div class="row mb-4">
+                    <div class="col-md-12">
+                        <div class="chart-container">
+                            <h4 class="chart-title">남녀별 적성 유형 분포 (상위 5개 유형)</h4>
+                            <div class="chart-description">
+                                <p>※ 이 차트는 남녀 각각의 상위 적성 유형을 기준으로 작성되었습니다. 괄호 안은 각 성별 내 순위입니다.</p>
                             </div>
-                        }
-                        
-                        <RadzenChart Style="height: 400px; width: 100%;">
-                            <RadzenLegend Position="LegendPosition.Bottom" />
-                            <RadzenCategoryAxis Padding="20">
-                                <RadzenAxisTitle Text="적성 유형" />
-                            </RadzenCategoryAxis>
-                            <RadzenValueAxis Min="0">
-                                <RadzenGridLines Visible="true" />
-                                <RadzenAxisTitle Text="인원수 (명)" />
-                            </RadzenValueAxis>
-                            <RadzenColumnSeries Data="@chartData" CategoryProperty="AptitudeType" 
-                                Title="남성" ValueProperty="Male" Fill="#3498db" LineType="LineType.Solid" />
-                            <RadzenColumnSeries Data="@chartData" CategoryProperty="AptitudeType" 
-                                Title="여성" ValueProperty="Female" Fill="#e74c3c" LineType="LineType.Solid" />
-                            <RadzenColumnOptions Radius="5" />
-                            <RadzenTooltipOptions/>
-                        </RadzenChart>
+
+                            <SfChart Height="380px">
+                                <ChartPrimaryXAxis ValueType="Syncfusion.Blazor.Charts.ValueType.Category" LabelIntersectAction="LabelIntersectAction.Rotate45"></ChartPrimaryXAxis>
+                                <ChartPrimaryYAxis Title="인원수 (명)" Minimum="0"></ChartPrimaryYAxis>
+                                <ChartLegendSettings Visible="true" Position="Syncfusion.Blazor.Charts.LegendPosition.Bottom"></ChartLegendSettings>
+                                <ChartTooltipSettings Enable="true"></ChartTooltipSettings>
+                                <ChartSeriesCollection>
+                                    <ChartSeries DataSource="@chartData" XName="AptitudeType" YName="Male" Name="남성" Type="ChartSeriesType.Column" Fill="#3498db">
+                                    </ChartSeries>
+                                    <ChartSeries DataSource="@chartData" XName="AptitudeType" YName="Female" Name="여성" Type="ChartSeriesType.Column" Fill="#e74c3c">
+                                    </ChartSeries>
+                                </ChartSeriesCollection>
+                            </SfChart>
+                        </div>
                     </div>
                 </div>
-            </div> *@
+            }
 
             <!-- 차트 설명 및 디버깅 정보 스타일 -->
             <style>

@@ -16,16 +16,29 @@
 @inject IWebHostEnvironment Environment
 @inject Blazored.SessionStorage.ISessionStorageService sessionStorage
 
-
-<h4>결과보기</h4>
+<div class="page-header">
+    <span class="oi oi-bar-chart page-header-icon" aria-hidden="true"></span>
+    <div>
+        <h4>결과보기</h4>
+        <p class="page-header-sub">우리 단체 검사 응시자들의 결과를 조회합니다.</p>
+    </div>
+</div>
 <div class="col-lg-12 control-section">
-    <div class="content-wrapper">
+    <div class="content-wrapper grid-card">
         <div class="row">
 
             <SfGrid TValue="AptitResultUserView" @ref="SubGrid"   DataSource="@Users" AllowPaging="true" AllowFiltering="true" AllowExcelExport="true" Toolbar="@(new List<string>() { "엑셀 다운로드" })">
                 <GridFilterSettings Type="Syncfusion.Blazor.Grids.FilterType.CheckBox"></GridFilterSettings>
                 <GridEditSettings AllowEditing="false" ></GridEditSettings>
                 <GridEvents OnToolbarClick="ToolbarClick"  OnActionComplete="ActionComplete" CommandClicked="CommandClickHandler" RowSelected="SubRowSelecthandler" TValue="AptitResultUserView"></GridEvents>
+                <GridTemplates>
+                    <EmptyRecordTemplate>
+                        <div class="empty-state">
+                            <span class="oi oi-inbox" aria-hidden="true"></span>
+                            <p>표시할 결과 데이터가 없습니다.</p>
+                        </div>
+                    </EmptyRecordTemplate>
+                </GridTemplates>
                 <GridPageSettings PageSize="15" />
                 <GridColumns>
                     <GridColumn Field=@nameof(AptitResultUserView.Group_ID) HeaderText="회차코드" TextAlign="@TextAlign.Left" HeaderTextAlign="@TextAlign.Center" Width="100" Visible="false" AllowEditing="false"> </GridColumn>
@@ -51,12 +64,11 @@
                                 var info = context as AptitResultUserView;
                                 if (info.Stage == "16")
                                 {
-                                    <div class="font - weight - bold">완료</div>
-
+                                    <span class="status-badge status-done">완료</span>
                                 }
                                 else
                                 {
-                                    <div class="font-weight-bold">@info.Stage </div>
+                                    <span class="status-badge status-progress">@info.Stage 단계</span>
                                 }
                             }
 
@@ -117,20 +129,97 @@
 
 </div>
 
-<div class="row">
-    <div>
-        <SfButton @onclick="GeneratePDF">Generate PDF</SfButton>
-    </div>
-</div>
-
-
 <style>
+    .page-header {
+        display: flex;
+        align-items: center;
+        gap: 14px;
+        padding: 16px 4px 18px;
+    }
+
+    .page-header-icon {
+        font-size: 20px;
+        color: #3498db;
+        background: rgba(52,152,219,0.12);
+        border-radius: 8px;
+        width: 40px;
+        height: 40px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+    }
+
+    .page-header h4 {
+        margin: 0;
+        font-size: 1.2em;
+        font-weight: 700;
+        color: #2c3e50;
+    }
+
+    .page-header-sub {
+        margin: 2px 0 0;
+        font-size: 12.5px;
+        color: #8a94a0;
+    }
+
+    .grid-card {
+        border: 1px solid #e2e6ea;
+        border-radius: 10px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+        padding: 10px;
+        background: #fff;
+    }
+
+    .empty-state {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        min-height: 160px;
+        color: #9aa5b1;
+        text-align: center;
+    }
+
+    .empty-state .oi {
+        font-size: 24px;
+        margin-bottom: 8px;
+        opacity: 0.6;
+    }
+
+    .empty-state p {
+        font-size: 13px;
+        margin: 0;
+    }
+
+    .status-badge {
+        display: inline-block;
+        padding: 3px 10px;
+        border-radius: 999px;
+        font-size: 12px;
+        font-weight: 700;
+    }
+
+    .status-done {
+        background: rgba(46,204,113,0.15);
+        color: #1e8a4c;
+    }
+
+    .status-progress {
+        background: rgba(52,152,219,0.15);
+        color: #2472a4;
+    }
+
     .e-grid .e-headercelldiv {
         font-size: 12px;
     }
 
     .e-grid .e-rowcell {
         font-size: 12px;
+    }
+
+    .e-grid .e-row:hover .e-rowcell {
+        background-color: #eef4fa;
     }
 </style>
 

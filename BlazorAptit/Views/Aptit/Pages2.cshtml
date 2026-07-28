@@ -5,7 +5,7 @@
 </script>
 <style>
 
-    input {
+    .pureCSS input[type="radio"] {
         -webkit-appearance: none;
         -moz-appearance: none;
         appearance: none;
@@ -17,8 +17,9 @@
         margin-right: 5px;
         position: relative;
         top: 2px;
+        flex-shrink: 0;
     }
-    input:checked {
+    .pureCSS input[type="radio"]:checked {
         border: 8px solid #3eb0f7;
     }
 
@@ -33,12 +34,79 @@
         font-size: large;
     }
 
-    
+
     .toast-body {
         padding: .75rem
     }
 
-    
+    /* 문항 카드 & 선택지 UX 개선 */
+    .card {
+        border: none;
+        border-radius: 12px;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+        overflow: hidden;
+    }
+
+    .card-header {
+        background: #f4f8fc;
+        border-bottom: 1px solid #e2e6ea;
+        padding: 18px 20px;
+    }
+
+    .pureCSS .form-check-inline {
+        align-items: center;
+        padding: 6px 8px;
+        border-radius: 8px;
+        margin-right: 2px;
+        flex: 0 0 auto;
+        transition: background-color 0.15s ease;
+    }
+
+    .pureCSS .form-check-inline:hover {
+        background-color: #eef6fd;
+    }
+
+    .pureCSS .form-check-label {
+        cursor: pointer;
+        margin-bottom: 0;
+        white-space: nowrap;
+    }
+
+    /* 선택지가 한 줄에 다 보이도록 강제 (이미지가 있는 선호도진단 문항은 제외) */
+    .pureCSS li.list-group-item:has(.form-check-inline):not(:has(img)) {
+        display: flex;
+        flex-wrap: nowrap;
+        align-items: center;
+        justify-content: space-between;
+        overflow-x: auto;
+    }
+
+    #chooseSource .progress-bar {
+        background-color: #3498db;
+        font-weight: 700;
+        border-radius: 6px;
+    }
+
+    .next-btn-wrap {
+        position: sticky;
+        bottom: 0;
+        background: linear-gradient(to top, #ffffff 70%, rgba(255,255,255,0));
+        padding: 16px 0 8px;
+        z-index: 50;
+    }
+
+    #btn-next {
+        background-color: #3498db;
+        border-color: #3498db;
+        padding: 10px 40px;
+        font-weight: 700;
+        border-radius: 8px;
+    }
+
+    #btn-next:hover {
+        background-color: #2f88c4;
+        border-color: #2f88c4;
+    }
 
 </style>
 <form  class="form-horizontal" method="post" asp-controller="Aptit" asp-action="Edit">
@@ -80,8 +148,8 @@
                         for (int i = 0; i < item.Choices.Count(); i++)
                         {
                             <div class="form-check form-check-inline">
-                                <input class="form-check-input" type="radio" name="AQ_1" data-toggle="AQ_1" value="@j">
-                                <label class="form-check-label" for="AQ_1"><span style="margin-right: 40px;">@item.Choices[i]</span></label>
+                                <input class="form-check-input" type="radio" name="AQ_1" data-toggle="AQ_1" value="@j" id="AQ_1_@i">
+                                <label class="form-check-label" for="AQ_1_@i"><span style="margin-right: 40px;">@item.Choices[i]</span></label>
                             </div>
                             j = j - 2;
                         }
@@ -96,8 +164,8 @@
                         for (int i = 0; i < item.Choices.Count(); i++)
                         {
                             <div class="form-check form-check-inline">
-                                <input class="form-check-input" type="radio" name="AQ_2" data-toggle="AQ_2" value="@j">
-                                <label class="form-check-label" for="AQ_2"><span style="margin-right: 40px;">@item.Choices[i]</span></label>
+                                <input class="form-check-input" type="radio" name="AQ_2" data-toggle="AQ_2" value="@j" id="AQ_2_@i">
+                                <label class="form-check-label" for="AQ_2_@i"><span style="margin-right: 40px;">@item.Choices[i]</span></label>
                             </div>
                             j = j - 2;
                         }
@@ -112,8 +180,8 @@
                         for (int i = 0; i < item.Choices.Count(); i++)
                         {
                             <div class="form-check form-check-inline">
-                                <input class="form-check-input" type="radio" name="AQ_3" data-toggle="AQ_3" value="@j">
-                                <label class="form-check-label" for="AQ_3"><span style="margin-right: 40px;">@item.Choices[i]</span></label>
+                                <input class="form-check-input" type="radio" name="AQ_3" data-toggle="AQ_3" value="@j" id="AQ_3_@i">
+                                <label class="form-check-label" for="AQ_3_@i"><span style="margin-right: 40px;">@item.Choices[i]</span></label>
                             </div>
                             j = j - 2;
                         }
@@ -128,8 +196,8 @@
                         for (int i = 0; i < item.Choices.Count(); i++)
                         {
                             <div class="form-check form-check-inline">
-                                <input class="form-check-input" type="radio" name="AQ_4" data-toggle="AQ_4" value="@j">
-                                <label class="form-check-label" for="AQ_4"><span style="margin-right: 40px;">@item.Choices[i]</span></label>
+                                <input class="form-check-input" type="radio" name="AQ_4" data-toggle="AQ_4" value="@j" id="AQ_4_@i">
+                                <label class="form-check-label" for="AQ_4_@i"><span style="margin-right: 40px;">@item.Choices[i]</span></label>
                             </div>
                             j = j - 2;
                         }
@@ -144,8 +212,8 @@
                         for (int i = 0; i < item.Choices.Count(); i++)
                         {
                             <div class="form-check form-check-inline">
-                                <input class="form-check-input" type="radio" name="AQ_5" data-toggle="AQ_5" value="@j">
-                                <label class="form-check-label" for="AQ_5"><span style="margin-right: 40px;">@item.Choices[i]</span></label>
+                                <input class="form-check-input" type="radio" name="AQ_5" data-toggle="AQ_5" value="@j" id="AQ_5_@i">
+                                <label class="form-check-label" for="AQ_5_@i"><span style="margin-right: 40px;">@item.Choices[i]</span></label>
                             </div>
                             j = j - 2;
                         }
@@ -160,8 +228,8 @@
                         for (int i = 0; i < item.Choices.Count(); i++)
                         {
                             <div class="form-check form-check-inline">
-                                <input class="form-check-input" type="radio" name="AQ_6" data-toggle="AQ_6" value="@j">
-                                <label class="form-check-label" for="AQ_6"><span style="margin-right: 40px;">@item.Choices[i]</span></label>
+                                <input class="form-check-input" type="radio" name="AQ_6" data-toggle="AQ_6" value="@j" id="AQ_6_@i">
+                                <label class="form-check-label" for="AQ_6_@i"><span style="margin-right: 40px;">@item.Choices[i]</span></label>
                             </div>
                             j = j - 2;
                         }
@@ -176,8 +244,8 @@
                         for (int i = 0; i < item.Choices.Count(); i++)
                         {
                             <div class="form-check form-check-inline">
-                                <input class="form-check-input" type="radio" name="AQ_7" data-toggle="AQ_7" value="@j">
-                                <label class="form-check-label" for="AQ_7"><span style="margin-right: 40px;">@item.Choices[i]</span></label>
+                                <input class="form-check-input" type="radio" name="AQ_7" data-toggle="AQ_7" value="@j" id="AQ_7_@i">
+                                <label class="form-check-label" for="AQ_7_@i"><span style="margin-right: 40px;">@item.Choices[i]</span></label>
                             </div>
                             j = j - 2;
                         }
@@ -192,8 +260,8 @@
                         for (int i = 0; i < item.Choices.Count(); i++)
                         {
                             <div class="form-check form-check-inline">
-                                <input class="form-check-input" type="radio" name="AQ_8" data-toggle="AQ_8" value="@j">
-                                <label class="form-check-label" for="AQ_8"><span style="margin-right: 40px;">@item.Choices[i]</span></label>
+                                <input class="form-check-input" type="radio" name="AQ_8" data-toggle="AQ_8" value="@j" id="AQ_8_@i">
+                                <label class="form-check-label" for="AQ_8_@i"><span style="margin-right: 40px;">@item.Choices[i]</span></label>
                             </div>
                             j = j - 2;
                         }
@@ -208,8 +276,8 @@
                         for (int i = 0; i < item.Choices.Count(); i++)
                         {
                             <div class="form-check form-check-inline">
-                                <input class="form-check-input" type="radio" name="AQ_9" data-toggle="AQ_9" value="@j">
-                                <label class="form-check-label" for="AQ_9"><span style="margin-right: 40px;">@item.Choices[i]</span></label>
+                                <input class="form-check-input" type="radio" name="AQ_9" data-toggle="AQ_9" value="@j" id="AQ_9_@i">
+                                <label class="form-check-label" for="AQ_9_@i"><span style="margin-right: 40px;">@item.Choices[i]</span></label>
                             </div>
                             j = j - 2;
                         }
@@ -244,8 +312,8 @@
                             @*<input type="radio" class="form-check-input" name="AQ_1" value="@choice" />@choice*@
 
                             <div class="form-check form-check-inline">
-                                <input class="form-check-input" type="radio" name="AQ_10" data-toggle="AQ_10" value="@j">
-                                <label class="form-check-label" for="AQ_10"><span style="margin-right: 40px;">@item.Choices[i]</span></label>
+                                <input class="form-check-input" type="radio" name="AQ_10" data-toggle="AQ_10" value="@j" id="AQ_10_@i">
+                                <label class="form-check-label" for="AQ_10_@i"><span style="margin-right: 40px;">@item.Choices[i]</span></label>
                             </div>
                             j = j - 2;
                         }
@@ -262,8 +330,8 @@
                             @*<input type="radio" class="form-check-input" name="AQ_1" value="@choice" />@choice*@
 
                             <div class="form-check form-check-inline">
-                                <input class="form-check-input" type="radio" name="AQ_11" data-toggle="AQ_11" value="@j">
-                                <label class="form-check-label" for="AQ_11"><span style="margin-right: 40px;">@item.Choices[i]</span></label>
+                                <input class="form-check-input" type="radio" name="AQ_11" data-toggle="AQ_11" value="@j" id="AQ_11_@i">
+                                <label class="form-check-label" for="AQ_11_@i"><span style="margin-right: 40px;">@item.Choices[i]</span></label>
                             </div>
                             j = j - 2;
                         }
@@ -297,8 +365,8 @@
                             @*<input type="radio" class="form-check-input" name="AQ_1" value="@choice" />@choice*@
 
                             <div class="form-check form-check-inline ml-2">
-                                <input class="form-check-input" type="radio" name="AQ_12" data-toggle="AQ_12" value="@j">
-                                <label class="form-check-label" for="AQ_12"><span style="margin-right: 15px;">@item.Choices[i]</span></label>
+                                <input class="form-check-input" type="radio" name="AQ_12" data-toggle="AQ_12" value="@j" id="AQ_12_@i">
+                                <label class="form-check-label" for="AQ_12_@i"><span style="margin-right: 15px;">@item.Choices[i]</span></label>
                             </div>
                             j = j - 2;
                         }
@@ -316,8 +384,8 @@
                         {
 
                             <div class="form-check form-check-inline  ml-2">
-                                <input class="form-check-input" type="radio" name="AQ_13" data-toggle="AQ_13" value="@j">
-                                <label class="form-check-label" for="AQ_13"><span style="margin-right: 15px;">@item.Choices[i]</span></label>
+                                <input class="form-check-input" type="radio" name="AQ_13" data-toggle="AQ_13" value="@j" id="AQ_13_@i">
+                                <label class="form-check-label" for="AQ_13_@i"><span style="margin-right: 15px;">@item.Choices[i]</span></label>
                             </div>
                             j = j - 2;
                         }
@@ -334,8 +402,8 @@
                         {
 
                             <div class="form-check form-check-inline ml-2">
-                                <input class="form-check-input" type="radio" name="AQ_14" data-toggle="AQ_14" value="@j">
-                                <label class="form-check-label" for="AQ_14"><span style="margin-right: 15px;">@item.Choices[i]</span></label>
+                                <input class="form-check-input" type="radio" name="AQ_14" data-toggle="AQ_14" value="@j" id="AQ_14_@i">
+                                <label class="form-check-label" for="AQ_14_@i"><span style="margin-right: 15px;">@item.Choices[i]</span></label>
                             </div>
                             j = j - 2;
                         }
@@ -352,8 +420,8 @@
                         {
 
                             <div class="form-check form-check-inline ml-2">
-                                <input class="form-check-input" type="radio" name="AQ_15" data-toggle="AQ_15" value="@j">
-                                <label class="form-check-label" for="AQ_15"><span style="margin-right: 15px;">@item.Choices[i]</span></label>
+                                <input class="form-check-input" type="radio" name="AQ_15" data-toggle="AQ_15" value="@j" id="AQ_15_@i">
+                                <label class="form-check-label" for="AQ_15_@i"><span style="margin-right: 15px;">@item.Choices[i]</span></label>
                             </div>
                             j = j - 2;
                         }
@@ -370,8 +438,8 @@
                         {
 
                             <div class="form-check form-check-inline ml-2">
-                                <input class="form-check-input" type="radio" name="AQ_16" data-toggle="AQ_16" value="@j">
-                                <label class="form-check-label" for="AQ_16"><span style="margin-right: 15px;">@item.Choices[i]</span></label>
+                                <input class="form-check-input" type="radio" name="AQ_16" data-toggle="AQ_16" value="@j" id="AQ_16_@i">
+                                <label class="form-check-label" for="AQ_16_@i"><span style="margin-right: 15px;">@item.Choices[i]</span></label>
                             </div>
                             j = j - 2;
                         }
@@ -404,8 +472,8 @@
                         for (int i = 0; i < item.Choices.Count(); i++)
                         {
                             <div class="form-check form-check-inline ml-2">
-                                <input class="form-check-input" type="radio" name="AQ_17" data-toggle="AQ_17" value="@j">
-                                <label class="form-check-label" for="AQ_17"><span style="margin-right: 15px;">@item.Choices[i]</span></label>
+                                <input class="form-check-input" type="radio" name="AQ_17" data-toggle="AQ_17" value="@j" id="AQ_17_@i">
+                                <label class="form-check-label" for="AQ_17_@i"><span style="margin-right: 15px;">@item.Choices[i]</span></label>
                             </div>
                             j = j - 2;
                         }
@@ -421,8 +489,8 @@
                         for (int i = 0; i < item.Choices.Count(); i++)
                         {
                             <div class="form-check form-check-inline ml-2">
-                                <input class="form-check-input" type="radio" name="AQ_18" data-toggle="AQ_18" value="@j">
-                                <label class="form-check-label" for="AQ_18"><span style="margin-right: 15px;">@item.Choices[i]</span></label>
+                                <input class="form-check-input" type="radio" name="AQ_18" data-toggle="AQ_18" value="@j" id="AQ_18_@i">
+                                <label class="form-check-label" for="AQ_18_@i"><span style="margin-right: 15px;">@item.Choices[i]</span></label>
                             </div>
                             j = j - 2;
                         }
@@ -454,8 +522,8 @@
                         for (int i = 0; i < item.Choices.Count(); i++)
                         {
                             <div class="form-check form-check-inline">
-                                <input class="form-check-input" type="radio" name="AQ_19" data-toggle="AQ_19" value="@j">
-                                <label class="form-check-label" for="AQ_19"><span style="margin-right: 30px;">@item.Choices[i]</span></label>
+                                <input class="form-check-input" type="radio" name="AQ_19" data-toggle="AQ_19" value="@j" id="AQ_19_@i">
+                                <label class="form-check-label" for="AQ_19_@i"><span style="margin-right: 30px;">@item.Choices[i]</span></label>
                             </div>
                             j = j - 2;
                         }
@@ -470,8 +538,8 @@
                         for (int i = 0; i < item.Choices.Count(); i++)
                         {
                             <div class="form-check form-check-inline">
-                                <input class="form-check-input" type="radio" name="AQ_20" data-toggle="AQ_20" value="@j">
-                                <label class="form-check-label" for="AQ_20"><span style="margin-right: 20px;">@item.Choices[i]</span></label>
+                                <input class="form-check-input" type="radio" name="AQ_20" data-toggle="AQ_20" value="@j" id="AQ_20_@i">
+                                <label class="form-check-label" for="AQ_20_@i"><span style="margin-right: 20px;">@item.Choices[i]</span></label>
                             </div>
                             j = j - 2;
                         }
@@ -509,7 +577,7 @@
 
 
 
-    <div class="form-group  text-center  col-sm-10 ">
+    <div class="form-group  text-center  col-sm-10 next-btn-wrap">
         <div class="btn-group m-4">
             <button type="button" class="btn btn-primary mx-1" id="btn-next">다음</button>
         </div>

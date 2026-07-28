@@ -1,74 +1,141 @@
-﻿@model BlazorAptit.Models.AptitGroupView
+@model BlazorAptit.Models.AptitGroupView
 
-@{ ViewData["Title"] = "Index"; }
+@{ ViewData["Title"] = "로그인"; }
 
-<div class="container">
-    <form class="form-horizontal" role="form" asp-action="MainLogin">
+<div class="login-page">
+    <div class="login-card">
+        <a href="/Aptit/MainLogin" class="login-logo-link">
+            <img src="~/img/LOGOIMAGE.JPG" alt="옥타그노시스" class="login-logo" />
+        </a>
 
-        @Html.AntiForgeryToken()
-        @Html.ValidationSummary(true)
-       
-        <div class="form-group text-center">
+        <form class="login-form" role="form" asp-action="MainLogin">
+            @Html.AntiForgeryToken()
 
-            <section class="min-vh-100 py-5">
-                <div class="container">
-                    <div class="row justify-content-center mb-md-6">
-                        <div class="form-group">
-                            <a href="/Aptit/Mainlogin">
-                                <img src="~/img/LOGOIMAGE.JPG" height="200" width="250" />
-                            </a>
-                        </div>
-                    </div>
-                   
-                    <div class="row justify-content-center pt-6">
-                        <div class="col-xl-4 col-lg-5 col-md-6">
-                            @*<div class="text-center mb-4">
-                    <h1 class="mb-1">Welcome back</h1>
-                    <span>Enter your account details below</span>
-                </div>*@
-                            <div class="form-group">
-                                <input asp-for="Group_ID" class="form-control" placeholder="회차코드 입력" value="" />
-                                <span asp-validation-for="Group_ID" class="text-danger"></span>
-                            </div>
-                            <div class="form-group">
-                                <input type="password" asp-for="Password" class="form-control" placeholder="비밀번호 입력" value="" />
-                                <span asp-validation-for="Password" class="text-danger"></span>
-                                @*<small>
-                        <a href="#">Forgot your password?</a>
-                    </small>*@
+            <h2 class="login-heading">기관 로그인</h2>
 
-                            </div>
-                            @if (@ViewBag.Message != null)
-                            {
-                                <div class="alert alert-danger" role="alert">
-                                    @ViewBag.Message
-                                </div>
-                            }
-                            <div class="form-group">
-                                <button class="btn-block btn btn-primary" type="submit">로그인</button>
-                            </div>
-                            @*<div class="custom-control custom-checkbox">
-                    <input type="checkbox" class="custom-control-input" id="login-remember">
-                    <label class="custom-control-label text-small text-muted" for="login-remember">Keep me signed in</label>
-                </div>
-                <hr>
-                <div class="text-center text-small text-muted">
-                    <span>
-                        Don't have an account yet? <a href="#">Create one</a>
-                    </span>
-                </div>*@
-                        </div>
-                    </div>
-                    <br /><br /><br />
-                    <div class="row justify-content-center mb-md-6">
-                        <div class="col-auto">
-                            <a href="https://aptitude-x.com/" target="_blank">
-                                <img src="~/img/MAINBOTTOM.JPG" width="400" />
-                            </a>
-                        </div>
-                    </div>
-                </div>
-            </section>
+            @Html.ValidationSummary(true, "", new { @class = "login-alert" })
+            @if (ViewBag.Message != null)
+            {
+                <div class="login-alert">@ViewBag.Message</div>
+            }
+
+            <div class="login-field">
+                <input asp-for="Group_ID" class="form-control" placeholder="회차코드 입력" value="" autocomplete="username" />
+                <span asp-validation-for="Group_ID" class="text-danger"></span>
+            </div>
+            <div class="login-field">
+                <input type="password" asp-for="Password" class="form-control" placeholder="비밀번호 입력" value="" autocomplete="current-password" />
+                <span asp-validation-for="Password" class="text-danger"></span>
+            </div>
+
+            <button class="btn-block btn login-submit" type="submit">로그인</button>
+        </form>
+
+        <div class="login-footer">
+            <a href="https://aptitude-x.com/" target="_blank">
+                <img src="~/img/MAINBOTTOM.JPG" alt="한국진로적성센터" width="260" />
+            </a>
         </div>
-    </form>
+    </div>
 </div>
+
+<style>
+    body {
+        background: #EBEBEB !important;
+    }
+
+    .login-page {
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 24px;
+    }
+
+    .login-card {
+        width: 100%;
+        max-width: 400px;
+        background: #ffffff;
+        border-radius: 14px;
+        box-shadow: 0 8px 28px rgba(0,0,0,0.1);
+        padding: 36px 32px 28px;
+        text-align: center;
+    }
+
+    .login-logo-link {
+        display: inline-block;
+        margin-bottom: 8px;
+    }
+
+    .login-logo {
+        max-width: 200px;
+        height: auto;
+    }
+
+    .login-heading {
+        font-size: 1.3em;
+        font-weight: 800;
+        color: #0D4F8A;
+        margin: 10px 0 22px;
+    }
+
+    .login-alert {
+        display: block;
+        background: rgba(220,53,69,0.1);
+        color: #c0392b;
+        border-radius: 8px;
+        padding: 10px 12px;
+        font-size: 13px;
+        margin-bottom: 16px;
+        text-align: left;
+    }
+
+    .login-alert:empty {
+        display: none;
+    }
+
+    .login-field {
+        margin-bottom: 16px;
+        text-align: left;
+    }
+
+    .login-field .form-control {
+        width: 100%;
+        padding: 10px 12px;
+        font-size: 15px;
+        border: 1px solid #dfe3e8;
+        border-radius: 8px;
+        box-sizing: border-box;
+        transition: border-color 0.15s ease, box-shadow 0.15s ease;
+    }
+
+    .login-field .form-control:focus {
+        outline: none;
+        border-color: #0D4F8A;
+        box-shadow: 0 0 0 3px rgba(13,79,138,0.15);
+    }
+
+    .login-submit {
+        width: 100%;
+        margin-top: 8px;
+        padding: 11px;
+        font-size: 15px;
+        font-weight: 700;
+        background-color: #0D4F8A;
+        border: none;
+        border-radius: 8px;
+        color: #fff;
+        transition: background-color 0.15s ease;
+    }
+
+    .login-submit:hover {
+        background-color: #0a3d6d;
+        color: #fff;
+    }
+
+    .login-footer {
+        margin-top: 26px;
+        padding-top: 18px;
+        border-top: 1px solid #eee;
+    }
+</style>
