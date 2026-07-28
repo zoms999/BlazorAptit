@@ -60,7 +60,12 @@ namespace BlazorAptit.Pages.AptitManage
              오늘검사단체 = await AptitRepository.오늘검사단체(now);
         }
 
-        
+        protected int TotalGroups => aptitGroups?.Count ?? 0;
+        protected int TotalRegCount => aptitGroups?.Sum(g => g.RegCount) ?? 0;
+        protected int TotalCompleteCount => aptitGroups?.Sum(g => g.CompletCount) ?? 0;
+        protected int TodayTestCount => 오늘검사단체?.Count ?? 0;
+
+
     public async Task Complete(Object args)
     {
         // Select the listview items using selectItem method.

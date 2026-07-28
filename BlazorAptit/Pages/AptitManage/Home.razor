@@ -1,4 +1,4 @@
-﻿@page "/AptitManage/Home"
+@page "/AptitManage/Home"
 @inherits AptitManageAuthBase
 @using Syncfusion.Blazor.Layouts
 @using Syncfusion.Blazor.Lists
@@ -7,103 +7,141 @@
 @inject Blazored.SessionStorage.ISessionStorageService sessionStorage
 
 <div class="col-lg-12 control-section">
+
+    <div class="stat-row">
+        <div class="stat-tile">
+            <span class="stat-icon oi oi-people" aria-hidden="true"></span>
+            <div>
+                <div class="stat-value">@TotalGroups</div>
+                <div class="stat-label">@dt.Month.ToString()월 접수단체</div>
+            </div>
+        </div>
+        <div class="stat-tile">
+            <span class="stat-icon oi oi-account-login" aria-hidden="true"></span>
+            <div>
+                <div class="stat-value">@TotalRegCount</div>
+                <div class="stat-label">신청인원 합계</div>
+            </div>
+        </div>
+        <div class="stat-tile">
+            <span class="stat-icon oi oi-task" aria-hidden="true"></span>
+            <div>
+                <div class="stat-value">@TotalCompleteCount</div>
+                <div class="stat-label">진행인원 합계</div>
+            </div>
+        </div>
+        <div class="stat-tile">
+            <span class="stat-icon oi oi-calendar" aria-hidden="true"></span>
+            <div>
+                <div class="stat-value">@TodayTestCount</div>
+                <div class="stat-label">오늘 검사 인원</div>
+            </div>
+        </div>
+    </div>
+
     <div class="control_wrapper">
-        <h4>@dt.Month.ToString()월
-             접수단체리스트 </h4>
+        <h4>@dt.Month.ToString()월 접수단체리스트</h4>
         <SfSplitter Height="300px" Width="100%">
             <SplitterPanes>
                 <SplitterPane Size="15%" Min="25%">
                     <ContentTemplate>
                         <div>
-
-                            <SfListView @ref="ListViewObj" ID="ui-list" DataSource="@aptitGroups" Height="250" CssClass="e-list-template"  >
-                                <ListViewEvents TValue="AptitGroup" Clicked="select"></ListViewEvents>
-                                <ListViewFieldSettings TValue="AptitGroup" Id="Group_ID" Text="Group_Name"></ListViewFieldSettings>
-                                @*<ListViewTemplates TValue="AptitGroup">
-                                        <Template>
-                                            @{
-                                                <div class="e-list-wrapper e-list-avatar">
-                                                    <span class="e-list-">@context.Group_Name</span>
-                                                    <span class="e-list-content">@context.Created</span>
-                                                </div>
-                                            }
-                                        </Template>
-                                    </ListViewTemplates>*@
-                            </SfListView>
+                            @if (aptitGroups == null || aptitGroups.Count == 0)
+                            {
+                                <div class="empty-state">
+                                    <span class="oi oi-inbox" aria-hidden="true"></span>
+                                    <p>이번 달 접수된 단체가 없습니다.</p>
+                                </div>
+                            }
+                            else
+                            {
+                                <SfListView @ref="ListViewObj" ID="ui-list" DataSource="@aptitGroups" Height="250" CssClass="e-list-template">
+                                    <ListViewEvents TValue="AptitGroup" Clicked="select"></ListViewEvents>
+                                    <ListViewFieldSettings TValue="AptitGroup" Id="Group_ID" Text="Group_Name"></ListViewFieldSettings>
+                                </SfListView>
+                            }
                         </div>
                     </ContentTemplate>
-                </SplitterPane>R
+                </SplitterPane>
                 <SplitterPane Size="85%" Min="45%">
                     <ContentTemplate>
                         <div>
-                            @*<div class="profile-name bold">@aptitGroupsSub.Group_Name</div>*@
-                            <div class="details-container">
-                                <div class="detail-row">
-                                    <div class="detail-item">
-                                        <span class="e-bold detail-label">회차코드:</span>
-                                        <span class="detail-value">@aptitGroupsSub.Group_ID</span>
+                            @if (string.IsNullOrEmpty(aptitGroupsSub.Group_Name))
+                            {
+                                <div class="empty-state detail-empty">
+                                    <span class="oi oi-arrow-left" aria-hidden="true"></span>
+                                    <p>왼쪽 목록에서 단체를 선택하면 상세 정보가 표시됩니다.</p>
+                                </div>
+                            }
+                            else
+                            {
+                                <div class="details-container">
+                                    <div class="detail-row">
+                                        <div class="detail-item">
+                                            <span class="detail-label">회차코드</span>
+                                            <span class="detail-value">@aptitGroupsSub.Group_ID</span>
+                                        </div>
+                                        <div class="detail-item">
+                                            <span class="detail-label">단체명</span>
+                                            <span class="detail-value">@aptitGroupsSub.Group_Name</span>
+                                        </div>
+                                        <div class="detail-item">
+                                            <span class="detail-label">검사종류</span>
+                                            <span class="detail-value">@aptitGroupsSub.CheckType</span>
+                                        </div>
                                     </div>
-                                    <div class="detail-item">
-                                        <span class="e-bold detail-label">단체명:</span>
-                                        <span class="detail-value">@aptitGroupsSub.Group_Name</span>
+                                    <div class="detail-row">
+                                        <div class="detail-item">
+                                            <span class="detail-label">담당자</span>
+                                            <span class="detail-value">@aptitGroupsSub.Manage_Name</span>
+                                        </div>
+                                        <div class="detail-item">
+                                            <span class="detail-label">연락처1</span>
+                                            <span class="detail-value">@aptitGroupsSub.Manage_Tel1</span>
+                                        </div>
+                                        <div class="detail-item">
+                                            <span class="detail-label">연락처2</span>
+                                            <span class="detail-value">@aptitGroupsSub.Manage_Tel2</span>
+                                        </div>
                                     </div>
-                                    <div class="detail-item">
-                                        <span class="e-bold detail-label">검사종류:</span>
-                                        <span class="detail-value">@aptitGroupsSub.CheckType</span>
+                                    <div class="detail-row">
+                                        <div class="detail-item highlight">
+                                            <span class="detail-label">신청인원</span>
+                                            <span class="detail-value">@aptitGroupsSub.RegCount</span>
+                                        </div>
+                                        <div class="detail-item highlight">
+                                            <span class="detail-label">진행인원</span>
+                                            <span class="detail-value">@aptitGroupsSub.CompletCount</span>
+                                        </div>
+                                        <div class="detail-item"></div>
+                                    </div>
+                                    <div class="detail-row">
+                                        <div class="detail-item">
+                                            <span class="detail-label">시작일</span>
+                                            <span class="detail-value">@aptitGroupsSub.StartDate</span>
+                                        </div>
+                                        <div class="detail-item">
+                                            <span class="detail-label">종료일</span>
+                                            <span class="detail-value">@aptitGroupsSub.EndDate</span>
+                                        </div>
+                                        <div class="detail-item">
+                                            <span class="detail-label">계약일</span>
+                                            <span class="detail-value">@aptitGroupsSub.Created</span>
+                                        </div>
+                                    </div>
+                                    <div class="detail-row">
+                                        <div class="detail-item">
+                                            <span class="detail-label">입금액</span>
+                                            <span class="detail-value">@aptitGroupsSub.Payment</span>
+                                        </div>
+                                        <div class="detail-item">
+                                            <span class="detail-label">발급회차</span>
+                                            <span class="detail-value">@aptitGroupsSub.PaymentCount</span>
+                                        </div>
+                                        <div class="detail-item"></div>
                                     </div>
                                 </div>
-                                <div class="detail-row">
-                                    <div class="detail-item">
-                                        <span class="e-bold detail-label">담당자:</span>
-                                        <span class="detail-value">@aptitGroupsSub.Manage_Name</span>
-                                    </div>
-                                    <div class="detail-item">
-                                        <span class="e-bold detail-label">연락처1:</span>
-                                        <span class="detail-value">@aptitGroupsSub.Manage_Tel1</span>
-                                    </div>
-                                    <div class="detail-item">
-                                        <span class="e-bold detail-label">연락처2:</span>
-                                        <span class="detail-value">@aptitGroupsSub.Manage_Tel2</span>
-                                    </div>
-                                </div>
-                                <div class="detail-row">
-                                    <div class="detail-item">
-                                        <span class="e-bold detail-label">신청인원:</span>
-                                        <span class="detail-value">@aptitGroupsSub.RegCount</span>
-                                    </div>
-                                    <div class="detail-item">
-                                        <span class="e-bold detail-label">진행인원:</span>
-                                        <span class="detail-value">@aptitGroupsSub.CompletCount</span>
-                                    </div>
-                                    <div class="detail-item"></div>
-                                </div>
-                                <div class="detail-row">
-                                    <div class="detail-item">
-                                        <span class="e-bold detail-label">시작일:</span>
-                                        <span class="detail-value">@aptitGroupsSub.StartDate</span>
-                                    </div>
-                                    <div class="detail-item">
-                                        <span class="e-bold detail-label">종료일:</span>
-                                        <span class="detail-value">@aptitGroupsSub.EndDate</span>
-                                    </div>
-                                    <div class="detail-item">
-                                        <span class="e-bold detail-label">계약일:</span>
-                                        <span class="detail-value">@aptitGroupsSub.Created</span>
-                                    </div>
-                                </div>
-                                <div class="detail-row">
-                                    <div class="detail-item">
-                                        <span class="e-bold detail-label">입금액:</span>
-                                        <span class="detail-value">@aptitGroupsSub.Payment</span>
-                                    </div>
-                                    <div class="detail-item">
-                                        <span class="e-bold detail-label">발급회차:</span>
-                                        <span class="detail-value">@aptitGroupsSub.PaymentCount</span>
-                                    </div>
-                                    <div class="detail-item"></div>
-                                </div>
-                            </div>
-
+                            }
                         </div>
                     </ContentTemplate>
                 </SplitterPane>
@@ -118,71 +156,84 @@
                 <SplitterPane Size="15%" Min="25%">
                     <ContentTemplate>
                         <div>
-
-                            <SfListView @ref="ListViewObj2" ID="ui-list" DataSource="@오늘검사단체" Height="600" CssClass="e-list-template">
-                                <ListViewEvents TValue="AptitUser" Clicked="select"></ListViewEvents>
-                                <ListViewFieldSettings TValue="AptitUser" Id="Group_ID" Text="Group_Name"></ListViewFieldSettings>
-                                <ListViewTemplates TValue="AptitUser">
-                                    <Template>
-                                        @{
-                                            <div class="e-list-wrapper e-list-avatar">
-                                                <span class="e-list-">@context.Group_Name @context.User_Name</span>
-                                            </div>
-                                        }
-                                    </Template>
-                                </ListViewTemplates>
-                            </SfListView>
+                            @if (오늘검사단체 == null || 오늘검사단체.Count == 0)
+                            {
+                                <div class="empty-state">
+                                    <span class="oi oi-inbox" aria-hidden="true"></span>
+                                    <p>이번 달 검사 응시자가 없습니다.</p>
+                                </div>
+                            }
+                            else
+                            {
+                                <SfListView @ref="ListViewObj2" ID="ui-list" DataSource="@오늘검사단체" Height="600" CssClass="e-list-template">
+                                    <ListViewEvents TValue="AptitUser" Clicked="select"></ListViewEvents>
+                                    <ListViewFieldSettings TValue="AptitUser" Id="Group_ID" Text="Group_Name"></ListViewFieldSettings>
+                                    <ListViewTemplates TValue="AptitUser">
+                                        <Template>
+                                            @{
+                                                <div class="e-list-wrapper e-list-avatar">
+                                                    <span class="e-list-">@context.Group_Name @context.User_Name</span>
+                                                </div>
+                                            }
+                                        </Template>
+                                    </ListViewTemplates>
+                                </SfListView>
+                            }
                         </div>
                     </ContentTemplate>
                 </SplitterPane>
                 <SplitterPane Size="85%" Min="45%">
                     <ContentTemplate>
                         <div>
-
-                            @*<div class="profile-name bold">@aptitGroupsSub.Group_Name</div>*@
-                            <div class="details-container">
-                                <div class="detail-row">
-                                    <div class="detail-item">
-                                        <span class="e-bold detail-label">이름:</span>
-                                        <span class="detail-value">@aptitUserSub.User_Name</span>
+                            @if (string.IsNullOrEmpty(aptitUserSub.User_Name))
+                            {
+                                <div class="empty-state detail-empty">
+                                    <span class="oi oi-arrow-left" aria-hidden="true"></span>
+                                    <p>왼쪽 목록에서 응시자를 선택하면 상세 정보가 표시됩니다.</p>
+                                </div>
+                            }
+                            else
+                            {
+                                <div class="details-container">
+                                    <div class="detail-row">
+                                        <div class="detail-item">
+                                            <span class="detail-label">이름</span>
+                                            <span class="detail-value">@aptitUserSub.User_Name</span>
+                                        </div>
+                                        <div class="detail-item">
+                                            <span class="detail-label">이메일</span>
+                                            <span class="detail-value">@aptitUserSub.User_Email</span>
+                                        </div>
                                     </div>
-                                    <div class="detail-item">
-                                        <span class="e-bold detail-label">이메일:</span>
-                                        <span class="detail-value">@aptitUserSub.User_Email</span>
+                                    <div class="detail-row">
+                                        <div class="detail-item">
+                                            <span class="detail-label">나이</span>
+                                            <span class="detail-value">@aptitUserSub.User_Age</span>
+                                        </div>
+                                        <div class="detail-item">
+                                            <span class="detail-label">성별</span>
+                                            <span class="detail-value">@aptitUserSub.User_Gender</span>
+                                        </div>
+                                    </div>
+                                    <div class="detail-row">
+                                        <div class="detail-item">
+                                            <span class="detail-label">학년</span>
+                                            <span class="detail-value">@aptitUserSub.User_Grade</span>
+                                        </div>
+                                        <div class="detail-item">
+                                            <span class="detail-label">전공</span>
+                                            <span class="detail-value">@aptitUserSub.User_Finish</span>
+                                        </div>
+                                    </div>
+                                    <div class="detail-row">
+                                        <div class="detail-item">
+                                            <span class="detail-label">검사일</span>
+                                            <span class="detail-value">@aptitUserSub.Created</span>
+                                        </div>
+                                        <div class="detail-item"></div>
                                     </div>
                                 </div>
-                                <div class="detail-row">
-                                    <div class="detail-item">
-                                        <span class="e-bold detail-label">나이:</span>
-                                        <span class="detail-value">@aptitUserSub.User_Age</span>
-                                    </div>
-                                    <div class="detail-item">
-                                        <span class="e-bold detail-label">성별:</span>
-                                        <span class="detail-value">@aptitUserSub.User_Gender</span>
-                                    </div>
-                                </div>
-                                <div class="detail-row">
-                                    <div class="detail-item">
-                                        <span class="e-bold detail-label">학년:</span>
-                                        <span class="detail-value">@aptitUserSub.User_Grade</span>
-                                    </div>
-                                    <div class="detail-item">
-                                        <span class="e-bold detail-label">전공:</span>
-                                        <span class="detail-value">@aptitUserSub.User_Finish</span>
-                                    </div>
-                                </div>
-                                <div class="detail-row">
-                                    <div class="detail-item">
-                                        <span class="e-bold detail-label">검사일:</span>
-                                        <span class="detail-value">@aptitUserSub.Created</span>
-                                    </div>
-                                    <div class="detail-item">
-                                        <span class="e-bold detail-label">진행상태:</span>
-                                        <span class="detail-value"></span> @* Placeholder for status? *@
-                                    </div>
-                                </div>
-                            </div>
-
+                            }
                         </div>
                     </ContentTemplate>
                 </SplitterPane>
@@ -227,6 +278,82 @@
         left: calc(50% - 1.5em);
         box-shadow: 0 16px 28px -8px rgba(0, 0, 0, .36), 0 4px 15px 0 rgba(0, 0, 0, .12), 0 8px 10px -5px rgba(0, 0, 0, .2);
     }
+
+    /* KPI stat tiles */
+    .stat-row {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 16px;
+        margin: 6px 0 22px;
+    }
+
+    .stat-tile {
+        flex: 1 1 200px;
+        display: flex;
+        align-items: center;
+        gap: 14px;
+        background: #ffffff;
+        border: 1px solid #e2e6ea;
+        border-left: 4px solid #3498db;
+        border-radius: 10px;
+        padding: 16px 18px;
+        box-shadow: 0 2px 6px rgba(0,0,0,0.06);
+    }
+
+    .stat-icon {
+        font-size: 22px;
+        color: #3498db;
+        background: rgba(52,152,219,0.12);
+        border-radius: 8px;
+        width: 42px;
+        height: 42px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+    }
+
+    .stat-value {
+        font-size: 22px;
+        font-weight: 700;
+        color: #2c3e50;
+        line-height: 1.2;
+    }
+
+    .stat-label {
+        font-size: 12px;
+        color: #7f8c9a;
+        margin-top: 2px;
+    }
+
+    /* Empty states */
+    .empty-state {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        height: 100%;
+        min-height: 180px;
+        color: #9aa5b1;
+        text-align: center;
+        padding: 20px;
+    }
+
+    .empty-state .oi {
+        font-size: 26px;
+        margin-bottom: 8px;
+        opacity: 0.6;
+    }
+
+    .empty-state p {
+        font-size: 13px;
+        margin: 0;
+    }
+
+    .detail-empty {
+        min-height: 240px;
+    }
+
     /* ListView template customization */
     #ui-list.e-listview .showUI {
         display: flex;
@@ -237,37 +364,20 @@
     }
 
     #ui-list.e-listview .e-list-item {
-        padding: 3px 0;
+        padding: 8px 10px;
+        border-radius: 6px;
+        margin: 2px 4px;
+        transition: background-color 0.15s ease;
     }
 
-    #ui-list.e-listview .R {
-        background: lightgrey;
+    #ui-list.e-listview .e-list-item:hover {
+        background-color: #eef4fa;
     }
 
-    #ui-list.e-listview .M {
-        background: lightblue;
+    #ui-list.e-listview .e-list-item.e-active {
+        background-color: #3498db;
+        color: #ffffff;
     }
-
-    .highcontrast #ui-list.e-listview .e-list-item.e-active {
-        background: #ffd939;
-        color: #000000;
-    }
-
-    /* Remove table styles as they are no longer used for details */
-    /* table {
-        border-collapse: collapse;
-        border-spacing: 0;
-        width: calc(100% - 20px);
-        margin: 10px;
-    }
-
-        table th,
-        table td {
-            font-weight: normal;
-            padding: 5px;
-            text-align: left;
-            border: 1px solid #ddd
-        } */
 
     .e-bold {
         font-weight: bold;
@@ -279,65 +389,89 @@
         text-align: center;
     }
 
-    /* New styles for detail layout */
+    /* Detail cards */
     .details-container {
-        padding: 25px;
-        font-size: 16px;
-        background-color: #fdfdfd;
-        border: 1px solid #dcdcdc;
-        border-radius: 10px;
-        box-shadow: 0 5px 10px rgba(0,0,0,0.1);
-        transition: box-shadow 0.3s ease, transform 0.3s ease;
+        padding: 20px;
     }
 
     .detail-row {
         display: flex;
-        margin-bottom: 10px;
-        gap: 15px;
+        margin-bottom: 12px;
+        gap: 14px;
         flex-wrap: wrap;
     }
 
     .detail-item {
         flex: 1;
-        min-width: 240px;
-        background-color: #f8f8f8;
-        padding: 12px 18px;
+        min-width: 220px;
+        background-color: #f8fafc;
+        padding: 12px 16px;
         border-radius: 8px;
-        border: 1px solid #ddd;
-        box-shadow: 0 3px 6px rgba(0,0,0,0.05);
-        transition: transform 0.2s ease, box-shadow 0.2s ease;
+        border: 1px solid #e6eaee;
+        transition: transform 0.15s ease, box-shadow 0.15s ease;
     }
 
-    .detail-item:hover {
-        transform: translateY(-3px);
-        box-shadow: 0 6px 12px rgba(0,0,0,0.15);
+    .detail-item:empty {
+        background: transparent;
+        border: none;
+    }
+
+    .detail-item.highlight {
+        background-color: rgba(52,152,219,0.08);
+        border-color: rgba(52,152,219,0.35);
+    }
+
+    .detail-item:not(:empty):hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 10px rgba(0,0,0,0.08);
     }
 
     .detail-label {
-        margin-right: 12px;
-        color: #777;
+        display: block;
+        font-size: 11px;
+        text-transform: uppercase;
+        letter-spacing: 0.04em;
+        color: #8a94a0;
+        margin-bottom: 4px;
     }
 
     .detail-value {
-        font-size: 14px;
-        color: #111;
+        display: block;
+        font-size: 14.5px;
+        font-weight: 600;
+        color: #1e2a35;
     }
 
     h4 {
-        padding: 15px 25px;
-        background-color: #eaeaea;
-        border-bottom: 1px solid #bbb;
+        padding: 14px 20px;
+        background-color: #f4f6f8;
+        border-bottom: 1px solid #e2e6ea;
         margin-bottom: 0;
-        font-size: 1.3em;
+        font-size: 1.1em;
         font-weight: 700;
-        color: #444;
+        color: #2c3e50;
     }
 
     .control_wrapper {
-        border: 1px solid #bbb;
-        margin-bottom: 30px;
-        box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        border: 1px solid #e2e6ea;
+        margin-bottom: 26px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.06);
         border-radius: 10px;
         overflow: hidden;
+    }
+
+    @@media (max-width: 768px) {
+        .stat-row {
+            gap: 10px;
+        }
+
+        .stat-tile {
+            flex: 1 1 45%;
+            padding: 12px;
+        }
+
+        .stat-value {
+            font-size: 18px;
+        }
     }
 </style>
