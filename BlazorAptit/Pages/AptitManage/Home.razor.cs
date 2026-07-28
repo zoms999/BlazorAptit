@@ -12,18 +12,17 @@ using Syncfusion.Blazor.Lists;
 
 namespace BlazorAptit.Pages.AptitManage
 {
-    public partial class Home
+    public partial class Home : AptitManageAuthBase
     {
-        
+        protected override bool RequireManager => true;
+
+
         [Inject]
         public IRepository RepositoryAsync { get; set; }
 
         [Inject]
         public IAptitRepository AptitRepository { get; set; }
 
-
-        [Inject]
-        protected NavigationManager NavigationManager { get; set; }
 
         private SfListView<AptitGroup> ListViewObj;
 
@@ -45,6 +44,9 @@ namespace BlazorAptit.Pages.AptitManage
         public string groupname = "";
          protected  override  async Task OnInitializedAsync()
         {
+            await base.OnInitializedAsync();
+            if (!IsAuthorized) return;
+
             DateTime now =  DateTime.Now;
             aptitGroups = await AptitRepository.GetAllTodayGroupList(now);
 

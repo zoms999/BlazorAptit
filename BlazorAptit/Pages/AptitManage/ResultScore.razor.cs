@@ -11,17 +11,13 @@ using Syncfusion.Blazor.Grids;
 
 namespace BlazorAptit.Pages.AptitManage
 {
-    public partial class ResultScore
+    public partial class ResultScore : AptitManageAuthBase
     {
         [Inject]
         public IRepository RepositoryAsync { get; set; }
 
         [Inject]
         public IAptitRepository AptitRepository { get; set; }
-
-
-        [Inject]
-        protected NavigationManager NavigationManager { get; set; }
 
         protected List<AptitUserQue> aptitUserQue;
 
@@ -31,6 +27,9 @@ namespace BlazorAptit.Pages.AptitManage
 
         protected override async Task OnInitializedAsync()
         {
+            await base.OnInitializedAsync();
+            if (!IsAuthorized) return;
+
             aptitUserQue = await AptitRepository.GetResultScore(AptitUserID);
             ObservableData = new ObservableCollection<AptitUserQue>(aptitUserQue);
 

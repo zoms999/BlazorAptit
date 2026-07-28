@@ -1,4 +1,5 @@
 ﻿@page "/AptitManage/EditTest"
+@inherits AptitManageAuthBase
 @using Syncfusion.Blazor
 @using Syncfusion.Blazor.Grids
 @using Syncfusion.Blazor.Data
@@ -32,9 +33,14 @@
 </div>
 
 @code {
+    protected override bool RequireManager => true;
+
     public List<OrdersDetails> GridData { get; set; }
-    protected override void OnInitialized()
+    protected override async Task OnInitializedAsync()
     {
+        await base.OnInitializedAsync();
+        if (!IsAuthorized) return;
+
         GridData = OrdersDetails.GetAllRecords();
     }
 

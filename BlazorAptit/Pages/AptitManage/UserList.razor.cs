@@ -13,25 +13,26 @@ using Syncfusion.Blazor.Grids;
 namespace BlazorAptit.Pages.AptitManage
 {
 
-    public partial class UserList
+    public partial class UserList : AptitManageAuthBase
     {
+        protected override bool RequireManager => true;
+
         [Inject]
         public IRepository RepositoryAsync { get; set; }
 
         [Inject]
         public IAptitRepository AptitRepository { get; set; }
 
-
-        [Inject]
-        protected NavigationManager NavigationManager { get; set; }
-
         protected List<AptitUser> aptitUsers;
 
         public ObservableCollection<AptitUser> ObservableData { get; set; }
-        
+
 
         protected  override  async Task OnInitializedAsync()
         {
+            await base.OnInitializedAsync();
+            if (!IsAuthorized) return;
+
             aptitUsers = await AptitRepository.GetAllUserList();
             ObservableData = new ObservableCollection<AptitUser>(aptitUsers);
 

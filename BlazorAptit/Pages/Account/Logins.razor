@@ -7,6 +7,7 @@
 @using System.Net.Http.Json;
 @inject IAccountService AccountService
 @inject IAlertService AlertService
+@inject AptitManageAuthState AuthState
 
 @inject Blazored.SessionStorage.ISessionStorageService sessionStorage
 @inject NavigationManager NavigationManager
@@ -69,14 +70,16 @@
             if (result != null)
             {
                 await sessionStorage.SetItemAsync("USERID", model.Username);
+                AuthState.IsAuthenticated = true;
                 if (model.Username.ToLower() == "admin" )
                 {
-                    
+                    AuthState.IsManager = true;
                     await sessionStorage.SetItemAsync("USERROLE", "manager");
                     NavigationManager.NavigateTo($"/AptitManage/GroupList");
                 }
                 else
                 {
+                    AuthState.IsManager = false;
                     await sessionStorage.SetItemAsync("USERROLE", "user");
                     NavigationManager.NavigateTo($"/AptitManage/ResultByGroup");
                 }

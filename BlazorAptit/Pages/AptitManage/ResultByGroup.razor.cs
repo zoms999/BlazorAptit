@@ -17,7 +17,7 @@ using System.Threading.Tasks;
 
 namespace BlazorAptit.Pages.AptitManage
 {
-    public partial class ResultByGroup
+    public partial class ResultByGroup : AptitManageAuthBase
     {
 
         SfGrid<AptitResultUserView> SubGrid;
@@ -27,9 +27,6 @@ namespace BlazorAptit.Pages.AptitManage
 
         [Inject]
         public IAptitRepository AptitRepository { get; set; }
-
-        [Inject]
-        protected NavigationManager NavigationManager { get; set; }
 
         [Inject]
         Microsoft.AspNetCore.Hosting.IWebHostEnvironment hostingEnvironment { get; set; }
@@ -80,6 +77,9 @@ namespace BlazorAptit.Pages.AptitManage
 
         protected override async Task OnInitializedAsync()
         {
+            await base.OnInitializedAsync();
+            if (!IsAuthorized) return;
+
             ////var UserID = await sessionStorage.GetItemAsync<string>("USERID");
             //Users = await AptitRepository.GetGroupByID(UserID);
             //GridData = this.Users;

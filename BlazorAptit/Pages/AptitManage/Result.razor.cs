@@ -17,8 +17,9 @@ using System.Threading.Tasks;
 
 namespace BlazorAptit.Pages.AptitManage
 {
-    public partial class Result
+    public partial class Result : AptitManageAuthBase
     {
+        protected override bool RequireManager => true;
 
         SfGrid<AptitResultUserView> SubGrid;
 
@@ -27,9 +28,6 @@ namespace BlazorAptit.Pages.AptitManage
 
         [Inject]
         public IAptitRepository AptitRepository { get; set; }
-
-        [Inject]
-        protected NavigationManager NavigationManager { get; set; }
 
          [Inject]
         Microsoft.AspNetCore.Hosting.IWebHostEnvironment hostingEnvironment { get; set; }
@@ -80,6 +78,9 @@ namespace BlazorAptit.Pages.AptitManage
 
         protected override async Task OnInitializedAsync()
         {
+            await base.OnInitializedAsync();
+            if (!IsAuthorized) return;
+
             resutl = await AptitRepository.GetAllAptitUsers();
             //ObservableData = new ObservableCollection<AptitUser>(aptitUsers);
 

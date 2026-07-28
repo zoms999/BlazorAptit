@@ -81,6 +81,7 @@ namespace BlazorAptit
             services.AddSingleton<AptitService>();
             services.AddScoped<IRepository, Repository>();
             services.AddScoped<StatisticsService>();
+            services.AddScoped<AptitManageAuthState>();
 
             services.AddBlazoredSessionStorage();
 

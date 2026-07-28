@@ -1,13 +1,13 @@
 @page "/AptitManage/ChartStats/GenderByGroup"
 @layout MainLayoutByGroup
 @namespace BlazorAptit.Pages.AptitManage.ChartStats
+@inherits BlazorAptit.Pages.AptitManage.AptitManageAuthBase
 @using BlazorAptit.Models
 @using BlazorAptit.Models.Dapper
 @using BlazorAptit.Services
 
 @using System.Collections.ObjectModel
 @inject StatisticsService StatisticsService
-@inject NavigationManager NavigationManager
 @inject IJSRuntime JSRuntime
 @inject Blazored.SessionStorage.ISessionStorageService sessionStorage
 @inject IAptitRepository AptitRepository
@@ -405,6 +405,9 @@
 
     protected override async Task OnInitializedAsync()
     {
+        await base.OnInitializedAsync();
+        if (!IsAuthorized) return;
+
         await CheckUserSession();
     }
 

@@ -1,4 +1,5 @@
 ﻿@page "/AptitManage/TendencyChart"
+@inherits AptitManageAuthBase
 @using Syncfusion.Blazor.Charts
 @using Syncfusion.Blazor.Buttons
 @using PointRender
@@ -7,7 +8,6 @@
 @using Syncfusion.Blazor.Layouts
 @using Syncfusion.Blazor.Navigations
 @using System.Dynamic
-@inject NavigationManager NavigationManager
 @inject BlazorAptit.Models.Dapper.IAptitRepository AptitRepository
 
 
@@ -106,8 +106,13 @@
     string CurrentUri;
     private Syncfusion.Blazor.Theme Theme { get; set; }
 
+    protected override bool RequireManager => true;
+
     protected override async Task OnInitializedAsync()
     {
+        await base.OnInitializedAsync();
+        if (!IsAuthorized) return;
+
         CurrentUri = NavigationManager.Uri;
         Theme = Syncfusion.Blazor.Theme.Bootstrap4;
         aptitRankViews = await AptitRepository.성향유형전체통계(1);

@@ -1,4 +1,5 @@
 ﻿@page "/AptitManage/Chart2"
+@inherits AptitManageAuthBase
 @using Syncfusion.Blazor.Charts
 @using Syncfusion.Blazor.Buttons
 @using System.Dynamic
@@ -7,7 +8,6 @@
 @using Syncfusion.Blazor.Layouts
 @using Syncfusion.Blazor.Navigations
 @using PointRender
-@inject NavigationManager NavigationManager
 @inject BlazorAptit.Models.Dapper.IAptitRepository AptitRepository
 @inject Blazored.SessionStorage.ISessionStorageService sessionStorage
 @implements IDisposable
@@ -123,8 +123,13 @@ else
     public List<ExpandoObject> MedalDetails { get; set; } = new List<ExpandoObject>();
     string CurrentUri;
     private Syncfusion.Blazor.Theme Theme { get; set; }
+    protected override bool RequireManager => true;
+
     protected override async Task OnInitializedAsync()
     {
+        await base.OnInitializedAsync();
+        if (!IsAuthorized) return;
+
         try
         {
             CurrentUri = NavigationManager.Uri;

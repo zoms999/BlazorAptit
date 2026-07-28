@@ -12,25 +12,26 @@ using BlazorAptit.Models.Dapper;
 
 namespace BlazorAptit.Pages.AptitManage
 {
-   public partial class GroupList
+   public partial class GroupList : AptitManageAuthBase
     {
+        protected override bool RequireManager => true;
+
         [Inject]
         public IRepository RepositoryAsync { get; set; }
 
         [Inject]
         public IAptitRepository AptitRepository { get; set; }
 
-
-        [Inject]
-        protected NavigationManager NavigationManager { get; set; }
-
         protected List<AptitGroup> aptitGroups;
 
         public ObservableCollection<AptitGroup> ObservableData { get; set; }
-        
+
 
         protected  override  async Task OnInitializedAsync()
         {
+            await base.OnInitializedAsync();
+            if (!IsAuthorized) return;
+
             aptitGroups = await AptitRepository.GetAllGroupList();
             ObservableData = new ObservableCollection<AptitGroup>(aptitGroups);
 

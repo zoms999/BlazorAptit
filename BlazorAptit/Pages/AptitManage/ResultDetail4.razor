@@ -1,4 +1,5 @@
 ﻿@page "/AptitManage/ResultDetail4/{AptitUserID:int}/{AptitAnswerID:int}"
+@inherits AptitManageAuthBase
 
 @using Syncfusion.Blazor.Buttons
 @using Syncfusion.Blazor.Cards
@@ -444,7 +445,6 @@
     [Parameter]
     public int AptitAnswerID { get; set; }
 
-    [Inject] public NavigationManager NavigationManager { get; set; }
     [Inject] public IJSRuntime JsRuntime { get; set; }
     public string SearchValue { get; set; }
     public string SortingValue { get; set; }

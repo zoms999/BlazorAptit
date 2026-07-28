@@ -1,10 +1,10 @@
 @page "/AptitManage/ChartStats/Gender"
 @namespace BlazorAptit.Pages.AptitManage.ChartStats
+@inherits BlazorAptit.Pages.AptitManage.AptitManageAuthBase
 @using BlazorAptit.Models
 @using BlazorAptit.Services
 
 @inject StatisticsService StatisticsService
-@inject NavigationManager NavigationManager
 @inject IJSRuntime JSRuntime
 @implements IDisposable
 
@@ -443,8 +443,13 @@
         }
     }
 
+    protected override bool RequireManager => true;
+
     protected override async Task OnInitializedAsync()
     {
+        await base.OnInitializedAsync();
+        if (!IsAuthorized) return;
+
         // 드롭다운리스트 데이터 로드
         await LoadGroups();
         

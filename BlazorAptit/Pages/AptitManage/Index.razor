@@ -1,4 +1,5 @@
 ﻿@page "/AptitManage/Index"
+@inherits AptitManageAuthBase
 @using Syncfusion.Blazor.Grids
 @using Syncfusion.Blazor.Data
 @using Syncfusion.Blazor.Buttons
@@ -331,8 +332,13 @@
     }
 
 
+    protected override bool RequireManager => true;
+
     protected async override Task OnInitializedAsync()
     {
+        await base.OnInitializedAsync();
+        if (!IsAuthorized) return;
+
         //GridData = this.Orders;
         resutl = await AptitRepository.GetAllAptitQuestionsAsyns();
         await Task.Delay(500);

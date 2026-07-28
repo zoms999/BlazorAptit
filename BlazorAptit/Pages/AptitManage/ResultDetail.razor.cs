@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace BlazorAptit.Pages.AptitManage
 {
-    public partial class ResultDetail
+    public partial class ResultDetail : AptitManageAuthBase
     {
          [Inject]
         public IRepository RepositoryAsync { get; set; }
@@ -21,6 +21,9 @@ namespace BlazorAptit.Pages.AptitManage
 
         protected  override  async Task OnInitializedAsync()
         {
+            await base.OnInitializedAsync();
+            if (!IsAuthorized) return;
+
             AptitResults = await AptitRepository.GetUsersResult(AptitAnswerID);
 
         }
