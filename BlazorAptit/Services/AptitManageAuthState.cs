@@ -7,5 +7,11 @@ namespace BlazorAptit.Services
     {
         public bool IsAuthenticated { get; set; }
         public bool IsManager { get; set; }
+
+        // The Group_ID the user actually authenticated with. Group-scoped pages must
+        // filter using this (server-held, per-circuit) value instead of the client-side
+        // sessionStorage "USERID", which a user can freely rewrite via devtools to view
+        // another organization's results.
+        public string GroupId { get; set; }
     }
 }

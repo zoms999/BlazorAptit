@@ -41,11 +41,5 @@ namespace BlazorAptit.Data
             return stringContent;
         }
 
-        public async Task<HttpResponseMessage> EditAsync(string id, Order value)
-        {
-            var client = new HttpClient();
-            return await client.PutAsync($"{baseUrl}api/Aptits/{id}", getStringContentFromObject(value));
-        }
-
     }
 }

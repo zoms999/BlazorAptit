@@ -169,8 +169,7 @@
 
     async Task GetNameFromSessionStorage()
     {
-        var UserID = await sessionStorage.GetItemAsync<string>("USERID");
-        Users = await AptitRepository.GetGroupByID(UserID);
+        Users = await AptitRepository.GetGroupByID(AuthState.GroupId);
         GridData = this.Users;
 
         ObservableData = new ObservableCollection<AptitResultUserView>(Users);

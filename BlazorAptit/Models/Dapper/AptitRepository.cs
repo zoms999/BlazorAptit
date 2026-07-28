@@ -267,10 +267,8 @@ namespace BlazorAptit.Models.Dapper
 
         public async Task<string> GetPwd(string email)
         {
-            string sql = "Select User_Password From [AptitUser] WHERE [User_Email] = '" + email + "' ";
-            //var pwd = db.QueryAsync<string>(sql).Result;
-
-            return db.QueryAsync<string>(sql).Result.FirstOrDefault();
+            string sql = "Select User_Password From [AptitUser] WHERE [User_Email] = @Email";
+            return db.QueryAsync<string>(sql, new { Email = email }).Result.FirstOrDefault();
         }
 
 
@@ -283,10 +281,16 @@ namespace BlazorAptit.Models.Dapper
             return Task.FromResult(true);
         }
 
+        public async Task<string> GetGroupIdByUserId(int aptitUserId)
+        {
+            string sql = "Select Group_ID From [AptitUser] WHERE [ID] = @AptitUserId";
+            return db.QueryAsync<string>(sql, new { AptitUserId = aptitUserId }).Result.FirstOrDefault();
+        }
+
         public async Task<string> GetGroupMemberLoginCheck(string userid, string userpw)
         {
-            string sql = "Select * From AptitGroup WHERE [Group_ID] = '" + userid + "' AND  [Password] = '" + userpw + "' ";
-            return db.QueryAsync<string>(sql).Result.FirstOrDefault();
+            string sql = "Select * From AptitGroup WHERE [Group_ID] = @UserId AND [Password] = @UserPw";
+            return db.QueryAsync<string>(sql, new { UserId = userid, UserPw = userpw }).Result.FirstOrDefault();
         }
 
 

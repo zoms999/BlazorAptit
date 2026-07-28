@@ -25,6 +25,16 @@ namespace BlazorAptit.Pages.AptitManage
             await base.OnInitializedAsync();
             if (!IsAuthorized) return;
 
+            if (!AuthState.IsManager)
+            {
+                var ownerGroupId = await AptitRepository.GetGroupIdByUserId(AptitUserID);
+                if (!string.Equals(ownerGroupId?.Trim(), AuthState.GroupId, StringComparison.OrdinalIgnoreCase))
+                {
+                    NavigationManager.NavigateTo("/account");
+                    return;
+                }
+            }
+
             AptitReplys = await AptitRepository.GetUsersReply(AptitUserID);
             
          

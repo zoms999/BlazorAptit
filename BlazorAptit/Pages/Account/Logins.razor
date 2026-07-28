@@ -71,6 +71,7 @@
             {
                 await sessionStorage.SetItemAsync("USERID", model.Username);
                 AuthState.IsAuthenticated = true;
+                AuthState.GroupId = model.Username;
                 if (model.Username.ToLower() == "admin" )
                 {
                     AuthState.IsManager = true;

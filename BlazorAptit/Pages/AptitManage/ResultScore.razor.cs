@@ -30,6 +30,16 @@ namespace BlazorAptit.Pages.AptitManage
             await base.OnInitializedAsync();
             if (!IsAuthorized) return;
 
+            if (!AuthState.IsManager)
+            {
+                var ownerGroupId = await AptitRepository.GetGroupIdByUserId(AptitUserID);
+                if (!string.Equals(ownerGroupId?.Trim(), AuthState.GroupId, StringComparison.OrdinalIgnoreCase))
+                {
+                    NavigationManager.NavigateTo("/account");
+                    return;
+                }
+            }
+
             aptitUserQue = await AptitRepository.GetResultScore(AptitUserID);
             ObservableData = new ObservableCollection<AptitUserQue>(aptitUserQue);
 

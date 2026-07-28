@@ -37,5 +37,7 @@ namespace BlazorAptit.Models.Dapper
 
         Task<bool> SetUserRankInsert(int aptituserid);
 
+        Task<string> GetGroupIdByUserId(int aptitUserId);
+
     }
 }
